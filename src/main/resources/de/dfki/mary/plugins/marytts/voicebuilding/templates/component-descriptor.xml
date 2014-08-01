@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<marytts-install xmlns="http://mary.dfki.de/installer">
+    <voice gender="${voiceGender}" locale="${voiceLocaleXml}" name="${voiceName}" type="${voiceType}" version="${version}">
+        <description>${voiceDescription}</description>
+        <license href="${licenseUrl}"/>
+        <package filename="${componentZip.fileName}" md5sum="${componentZip.fileHash}" size="${componentZip.fileSize}">
+            <location folder="${location1_isFolder}" href="${location1}"/>
+            <location folder="${location2_isFolder}" href="${location2}"/>
+            <location folder="${location3_isFolder}" href="${location3}"/>
+        </package>
+        <depends language="${voiceLocaleXml}" version="${version}"/>
+    </voice>
+</marytts-install>
