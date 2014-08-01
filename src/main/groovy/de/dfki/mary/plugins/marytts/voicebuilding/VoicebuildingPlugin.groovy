@@ -25,12 +25,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
     }
 
     private void addTasks(Project project) {
-        project.task('sayHi') {
-            doLast {
-                println "$project.name says HI!"
-            }
-        }
-
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/Config.java"))
             into project.generatedSrcDir
