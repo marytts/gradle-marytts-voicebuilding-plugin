@@ -45,5 +45,13 @@ class VoicebuildingPlugin implements Plugin<Project> {
             expand project.properties
             rename { "marytts/voice/$project.voiceNameCamelCase/$it" }
         }
+
+        project.processResources.doLast {
+            project.copy {
+                from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/marytts.config.MaryConfig"))
+                into "$destinationDir/META-INF/services"
+                expand project.properties
+            }
+        }
     }
 }
