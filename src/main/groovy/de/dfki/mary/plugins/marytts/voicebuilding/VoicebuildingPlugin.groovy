@@ -7,6 +7,7 @@ import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Copy
 
 class VoicebuildingPlugin implements Plugin<Project> {
+    final templateDir = "/de/dfki/mary/plugins/marytts/voicebuilding/templates"
 
     @Override
     void apply(Project project) {
@@ -26,15 +27,15 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
         project.task('generateSource', type: Copy) {
-            from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/Config.java"))
+            from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
             expand project.properties
             rename { "marytts/voice/$project.voiceNameCamelCase/$it" }
         }
 
         project.task('generateTestSource', type: Copy) {
-            from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/ConfigTest.java"))
-            from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/LoadVoiceIT.java"))
+            from project.file(getClass().getResource("$templateDir/ConfigTest.java"))
+            from project.file(getClass().getResource("$templateDir/LoadVoiceIT.java"))
             into project.generatedTestSrcDir
             expand project.properties
             rename { "marytts/voice/$project.voiceNameCamelCase/$it" }
@@ -43,13 +44,13 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.processResources.doLast {
             // generate voice config
             project.copy {
-                from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/voice${project.voiceType == "hsmm" ? "-hsmm" : ""}.config"))
+                from project.file(getClass().getResource("$templateDir/voice${project.voiceType == "hsmm" ? "-hsmm" : ""}.config"))
                 into "$destinationDir/marytts/voice/$project.voiceNameCamelCase"
                 expand project.properties
             }
             // generate service loader
             project.copy {
-                from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/marytts.config.MaryConfig"))
+                from project.file(getClass().getResource("$templateDir/marytts.config.MaryConfig"))
                 into "$destinationDir/META-INF/services"
                 expand project.properties
             }
