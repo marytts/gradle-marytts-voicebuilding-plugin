@@ -16,8 +16,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.sourceCompatibility = 1.7
 
         project.ext {
-            generatedSrcDir = "$project.buildDir/generated-src"
             voiceNameCamelCase = project.voiceName.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
+            generatedSrcDir = "$project.buildDir/generated-src"
+            generatedTestSrcDir = "$project.buildDir/generated-test-src"
         }
 
         addTasks(project)
@@ -33,6 +34,14 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/Config.java"))
             into project.generatedSrcDir
+            expand project.properties
+            rename { "marytts/voice/$project.voiceNameCamelCase/$it" }
+        }
+
+        project.task('generateTestSource', type: Copy) {
+            from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/ConfigTest.java"))
+            from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/LoadVoiceIT.java"))
+            into project.generatedTestSrcDir
             expand project.properties
             rename { "marytts/voice/$project.voiceNameCamelCase/$it" }
         }
