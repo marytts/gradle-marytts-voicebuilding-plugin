@@ -30,10 +30,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('unpackTemplate', type: Copy) {
+        project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/Config.java"))
             into project.generatedSrcDir
             expand project.properties
+            rename { "marytts/voice/$project.voiceNameCamelCase/$it" }
         }
     }
 }
