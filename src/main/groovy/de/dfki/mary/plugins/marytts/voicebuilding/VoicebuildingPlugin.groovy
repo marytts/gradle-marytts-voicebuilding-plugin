@@ -10,6 +10,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
         project.plugins.apply(MavenPlugin)
+        project.sourceCompatibility = 1.7
         addTasks(project)
     }
 
