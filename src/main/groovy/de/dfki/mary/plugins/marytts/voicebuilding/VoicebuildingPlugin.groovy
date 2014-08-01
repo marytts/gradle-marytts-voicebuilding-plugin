@@ -47,6 +47,13 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.processResources.doLast {
+            // generate voice config
+            project.copy {
+                from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/voice${project.voiceType == "hsmm" ? "-hsmm" : ""}.config"))
+                into "$destinationDir/marytts/voice/$project.voiceNameCamelCase"
+                expand project.properties
+            }
+            // generate service loader
             project.copy {
                 from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/marytts.config.MaryConfig"))
                 into "$destinationDir/META-INF/services"
