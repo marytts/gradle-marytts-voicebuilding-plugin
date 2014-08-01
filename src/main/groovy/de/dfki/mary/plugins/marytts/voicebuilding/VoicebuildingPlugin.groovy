@@ -20,5 +20,14 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 println "$project.name says HI!"
             }
         }
+        project.task('unpackTemplate') {
+            doLast {
+                project.copy {
+                    from project.file(getClass().getResource("/de/dfki/mary/plugins/marytts/voicebuilding/templates/templateTest.txt"))
+                    into project.buildDir
+                    expand project.properties
+                }
+            }
+        }
     }
 }
