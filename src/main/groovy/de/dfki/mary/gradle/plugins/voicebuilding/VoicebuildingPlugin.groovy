@@ -32,6 +32,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             expand project.properties
             rename { "marytts/voice/$project.voiceNameCamelCase/$it" }
         }
+        project.tasks['compileJava'].dependsOn 'generateSource'
 
         project.task('generateTestSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/ConfigTest.java"))
@@ -40,6 +41,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             expand project.properties
             rename { "marytts/voice/$project.voiceNameCamelCase/$it" }
         }
+        project.tasks['compileTestJava'].dependsOn 'generateTestSource'
 
         project.processResources.doLast {
             // generate voice config
