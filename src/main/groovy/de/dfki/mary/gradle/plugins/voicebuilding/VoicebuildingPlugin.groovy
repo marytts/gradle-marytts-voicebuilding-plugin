@@ -1,4 +1,4 @@
-package de.dfki.mary.plugins.marytts.voicebuilding
+package de.dfki.mary.gradle.plugins.voicebuilding
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -7,7 +7,7 @@ import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Copy
 
 class VoicebuildingPlugin implements Plugin<Project> {
-    final templateDir = "/de/dfki/mary/plugins/marytts/voicebuilding/templates"
+    final templateDir = "/de/dfki/mary/gradle/plugins/voicebuilding/templates"
 
     @Override
     void apply(Project project) {
