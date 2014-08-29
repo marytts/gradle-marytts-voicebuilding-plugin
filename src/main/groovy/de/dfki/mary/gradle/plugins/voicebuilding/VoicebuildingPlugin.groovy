@@ -20,6 +20,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
             voiceNameCamelCase = project.voiceName.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
+            voiceRegion = project.hasProperty('voiceRegion') ? voiceRegion : voiceLanguage.toUpperCase()
+            voiceLocale = "${voiceLanguage}_$voiceRegion"
+            voiceLocaleXml = "$voiceLanguage-$voiceRegion"
         }
 
         addTasks(project)
