@@ -5,6 +5,9 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.bundling.Zip
+
+import org.apache.commons.codec.digest.DigestUtils
 
 class VoicebuildingPlugin implements Plugin<Project> {
     final templateDir = "/de/dfki/mary/gradle/plugins/voicebuilding/templates"
@@ -27,6 +30,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             voiceNameCamelCase = project.voiceName.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
+            generatedResourceDir = "$project.buildDir/generated-resources"
             voiceRegion = project.hasProperty('voiceRegion') ? voiceRegion : voiceLanguage.toUpperCase()
             voiceLocale = "${voiceLanguage}_$voiceRegion"
             voiceLocaleXml = "$voiceLanguage-$voiceRegion"
@@ -35,12 +39,12 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.sourceSets {
             main {
                 java {
-                    srcDir project.ext.generatedSrcDir
+                    srcDir project.generatedSrcDir
                 }
             }
             test {
                 java {
-                    srcDir project.ext.generatedTestSrcDir
+                    srcDir project.generatedTestSrcDir
                 }
             }
         }
@@ -74,18 +78,48 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
         project.tasks['compileTestJava'].dependsOn 'generateTestSource'
 
-        project.processResources.doLast {
-            // generate voice config
-            project.copy {
-                from project.file(getClass().getResource("$templateDir/voice${project.voiceType == "hsmm" ? "-hsmm" : ""}.config"))
-                into "$destinationDir/marytts/voice/$project.voiceNameCamelCase"
+        project.task('generateData', type: Copy) {
+            from "data"
+            into project.generatedResourceDir
+        }
+
+        project.processResources {
+            filesMatching('voice.config') {
                 expand project.properties
             }
-            // generate service loader
-            project.copy {
-                from project.file(getClass().getResource("$templateDir/marytts.config.MaryConfig"))
-                into "$destinationDir/META-INF/services"
-                expand project.properties
+            rename {
+                "marytts/voice/$project.voiceNameCamelCase/$it"
+            }
+            exclude 'component-descriptor.xml'
+            if (project.voiceType == "unit selection") {
+                dependsOn 'generateData', 'generateFeatureFiles'
+                ext.jarResourceNames = ['cart.mry',
+                                        'dur.tree',
+                                        'f0.left.tree',
+                                        'f0.mid.tree',
+                                        'f0.right.tree',
+                                        'halfphoneUnitFeatureDefinition_ac.txt',
+                                        'joinCostWeights.txt']
+                from project.fileTree(project.generatedResourceDir) {
+                    include jarResourceNames
+                }
+                rename {
+                    "marytts/voice/$project.voiceNameCamelCase/$it"
+                }
+            }
+            doLast {
+                // generate voice config
+                project.copy {
+                    from project.file(getClass().getResource("$templateDir/voice${project.voiceType == "hsmm" ? "-hsmm" : ""}.config"))
+                    into "$destinationDir/marytts/voice/$project.voiceNameCamelCase"
+                    expand project.properties
+                }
+                // generate service loader
+                project.copy {
+                    from project.file(getClass().getResource("$templateDir/marytts.config.MaryConfig"))
+                    into "$destinationDir/META-INF/services"
+                    expand project.properties
+                }
             }
         }
 
@@ -116,5 +150,40 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
         project.tasks['jar'].dependsOn 'generatePom'
+
+        project.task('legacyComponentZip', type: Zip, dependsOn: 'jar') {
+            from(project.tasks['jar'].outputs.files) {
+                rename {
+                    "lib/$it"
+                }
+            }
+            if (project.voiceType == 'unit selection') {
+                dependsOn 'generateData'
+                from(project.tasks['generateData'].outputs.files) {
+                    rename {
+                        "lib/voices/$project.voiceName/$it"
+                    }
+                    exclude project.tasks['processResources'].jarResourceNames
+                }
+            }
+        }
+
+        project.task('legacyComponentZipInfo', dependsOn: 'legacyComponentZip') << {
+            def zipFile = project.tasks['legacyComponentZip'].outputs.files.singleFile
+            ext.fileName = zipFile.name
+            ext.fileSize = zipFile.size()
+            def fis = new FileInputStream(zipFile)
+            ext.fileHash = DigestUtils.md5Hex(fis)
+        }
+
+        project.task('legacyComponentXml', type: Copy, dependsOn: 'legacyComponentZipInfo') {
+            from project.sourceSets.main.resources
+            include 'component-descriptor.xml'
+            rename {
+                "$project.name-$version-$it"
+            }
+            into project.distsDir
+            expand project.properties
+        }
     }
 }
