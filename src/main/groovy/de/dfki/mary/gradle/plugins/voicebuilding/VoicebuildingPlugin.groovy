@@ -32,6 +32,19 @@ class VoicebuildingPlugin implements Plugin<Project> {
             voiceLocaleXml = "$voiceLanguage-$voiceRegion"
         }
 
+        project.sourceSets {
+            main {
+                java {
+                    srcDir project.ext.generatedSrcDir
+                }
+            }
+            test {
+                java {
+                    srcDir project.ext.generatedTestSrcDir
+                }
+            }
+        }
+
         addTasks(project)
     }
 
