@@ -123,6 +123,26 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
+        if (project.voiceType == 'unit selection') {
+            project.task('packageData', type: Zip, dependsOn: 'generateData') {
+                from project.fileTree(project.generatedResourceDir) {
+                    include 'halfphoneFeatures_ac.mry',
+                            'halfphoneUnits.mry',
+                            'joinCostFeatures.mry',
+                            'timeline_basenames.mry',
+                            'timeline_waveforms.mry'
+                }
+                rename {
+                    "voices/$project.voiceName/$it"
+                }
+                classifier 'data'
+            }
+
+            project.artifacts {
+                archives project.tasks['jar'], project.tasks['packageData']
+            }
+        }
+
         project.task('generatePom') {
             def groupAsPathString = project.group.replace('.', '/')
             def pomDir = project.file("${project.tasks['processResources'].destinationDir}/META-INF/maven/$groupAsPathString/$project.name")
