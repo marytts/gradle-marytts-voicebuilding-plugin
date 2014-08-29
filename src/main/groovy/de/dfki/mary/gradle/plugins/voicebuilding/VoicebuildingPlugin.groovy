@@ -45,6 +45,14 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
+        project.jar {
+            manifest {
+                attributes('Created-By': "${System.properties['java.version']} (${System.properties['java.vendor']})",
+                        'Built-By': System.properties['user.name'],
+                        'Built-With': "gradle-${project.gradle.gradleVersion}, groovy-${GroovySystem.version}")
+            }
+        }
+
         addTasks(project)
     }
 
