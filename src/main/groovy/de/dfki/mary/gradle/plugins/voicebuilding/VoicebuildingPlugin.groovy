@@ -14,6 +14,13 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.plugins.apply(JavaPlugin)
         project.plugins.apply(MavenPlugin)
 
+        project.repositories {
+            jcenter()
+            maven {
+                url project.maryttsRepositoryUrl
+            }
+        }
+
         project.sourceCompatibility = 1.7
 
         project.ext {
