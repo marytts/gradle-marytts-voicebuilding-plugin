@@ -88,5 +88,33 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 expand project.properties
             }
         }
+
+        project.task('generatePom') {
+            def groupAsPathString = project.group.replace('.', '/')
+            def pomDir = project.file("${project.tasks['processResources'].destinationDir}/META-INF/maven/$groupAsPathString/$project.name")
+            def pomFile = project.file("$pomDir/pom.xml")
+            def propFile = project.file("$pomDir/pom.properties")
+            outputs.files project.files(pomFile, propFile)
+            doLast {
+                pomDir.mkdirs()
+                project.pom { pom ->
+                    pom.project {
+                        description project.voiceDescription
+                        licenses {
+                            license {
+                                name project.licenseName
+                                url project.licenseUrl
+                            }
+                        }
+                    }
+                }.writeTo(pomFile)
+                propFile.withWriter { dest ->
+                    dest.println "version=$project.version"
+                    dest.println "groupId=$project.group"
+                    dest.println "artifactId=$project.name"
+                }
+            }
+        }
+        project.tasks['jar'].dependsOn 'generatePom'
     }
 }
