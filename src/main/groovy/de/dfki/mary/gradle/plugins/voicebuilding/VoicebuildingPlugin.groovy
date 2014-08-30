@@ -7,6 +7,8 @@ import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
 
+import marytts.features.FeatureProcessorManager
+
 import org.apache.commons.codec.digest.DigestUtils
 
 class VoicebuildingPlugin implements Plugin<Project> {
@@ -16,13 +18,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(JavaPlugin)
         project.plugins.apply(MavenPlugin)
-
-        project.repositories {
-            jcenter()
-            maven {
-                url project.maryttsRepositoryUrl
-            }
-        }
 
         project.sourceCompatibility = 1.7
 
@@ -34,6 +29,10 @@ class VoicebuildingPlugin implements Plugin<Project> {
             voiceRegion = project.hasProperty('voiceRegion') ? voiceRegion : voiceLanguage.toUpperCase()
             voiceLocale = "${voiceLanguage}_$voiceRegion"
             voiceLocaleXml = "$voiceLanguage-$voiceRegion"
+        }
+
+        if (project.voiceType == 'unit selection') {
+            project.apply from: 'weights.gradle'
         }
 
         project.sourceSets {
@@ -124,6 +123,50 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         if (project.voiceType == 'unit selection') {
+
+            project.task('generateFeatureFiles', dependsOn: 'generateData') {
+                def featureFile = project.file("$project.generatedResourceDir/halfphoneUnitFeatureDefinition_ac.txt")
+                def joinCostFile = project.file("$project.generatedResourceDir/joinCostWeights.txt")
+                outputs.files project.files(featureFile, joinCostFile)
+                doLast {
+                    def fpm
+                    try {
+                        fpm = new FeatureProcessorManager(project.voiceLocale)
+                    } catch (e) {
+                        fpm = new FeatureProcessorManager(project.voiceLanguage)
+                    }
+                    featureFile.withWriter { dest ->
+                        dest.println 'ByteValuedFeatureProcessors'
+                        fpm.listByteValuedFeatureProcessorNames().tokenize().sort { a, b ->
+                            if (a == 'halfphone_unitname') return -1
+                            if (b == 'halfphone_unitname') return 1
+                            a <=> b
+                        }.each { name ->
+                            def weight = project.featureWeights[name] ?: 0
+                            def values = fpm.getFeatureProcessor(name).getValues().join(' ')
+                            dest.println "$weight | $name $values"
+                        }
+                        dest.println 'ShortValuedFeatureProcessors'
+                        fpm.listShortValuedFeatureProcessorNames().tokenize().each { name ->
+                            def weight = project.featureWeights[name] ?: 0
+                            def values = fpm.getFeatureProcessor(name).getValues().join(' ')
+                            dest.println "$weight | $name $values"
+                        }
+                        dest.println 'ContinuousFeatureProcessors'
+                        fpm.listContinuousFeatureProcessorNames().tokenize().each { name ->
+                            def weight = project.featureWeights[name] ?: 0
+                            dest.println "$weight | $name"
+                        }
+                    }
+                    joinCostFile.withWriter { dest ->
+                        (0..13).each { name ->
+                            def weight = project.featureWeights[name] ?: '1.0 linear'
+                            dest.println "${name.toString().padRight(2)} : $weight"
+                        }
+                    }
+                }
+            }
+
             project.task('packageData', type: Zip, dependsOn: 'generateData') {
                 from project.fileTree(project.generatedResourceDir) {
                     include 'halfphoneFeatures_ac.mry',

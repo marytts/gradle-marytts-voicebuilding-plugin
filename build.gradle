@@ -1,6 +1,17 @@
 repositories {
-	jcenter()
+    jcenter()
+    maven {
+        url 'http://oss.jfrog.org/artifactory/libs-release/'
+    }
 }
+
 dependencies {
-	compile "commons-codec:commons-codec:1.9"
+    compile "de.dfki.mary:marytts-common:$maryttsVersion",
+            "de.dfki.mary:marytts-runtime:$maryttsVersion",
+            "de.dfki.mary:marytts-lang-en:$maryttsVersion",
+            "de.dfki.mary:marytts-lang-de:$maryttsVersion",
+            "de.dfki.mary:marytts-lang-te:$maryttsVersion",
+            "de.dfki.mary:marytts-lang-tr:$maryttsVersion",
+            "de.dfki.mary:marytts-lang-ru:$maryttsVersion",
+            "commons-codec:commons-codec:1.9"
 }
