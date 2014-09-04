@@ -22,6 +22,8 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.sourceCompatibility = 1.7
 
         project.ext {
+            maryttsVersion = '5.1'
+            maryttsRepoUrl = 'http://oss.jfrog.org/artifactory/libs-release/'
             voiceNameCamelCase = project.voiceName.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
@@ -31,6 +33,10 @@ class VoicebuildingPlugin implements Plugin<Project> {
             voiceLocaleXml = "$voiceLanguage-$voiceRegion"
         }
 
+        project.repositories.jcenter()
+        project.repositories.maven {
+            url project.maryttsRepoUrl
+        }
         if (project.voiceType == 'unit selection') {
             project.apply from: 'weights.gradle'
         }
