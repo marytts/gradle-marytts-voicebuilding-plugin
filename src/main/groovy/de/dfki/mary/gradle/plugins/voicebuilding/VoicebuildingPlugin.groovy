@@ -81,6 +81,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.afterEvaluate {
+            project.dependencies {
+                compile "de.dfki.mary:marytts-lang-$voice.language:$project.maryttsVersion"
+            }
             if (voice.type == 'unit selection') {
                 project.apply from: 'weights.gradle'
             }
