@@ -24,17 +24,10 @@ class VoicebuildingPluginVoiceExtension {
     def region
     def samplingRate
     def type
+    def wantsToBeDefault
 
     VoicebuildingPluginVoiceExtension(final Project project) {
         this.project = project
-    }
-
-    def getNameCamelCase() {
-        nameCamelCase = nameCamelCase ?: name.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
-    }
-
-    def getRegion() {
-        region = region ?: language.toUpperCase()
     }
 
     def getLocale(glue = '_') {
@@ -43,6 +36,14 @@ class VoicebuildingPluginVoiceExtension {
 
     def getLocaleXml() {
         localeXml = localeXml ?: getLocale('-')
+    }
+
+    def getNameCamelCase() {
+        nameCamelCase = nameCamelCase ?: name.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
+    }
+
+    def getRegion() {
+        region = region ?: language.toUpperCase()
     }
 }
 
@@ -78,8 +79,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.repositories.maven {
             url project.maryttsRepoUrl
         }
-        if (voice.type == 'unit selection') {
-            project.apply from: 'weights.gradle'
+
+        project.afterEvaluate {
+            if (voice.type == 'unit selection') {
+                project.apply from: 'weights.gradle'
+            }
         }
 
         project.sourceSets {
@@ -137,20 +141,22 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 "marytts/voice/$project.voice.nameCamelCase/$it"
             }
             exclude 'component-descriptor.xml'
-            if (project.voice.type == "unit selection") {
-                dependsOn 'generateData', 'generateFeatureFiles'
-                ext.jarResourceNames = ['cart.mry',
-                                        'dur.tree',
-                                        'f0.left.tree',
-                                        'f0.mid.tree',
-                                        'f0.right.tree',
-                                        'halfphoneUnitFeatureDefinition_ac.txt',
-                                        'joinCostWeights.txt']
-                from project.fileTree(project.generatedResourceDir) {
-                    include jarResourceNames
-                }
-                rename {
-                    "marytts/voice/$project.voice.nameCamelCase/$it"
+            project.afterEvaluate {
+                if (project.voice.type == "unit selection") {
+                    dependsOn 'generateData', 'generateFeatureFiles'
+                    ext.jarResourceNames = ['cart.mry',
+                                            'dur.tree',
+                                            'f0.left.tree',
+                                            'f0.mid.tree',
+                                            'f0.right.tree',
+                                            'halfphoneUnitFeatureDefinition_ac.txt',
+                                            'joinCostWeights.txt']
+                    from project.fileTree(project.generatedResourceDir) {
+                        include jarResourceNames
+                    }
+                    rename {
+                        "marytts/voice/$project.voice.nameCamelCase/$it"
+                    }
                 }
             }
             doLast {
@@ -169,67 +175,69 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        if (project.voice.type == 'unit selection') {
+        project.afterEvaluate {
+            if (project.voice.type == 'unit selection') {
 
-            project.task('generateFeatureFiles', dependsOn: 'generateData') {
-                def featureFile = project.file("$project.generatedResourceDir/halfphoneUnitFeatureDefinition_ac.txt")
-                def joinCostFile = project.file("$project.generatedResourceDir/joinCostWeights.txt")
-                outputs.files project.files(featureFile, joinCostFile)
-                doLast {
-                    def fpm
-                    try {
-                        fpm = new FeatureProcessorManager(project.voice.locale)
-                    } catch (e) {
-                        fpm = new FeatureProcessorManager(project.voice.language)
-                    }
-                    featureFile.withWriter { dest ->
-                        dest.println 'ByteValuedFeatureProcessors'
-                        fpm.listByteValuedFeatureProcessorNames().tokenize().sort { a, b ->
-                            if (a == 'halfphone_unitname') return -1
-                            if (b == 'halfphone_unitname') return 1
-                            a <=> b
-                        }.each { name ->
-                            def weight = project.featureWeights[name] ?: 0
-                            def values = fpm.getFeatureProcessor(name).getValues().join(' ')
-                            dest.println "$weight | $name $values"
+                project.task('generateFeatureFiles', dependsOn: 'generateData') {
+                    def featureFile = project.file("$project.generatedResourceDir/halfphoneUnitFeatureDefinition_ac.txt")
+                    def joinCostFile = project.file("$project.generatedResourceDir/joinCostWeights.txt")
+                    outputs.files project.files(featureFile, joinCostFile)
+                    doLast {
+                        def fpm
+                        try {
+                            fpm = new FeatureProcessorManager(project.voice.locale)
+                        } catch (e) {
+                            fpm = new FeatureProcessorManager(project.voice.language)
                         }
-                        dest.println 'ShortValuedFeatureProcessors'
-                        fpm.listShortValuedFeatureProcessorNames().tokenize().each { name ->
-                            def weight = project.featureWeights[name] ?: 0
-                            def values = fpm.getFeatureProcessor(name).getValues().join(' ')
-                            dest.println "$weight | $name $values"
+                        featureFile.withWriter { dest ->
+                            dest.println 'ByteValuedFeatureProcessors'
+                            fpm.listByteValuedFeatureProcessorNames().tokenize().sort { a, b ->
+                                if (a == 'halfphone_unitname') return -1
+                                if (b == 'halfphone_unitname') return 1
+                                a <=> b
+                            }.each { name ->
+                                def weight = project.featureWeights[name] ?: 0
+                                def values = fpm.getFeatureProcessor(name).values.join(' ')
+                                dest.println "$weight | $name $values"
+                            }
+                            dest.println 'ShortValuedFeatureProcessors'
+                            fpm.listShortValuedFeatureProcessorNames().tokenize().each { name ->
+                                def weight = project.featureWeights[name] ?: 0
+                                def values = fpm.getFeatureProcessor(name).values.join(' ')
+                                dest.println "$weight | $name $values"
+                            }
+                            dest.println 'ContinuousFeatureProcessors'
+                            fpm.listContinuousFeatureProcessorNames().tokenize().each { name ->
+                                def weight = project.featureWeights[name] ?: 0
+                                dest.println "$weight | $name"
+                            }
                         }
-                        dest.println 'ContinuousFeatureProcessors'
-                        fpm.listContinuousFeatureProcessorNames().tokenize().each { name ->
-                            def weight = project.featureWeights[name] ?: 0
-                            dest.println "$weight | $name"
-                        }
-                    }
-                    joinCostFile.withWriter { dest ->
-                        (0..13).each { name ->
-                            def weight = project.featureWeights[name] ?: '1.0 linear'
-                            dest.println "${name.toString().padRight(2)} : $weight"
+                        joinCostFile.withWriter { dest ->
+                            (0..13).each { name ->
+                                def weight = project.featureWeights[name] ?: '1.0 linear'
+                                dest.println "${name.toString().padRight(2)} : $weight"
+                            }
                         }
                     }
                 }
-            }
 
-            project.task('packageData', type: Zip, dependsOn: 'generateData') {
-                from project.fileTree(project.generatedResourceDir) {
-                    include 'halfphoneFeatures_ac.mry',
-                            'halfphoneUnits.mry',
-                            'joinCostFeatures.mry',
-                            'timeline_basenames.mry',
-                            'timeline_waveforms.mry'
+                project.task('packageData', type: Zip, dependsOn: 'generateData') {
+                    from project.fileTree(project.generatedResourceDir) {
+                        include 'halfphoneFeatures_ac.mry',
+                                'halfphoneUnits.mry',
+                                'joinCostFeatures.mry',
+                                'timeline_basenames.mry',
+                                'timeline_waveforms.mry'
+                    }
+                    rename {
+                        "voices/$project.voice.name/$it"
+                    }
+                    classifier 'data'
                 }
-                rename {
-                    "voices/$project.voice.name/$it"
-                }
-                classifier 'data'
-            }
 
-            project.artifacts {
-                archives project.tasks['jar'], project.tasks['packageData']
+                project.artifacts {
+                    archives project.tasks['jar'], project.tasks['packageData']
+                }
             }
         }
 
@@ -267,13 +275,15 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     "lib/$it"
                 }
             }
-            if (project.voice.type == 'unit selection') {
-                dependsOn 'generateData'
-                from(project.tasks['generateData'].outputs.files) {
-                    rename {
-                        "lib/voices/$voice.name/$it"
+            project.afterEvaluate {
+                if (project.voice.type == 'unit selection') {
+                    dependsOn 'generateData'
+                    from(project.tasks['generateData'].outputs.files) {
+                        rename {
+                            "lib/voices/$voice.name/$it"
+                        }
+                        exclude project.tasks['processResources'].jarResourceNames
                     }
-                    exclude project.tasks['processResources'].jarResourceNames
                 }
             }
         }
