@@ -1,1 +1,1 @@
-marytts.voice.${voiceNameCamelCase}.Config
+marytts.voice.${project.voice.nameCamelCase}.Config

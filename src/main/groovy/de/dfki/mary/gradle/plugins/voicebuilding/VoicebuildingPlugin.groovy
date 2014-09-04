@@ -11,33 +11,74 @@ import marytts.features.FeatureProcessorManager
 
 import org.apache.commons.codec.digest.DigestUtils
 
+class VoicebuildingPluginVoiceExtension {
+    final Project project
+
+    def description
+    def gender
+    def name
+    def nameCamelCase
+    def language
+    def locale
+    def localeXml
+    def region
+    def samplingRate
+    def type
+
+    VoicebuildingPluginVoiceExtension(final Project project) {
+        this.project = project
+    }
+
+    def getNameCamelCase() {
+        nameCamelCase = nameCamelCase ?: name.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
+    }
+
+    def getRegion() {
+        region = region ?: language.toUpperCase()
+    }
+
+    def getLocale(glue = '_') {
+        locale = locale ?: [language, getRegion()].join(glue)
+    }
+
+    def getLocaleXml() {
+        localeXml = localeXml ?: getLocale('-')
+    }
+}
+
+class VoicebuildinfPluginLicenseExtension {
+    def name
+    def shortName
+    def url
+}
+
 class VoicebuildingPlugin implements Plugin<Project> {
     final templateDir = "/de/dfki/mary/gradle/plugins/voicebuilding/templates"
+    def voice
+    def license
 
     @Override
     void apply(Project project) {
-        project.plugins.apply(JavaPlugin)
-        project.plugins.apply(MavenPlugin)
+        project.plugins.apply JavaPlugin
+        project.plugins.apply MavenPlugin
 
         project.sourceCompatibility = 1.7
 
+        voice = project.extensions.create 'voice', VoicebuildingPluginVoiceExtension, project
+        license = project.extensions.create 'license', VoicebuildinfPluginLicenseExtension
         project.ext {
             maryttsVersion = '5.1'
             maryttsRepoUrl = 'http://oss.jfrog.org/artifactory/libs-release/'
-            voiceNameCamelCase = project.voiceName.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
             generatedResourceDir = "$project.buildDir/generated-resources"
-            voiceRegion = project.hasProperty('voiceRegion') ? voiceRegion : voiceLanguage.toUpperCase()
-            voiceLocale = "${voiceLanguage}_$voiceRegion"
-            voiceLocaleXml = "$voiceLanguage-$voiceRegion"
         }
 
         project.repositories.jcenter()
         project.repositories.maven {
             url project.maryttsRepoUrl
         }
-        if (project.voiceType == 'unit selection') {
+        if (voice.type == 'unit selection') {
             project.apply from: 'weights.gradle'
         }
 
@@ -70,7 +111,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
             expand project.properties
-            rename { "marytts/voice/$project.voiceNameCamelCase/$it" }
+            rename { "marytts/voice/$project.voice.nameCamelCase/$it" }
         }
         project.tasks['compileJava'].dependsOn 'generateSource'
 
@@ -79,7 +120,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             from project.file(getClass().getResource("$templateDir/LoadVoiceIT.java"))
             into project.generatedTestSrcDir
             expand project.properties
-            rename { "marytts/voice/$project.voiceNameCamelCase/$it" }
+            rename { "marytts/voice/$project.voice.nameCamelCase/$it" }
         }
         project.tasks['compileTestJava'].dependsOn 'generateTestSource'
 
@@ -93,10 +134,10 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 expand project.properties
             }
             rename {
-                "marytts/voice/$project.voiceNameCamelCase/$it"
+                "marytts/voice/$project.voice.nameCamelCase/$it"
             }
             exclude 'component-descriptor.xml'
-            if (project.voiceType == "unit selection") {
+            if (project.voice.type == "unit selection") {
                 dependsOn 'generateData', 'generateFeatureFiles'
                 ext.jarResourceNames = ['cart.mry',
                                         'dur.tree',
@@ -109,14 +150,14 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     include jarResourceNames
                 }
                 rename {
-                    "marytts/voice/$project.voiceNameCamelCase/$it"
+                    "marytts/voice/$project.voice.nameCamelCase/$it"
                 }
             }
             doLast {
                 // generate voice config
                 project.copy {
-                    from project.file(getClass().getResource("$templateDir/voice${project.voiceType == "hsmm" ? "-hsmm" : ""}.config"))
-                    into "$destinationDir/marytts/voice/$project.voiceNameCamelCase"
+                    from project.file(getClass().getResource("$templateDir/voice${project.voice.type == "hsmm" ? "-hsmm" : ""}.config"))
+                    into "$destinationDir/marytts/voice/$project.voice.nameCamelCase"
                     expand project.properties
                 }
                 // generate service loader
@@ -128,7 +169,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        if (project.voiceType == 'unit selection') {
+        if (project.voice.type == 'unit selection') {
 
             project.task('generateFeatureFiles', dependsOn: 'generateData') {
                 def featureFile = project.file("$project.generatedResourceDir/halfphoneUnitFeatureDefinition_ac.txt")
@@ -137,9 +178,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 doLast {
                     def fpm
                     try {
-                        fpm = new FeatureProcessorManager(project.voiceLocale)
+                        fpm = new FeatureProcessorManager(project.voice.locale)
                     } catch (e) {
-                        fpm = new FeatureProcessorManager(project.voiceLanguage)
+                        fpm = new FeatureProcessorManager(project.voice.language)
                     }
                     featureFile.withWriter { dest ->
                         dest.println 'ByteValuedFeatureProcessors'
@@ -182,7 +223,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                             'timeline_waveforms.mry'
                 }
                 rename {
-                    "voices/$project.voiceName/$it"
+                    "voices/$project.voice.name/$it"
                 }
                 classifier 'data'
             }
@@ -202,11 +243,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 pomDir.mkdirs()
                 project.pom { pom ->
                     pom.project {
-                        description project.voiceDescription
+                        description voice.description
                         licenses {
                             license {
-                                name project.licenseName
-                                url project.licenseUrl
+                                name project.license.name
+                                url project.license.url
                             }
                         }
                     }
@@ -226,11 +267,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     "lib/$it"
                 }
             }
-            if (project.voiceType == 'unit selection') {
+            if (project.voice.type == 'unit selection') {
                 dependsOn 'generateData'
                 from(project.tasks['generateData'].outputs.files) {
                     rename {
-                        "lib/voices/$project.voiceName/$it"
+                        "lib/voices/$voice.name/$it"
                     }
                     exclude project.tasks['processResources'].jarResourceNames
                 }
