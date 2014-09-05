@@ -139,9 +139,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.processResources {
-            filesMatching('voice.config') {
-                expand project.properties
-            }
             rename {
                 "marytts/voice/$project.voice.nameCamelCase/$it"
             }
@@ -169,6 +166,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 project.copy {
                     from project.file(getClass().getResource("$templateDir/voice${project.voice.type == "hsmm" ? "-hsmm" : ""}.config"))
                     into "$destinationDir/marytts/voice/$project.voice.nameCamelCase"
+                    rename {
+                        "voice.config"
+                    }
                     expand project.properties
                 }
                 // generate service loader
