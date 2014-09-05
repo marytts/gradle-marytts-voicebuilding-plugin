@@ -1,4 +1,4 @@
-package marytts.voice.${voiceNameCamelCase};
+package marytts.voice.${voice.nameCamelCase};
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -55,7 +55,7 @@ public class LoadVoiceIT {
 	@Test
 	public void canProcessToTargetfeatures() throws Exception {
     	MaryInterface mary = new LocalMaryInterface();
-        mary.setLocale(new Locale("${voiceLocale}"));
+        mary.setLocale(new Locale("${voice.locale}"));
 		mary.setOutputType(MaryDataType.TARGETFEATURES.name());
 		String out = mary.generateText("${testText}");
 		assertNotNull(out);
@@ -64,7 +64,7 @@ public class LoadVoiceIT {
 	@Test
 	public void canProcessTokensToTargetfeatures() throws Exception {
     	MaryInterface mary = new LocalMaryInterface();
-        mary.setLocale(new Locale("${voiceLocale}"));
+        mary.setLocale(new Locale("${voice.locale}"));
 		mary.setInputType(MaryDataType.TOKENS.name());
 		mary.setOutputType(MaryDataType.TARGETFEATURES.name());
 		Document doc = getExampleTokens(mary.getLocale());
@@ -75,7 +75,7 @@ public class LoadVoiceIT {
 	@Test
 	public void canProcessTokensToSpeech() throws Exception {
     	MaryInterface mary = new LocalMaryInterface();
-        mary.setLocale(new Locale("${voiceLocale}"));
+        mary.setLocale(new Locale("${voice.locale}"));
 		mary.setInputType(MaryDataType.TOKENS.name());
 		Document doc = getExampleTokens(mary.getLocale());
 		AudioInputStream audio = mary.generateAudio(doc);

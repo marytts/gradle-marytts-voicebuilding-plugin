@@ -1,5 +1,6 @@
 package de.dfki.mary.gradle.plugins.voicebuilding
 
+import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -63,7 +64,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.plugins.apply JavaPlugin
         project.plugins.apply MavenPlugin
 
-        project.sourceCompatibility = 1.7
+        project.sourceCompatibility = JavaVersion.VERSION_1_7
 
         voice = project.extensions.create 'voice', VoicebuildingPluginVoiceExtension, project
         license = project.extensions.create 'license', VoicebuildinfPluginLicenseExtension
@@ -83,6 +84,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$voice.language:$project.maryttsVersion"
+                testCompile "junit:junit:4.11"
             }
             if (voice.type == 'unit selection') {
                 project.apply from: 'weights.gradle'

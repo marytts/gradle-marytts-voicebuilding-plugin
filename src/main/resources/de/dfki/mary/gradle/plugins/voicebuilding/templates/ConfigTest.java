@@ -1,4 +1,4 @@
-package marytts.voice.${voiceNameCamelCase};
+package marytts.voice.${voice.nameCamelCase};
 
 import static org.junit.Assert.*;
 
@@ -13,7 +13,7 @@ import org.junit.Test;
  *
  */
 public class ConfigTest {
-	private static final String voiceName = "${voiceName}";
+	private static final String voiceName = "${voice.name}";
 
 	@Test
 	public void isNotMainConfig() throws MaryConfigurationException {
@@ -26,7 +26,7 @@ public class ConfigTest {
 		MaryConfig m = new Config();
 		assertTrue(m.isVoiceConfig());
 	}
-	
+
 	@Test
 	public void hasRightName() throws MaryConfigurationException {
 		VoiceConfig m = new Config();
@@ -39,7 +39,7 @@ public class ConfigTest {
 		assertNotNull(m);
 		assertEquals(voiceName, m.getName());
 	}
-	
+
 	@Test
 	public void hasVoiceConfigs() throws MaryConfigurationException {
 		assertTrue(MaryConfig.countVoiceConfigs() > 0);
@@ -51,6 +51,5 @@ public class ConfigTest {
 		assertNotNull(vcs);
 		assertTrue(vcs.iterator().hasNext());
 	}
-
 
 }
