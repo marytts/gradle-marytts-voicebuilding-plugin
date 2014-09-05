@@ -291,22 +291,21 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('legacyComponentZipInfo', dependsOn: 'legacyComponentZip') << {
+        project.task('legacyComponentXml', dependsOn: 'legacyComponentZip') << {
             def zipFile = project.tasks['legacyComponentZip'].outputs.files.singleFile
-            ext.fileName = zipFile.name
-            ext.fileSize = zipFile.size()
-            def fis = new FileInputStream(zipFile)
-            ext.fileHash = DigestUtils.md5Hex(fis)
-        }
-
-        project.task('legacyComponentXml', type: Copy, dependsOn: 'legacyComponentZipInfo') {
-            from project.sourceSets.main.resources
-            include 'component-descriptor.xml'
-            rename {
-                "$project.name-$version-$it"
+            project.ext {
+                fileName = zipFile.name
+                fileSize = zipFile.size()
+                fileHash = DigestUtils.md5Hex(new FileInputStream(zipFile))
             }
-            into project.distsDir
-            expand project.properties
+            project.copy {
+                from project.file(getClass().getResource("$templateDir/component-descriptor.xml"))
+                into project.distsDir
+                rename {
+                    "$project.name-$project.version-$it"
+                }
+                expand project.properties
+            }
         }
     }
 }
