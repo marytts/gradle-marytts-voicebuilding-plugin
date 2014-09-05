@@ -22,6 +22,7 @@ class VoicebuildingPluginVoiceExtension {
     def language
     def locale
     def localeXml
+    def maryLocale
     def region
     def samplingRate
     def type
@@ -31,12 +32,16 @@ class VoicebuildingPluginVoiceExtension {
         this.project = project
     }
 
-    def getLocale(glue = '_') {
-        locale = locale ?: [language, getRegion()].join(glue)
+    def getLocale() {
+        locale = locale ?: [language, getRegion()].join('_')
     }
 
     def getLocaleXml() {
-        localeXml = localeXml ?: getLocale('-')
+        localeXml = localeXml ?: [language, getRegion()].join('-')
+    }
+
+    def getMaryLocale() {
+        maryLocale = maryLocale ?: language.equalsIgnoreCase(getRegion()) ? language : getLocale()
     }
 
     def getNameCamelCase() {
