@@ -53,7 +53,7 @@ class VoicebuildingPluginVoiceExtension {
     }
 }
 
-class VoicebuildinfPluginLicenseExtension {
+class VoicebuildingPluginLicenseExtension {
     def name
     def shortName
     def url
@@ -72,7 +72,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.sourceCompatibility = JavaVersion.VERSION_1_7
 
         voice = project.extensions.create 'voice', VoicebuildingPluginVoiceExtension, project
-        license = project.extensions.create 'license', VoicebuildinfPluginLicenseExtension
+        license = project.extensions.create 'license', VoicebuildingPluginLicenseExtension
         project.ext {
             maryttsVersion = '5.1'
             maryttsRepoUrl = 'http://oss.jfrog.org/artifactory/libs-release/'
