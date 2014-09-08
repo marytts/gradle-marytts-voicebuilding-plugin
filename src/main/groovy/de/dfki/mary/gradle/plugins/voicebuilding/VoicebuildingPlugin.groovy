@@ -107,6 +107,12 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     srcDir project.generatedTestSrcDir
                 }
             }
+            data {
+                resources {
+                    srcDir 'data'
+                    output.dir "$project.buildDir/data"
+                }
+            }
         }
 
         project.jar {
@@ -165,6 +171,14 @@ class VoicebuildingPlugin implements Plugin<Project> {
                         "marytts/voice/$project.voice.nameCamelCase/$it"
                     }
                 }
+            }
+        }
+
+        project.task('processData', type: Copy) {
+            from project.sourceSets.data.resources.srcDirs
+            into project.sourceSets.data.output.resourcesDir
+            rename {
+                "lib/voices/$voice.name/$it"
             }
         }
 
