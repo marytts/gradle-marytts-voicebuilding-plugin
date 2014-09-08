@@ -235,6 +235,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.test {
             systemProperty 'mary.base', project.sourceSets.data.output.resourcesDir
+            systemProperty 'log4j.logger.marytts', 'DEBUG,stderr'
         }
 
         project.task('generatePom') {
