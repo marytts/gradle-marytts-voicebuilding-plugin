@@ -176,12 +176,17 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     }
                     expand project.properties
                 }
-                // generate service loader
-                project.copy {
-                    from project.file(getClass().getResource("$templateDir/marytts.config.MaryConfig"))
-                    into "$destinationDir/META-INF/services"
-                    expand project.properties
-                }
+            }
+        }
+
+        project.task('generateServiceLoader') {
+            def serviceLoaderFile = project.file("$project.sourceSets.main.output.resourcesDir/META-INF/services/marytts.config.MaryConfig")
+            outputs.files serviceLoaderFile
+            doFirst {
+                project.file(serviceLoaderFile.parent).mkdirs()
+            }
+            doLast {
+                serviceLoaderFile.text = "marytts.voice.${voice.nameCamelCase}.Config"
             }
         }
 
