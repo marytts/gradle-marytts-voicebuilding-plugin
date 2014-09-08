@@ -166,17 +166,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     }
                 }
             }
-            doLast {
-                // generate voice config
-                project.copy {
-                    from project.file(getClass().getResource("$templateDir/voice${project.voice.type == "hsmm" ? "-hsmm" : ""}.config"))
-                    into "$destinationDir/marytts/voice/$project.voice.nameCamelCase"
-                    rename {
-                        "voice.config"
-                    }
-                    expand project.properties
-                }
-            }
         }
 
         project.task('generateServiceLoader') {
@@ -188,6 +177,15 @@ class VoicebuildingPlugin implements Plugin<Project> {
             doLast {
                 serviceLoaderFile.text = "marytts.voice.${voice.nameCamelCase}.Config"
             }
+        }
+
+        project.task('generateVoiceConfig', type: Copy) {
+            from project.file(getClass().getResource("$templateDir/voice${project.voice.type == "hsmm" ? "-hsmm" : ""}.config"))
+            into project.sourceSets.main.output.resourcesDir
+            rename {
+                "marytts/voice/$project.voice.nameCamelCase/voice.config"
+            }
+            expand project.properties
         }
 
         project.afterEvaluate {
