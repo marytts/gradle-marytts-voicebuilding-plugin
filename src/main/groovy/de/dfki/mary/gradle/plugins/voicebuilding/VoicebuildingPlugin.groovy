@@ -75,10 +75,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
         license = project.extensions.create 'license', VoicebuildingPluginLicenseExtension
         project.ext {
             maryttsVersion = '5.1'
-            maryttsRepoUrl = 'http://oss.jfrog.org/artifactory/libs-release/'
+            maryttsRepoUrl = 'https://oss.jfrog.org/artifactory/libs-release/'
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
-            generatedResourceDir = "$project.buildDir/generated-resources"
         }
 
         project.repositories.jcenter()
@@ -102,15 +101,16 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     srcDir project.generatedSrcDir
                 }
             }
-            test {
-                java {
-                    srcDir project.generatedTestSrcDir
-                }
-            }
             data {
                 resources {
                     output.dir "$project.buildDir/data"
                 }
+            }
+            test {
+                java {
+                    srcDir project.generatedTestSrcDir
+                }
+                compileClasspath += data.output
             }
         }
 
@@ -126,59 +126,32 @@ class VoicebuildingPlugin implements Plugin<Project> {
     }
 
     private void addTasks(Project project) {
+        
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
+            rename {
+                "marytts/voice/$project.voice.nameCamelCase/$it"
+            }
             expand project.properties
-            rename { "marytts/voice/$project.voice.nameCamelCase/$it" }
         }
-        project.tasks['compileJava'].dependsOn 'generateSource'
+
+        project.compileJava {
+            dependsOn 'generateSource'
+        }
 
         project.task('generateTestSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/ConfigTest.java"))
             from project.file(getClass().getResource("$templateDir/LoadVoiceIT.java"))
             into project.generatedTestSrcDir
-            expand project.properties
-            rename { "marytts/voice/$project.voice.nameCamelCase/$it" }
-        }
-        project.tasks['compileTestJava'].dependsOn 'generateTestSource'
-
-        project.task('generateData', type: Copy) {
-            from "data"
-            into project.generatedResourceDir
-        }
-
-        project.processResources {
             rename {
                 "marytts/voice/$project.voice.nameCamelCase/$it"
             }
-            exclude 'component-descriptor.xml'
-            project.afterEvaluate {
-                if (project.voice.type == "unit selection") {
-                    dependsOn 'generateData', 'generateFeatureFiles'
-                    ext.jarResourceNames = ['cart.mry',
-                                            'dur.tree',
-                                            'f0.left.tree',
-                                            'f0.mid.tree',
-                                            'f0.right.tree',
-                                            'halfphoneUnitFeatureDefinition_ac.txt',
-                                            'joinCostWeights.txt']
-                    from project.fileTree(project.generatedResourceDir) {
-                        include jarResourceNames
-                    }
-                    rename {
-                        "marytts/voice/$project.voice.nameCamelCase/$it"
-                    }
-                }
-            }
+            expand project.properties
         }
 
-        project.task('processData', type: Copy) {
-            from project.sourceSets.data.resources.srcDirs
-            into project.sourceSets.data.output.resourcesDir
-            rename {
-                "lib/voices/$voice.name/$it"
-            }
+        project.compileTestJava {
+            dependsOn 'generateTestSource'
         }
 
         project.task('generateServiceLoader') {
@@ -193,7 +166,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('generateVoiceConfig', type: Copy) {
-            from project.file(getClass().getResource("$templateDir/voice${project.voice.type == "hsmm" ? "-hsmm" : ""}.config"))
+            project.afterEvaluate {
+                from project.file(getClass().getResource("$templateDir/voice${project.voice.type == "hsmm" ? "-hsmm" : ""}.config"))
+            }
             into project.sourceSets.main.output.resourcesDir
             rename {
                 "marytts/voice/$project.voice.nameCamelCase/voice.config"
@@ -201,12 +176,27 @@ class VoicebuildingPlugin implements Plugin<Project> {
             expand project.properties
         }
 
+        project.processResources {
+            rename {
+                "marytts/voice/$project.voice.nameCamelCase/$it"
+            }
+            dependsOn 'generateServiceLoader', 'generateVoiceConfig'
+        }
+
+        project.task('processData', type: Copy) {
+            from project.sourceSets.data.resources.srcDirs
+            into project.sourceSets.data.output.resourcesDir
+            rename {
+                "lib/voices/$voice.name/$it"
+            }
+        }
+
         project.afterEvaluate {
             if (project.voice.type == 'unit selection') {
 
-                project.task('generateFeatureFiles', dependsOn: 'generateData') {
-                    def featureFile = project.file("$project.generatedResourceDir/halfphoneUnitFeatureDefinition_ac.txt")
-                    def joinCostFile = project.file("$project.generatedResourceDir/joinCostWeights.txt")
+                project.task('generateFeatureFiles') {
+                    def featureFile = project.file("$project.sourceSets.data.output.resourcesDir/halfphoneUnitFeatureDefinition_ac.txt")
+                    def joinCostFile = project.file("$project.sourceSets.data.output.resourcesDir/joinCostWeights.txt")
                     outputs.files project.files(featureFile, joinCostFile)
                     doLast {
                         def fpm
@@ -246,35 +236,18 @@ class VoicebuildingPlugin implements Plugin<Project> {
                         }
                     }
                 }
-
-                project.task('packageData', type: Zip, dependsOn: 'generateData') {
-                    from project.fileTree(project.generatedResourceDir) {
-                        include 'halfphoneFeatures_ac.mry',
-                                'halfphoneUnits.mry',
-                                'joinCostFeatures.mry',
-                                'timeline_basenames.mry',
-                                'timeline_waveforms.mry'
-                    }
-                    rename {
-                        "voices/$project.voice.name/$it"
-                    }
-                    classifier 'data'
-                }
-
-                project.artifacts {
-                    archives project.tasks['jar'], project.tasks['packageData']
-                }
             }
         }
 
         project.task('generatePom') {
-            def groupAsPathString = project.group.replace('.', '/')
-            def pomDir = project.file("${project.tasks['processResources'].destinationDir}/META-INF/maven/$groupAsPathString/$project.name")
+            def pomDir = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/$project.name")
             def pomFile = project.file("$pomDir/pom.xml")
             def propFile = project.file("$pomDir/pom.properties")
             outputs.files project.files(pomFile, propFile)
-            doLast {
+            doFirst {
                 pomDir.mkdirs()
+            }
+            doLast {
                 project.pom { pom ->
                     pom.project {
                         description voice.description
@@ -293,23 +266,15 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 }
             }
         }
-        project.tasks['jar'].dependsOn 'generatePom'
+
+        project.jar {
+            dependsOn 'generatePom'
+        }
 
         project.task('legacyComponentZip', type: Zip, dependsOn: 'jar') {
             from(project.tasks['jar'].outputs.files) {
                 rename {
                     "lib/$it"
-                }
-            }
-            project.afterEvaluate {
-                if (project.voice.type == 'unit selection') {
-                    dependsOn 'generateData'
-                    from(project.tasks['generateData'].outputs.files) {
-                        rename {
-                            "lib/voices/$voice.name/$it"
-                        }
-                        exclude project.tasks['processResources'].jarResourceNames
-                    }
                 }
             }
         }
