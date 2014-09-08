@@ -91,11 +91,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     srcDir project.generatedSrcDir
                 }
             }
-            data {
-                resources {
-                    output.dir "$project.buildDir/data"
-                }
-            }
+            data
             test {
                 java {
                     srcDir project.generatedTestSrcDir
@@ -174,65 +170,71 @@ class VoicebuildingPlugin implements Plugin<Project> {
             expand project.properties
         }
 
+        project.task('generateFeatureFiles') {
+            def destDir = "$project.sourceSets.main.output.resourcesDir/marytts/voice/$voice.nameCamelCase"
+            def featureFile = project.file("$destDir/halfphoneUnitFeatureDefinition_ac.txt")
+            def joinCostFile = project.file("$destDir/joinCostWeights.txt")
+            outputs.files featureFile, joinCostFile
+            doFirst {
+                project.file(destDir).mkdirs()
+            }
+            doLast {
+                def fpm
+                try {
+                    fpm = new FeatureProcessorManager(project.voice.locale)
+                } catch (e) {
+                    fpm = new FeatureProcessorManager(project.voice.language)
+                }
+                featureFile.withWriter { dest ->
+                    dest.println 'ByteValuedFeatureProcessors'
+                    fpm.listByteValuedFeatureProcessorNames().tokenize().sort { a, b ->
+                        if (a == 'halfphone_unitname') return -1
+                        if (b == 'halfphone_unitname') return 1
+                        a <=> b
+                    }.each { name ->
+                        def weight = project.featureWeights[name] ?: 0
+                        def values = fpm.getFeatureProcessor(name).values.join(' ')
+                        dest.println "$weight | $name $values"
+                    }
+                    dest.println 'ShortValuedFeatureProcessors'
+                    fpm.listShortValuedFeatureProcessorNames().tokenize().each { name ->
+                        def weight = project.featureWeights[name] ?: 0
+                        def values = fpm.getFeatureProcessor(name).values.join(' ')
+                        dest.println "$weight | $name $values"
+                    }
+                    dest.println 'ContinuousFeatureProcessors'
+                    fpm.listContinuousFeatureProcessorNames().tokenize().each { name ->
+                        def weight = project.featureWeights[name] ?: 0
+                        dest.println "$weight | $name"
+                    }
+                }
+                joinCostFile.withWriter { dest ->
+                    (0..13).each { name ->
+                        def weight = project.featureWeights[name] ?: '1.0 linear'
+                        dest.println "${name.toString().padRight(2)} : $weight"
+                    }
+                }
+            }
+        }
+
         project.processResources {
             rename {
                 "marytts/voice/$project.voice.nameCamelCase/$it"
             }
             dependsOn 'generateServiceLoader', 'generateVoiceConfig'
+            if (project.voice.type == 'unit selection') {
+                dependsOn 'generateFeatureFiles'
+            }
         }
 
-        project.task('processData', type: Copy) {
-            from project.sourceSets.data.resources.srcDirs
-            into project.sourceSets.data.output.resourcesDir
+        project.processDataResources {
             rename {
                 "lib/voices/$voice.name/$it"
             }
         }
 
-        if (project.voice.type == 'unit selection') {
-
-            project.task('generateFeatureFiles') {
-                def featureFile = project.file("$project.sourceSets.data.output.resourcesDir/halfphoneUnitFeatureDefinition_ac.txt")
-                def joinCostFile = project.file("$project.sourceSets.data.output.resourcesDir/joinCostWeights.txt")
-                outputs.files project.files(featureFile, joinCostFile)
-                doLast {
-                    def fpm
-                    try {
-                        fpm = new FeatureProcessorManager(project.voice.locale)
-                    } catch (e) {
-                        fpm = new FeatureProcessorManager(project.voice.language)
-                    }
-                    featureFile.withWriter { dest ->
-                        dest.println 'ByteValuedFeatureProcessors'
-                        fpm.listByteValuedFeatureProcessorNames().tokenize().sort { a, b ->
-                            if (a == 'halfphone_unitname') return -1
-                            if (b == 'halfphone_unitname') return 1
-                            a <=> b
-                        }.each { name ->
-                            def weight = project.featureWeights[name] ?: 0
-                            def values = fpm.getFeatureProcessor(name).values.join(' ')
-                            dest.println "$weight | $name $values"
-                        }
-                        dest.println 'ShortValuedFeatureProcessors'
-                        fpm.listShortValuedFeatureProcessorNames().tokenize().each { name ->
-                            def weight = project.featureWeights[name] ?: 0
-                            def values = fpm.getFeatureProcessor(name).values.join(' ')
-                            dest.println "$weight | $name $values"
-                        }
-                        dest.println 'ContinuousFeatureProcessors'
-                        fpm.listContinuousFeatureProcessorNames().tokenize().each { name ->
-                            def weight = project.featureWeights[name] ?: 0
-                            dest.println "$weight | $name"
-                        }
-                    }
-                    joinCostFile.withWriter { dest ->
-                        (0..13).each { name ->
-                            def weight = project.featureWeights[name] ?: '1.0 linear'
-                            dest.println "${name.toString().padRight(2)} : $weight"
-                        }
-                    }
-                }
-            }
+        project.test {
+            systemProperty 'mary.base', project.sourceSets.data.output.resourcesDir
         }
 
         project.task('generatePom') {
