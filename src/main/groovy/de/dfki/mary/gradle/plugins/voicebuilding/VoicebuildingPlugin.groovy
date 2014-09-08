@@ -85,16 +85,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
             url project.maryttsRepoUrl
         }
 
-        project.afterEvaluate {
-            project.dependencies {
-                compile "de.dfki.mary:marytts-lang-$voice.language:$project.maryttsVersion"
-                testCompile "junit:junit:4.11"
-            }
-            if (voice.type == 'unit selection') {
-                project.apply from: 'weights.gradle'
-            }
-        }
-
         project.sourceSets {
             main {
                 java {
@@ -122,11 +112,21 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        addTasks(project)
+        project.afterEvaluate {
+            project.dependencies {
+                compile "de.dfki.mary:marytts-lang-$voice.language:$project.maryttsVersion"
+                testCompile "junit:junit:4.11"
+            }
+            if (voice.type == 'unit selection') {
+                project.apply from: 'weights.gradle'
+            }
+
+            addTasks(project)
+        }
     }
 
     private void addTasks(Project project) {
-        
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
@@ -166,9 +166,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('generateVoiceConfig', type: Copy) {
-            project.afterEvaluate {
-                from project.file(getClass().getResource("$templateDir/voice${project.voice.type == "hsmm" ? "-hsmm" : ""}.config"))
-            }
+            from project.file(getClass().getResource("$templateDir/voice${project.voice.type == "hsmm" ? "-hsmm" : ""}.config"))
             into project.sourceSets.main.output.resourcesDir
             rename {
                 "marytts/voice/$project.voice.nameCamelCase/voice.config"
@@ -191,48 +189,46 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        project.afterEvaluate {
-            if (project.voice.type == 'unit selection') {
+        if (project.voice.type == 'unit selection') {
 
-                project.task('generateFeatureFiles') {
-                    def featureFile = project.file("$project.sourceSets.data.output.resourcesDir/halfphoneUnitFeatureDefinition_ac.txt")
-                    def joinCostFile = project.file("$project.sourceSets.data.output.resourcesDir/joinCostWeights.txt")
-                    outputs.files project.files(featureFile, joinCostFile)
-                    doLast {
-                        def fpm
-                        try {
-                            fpm = new FeatureProcessorManager(project.voice.locale)
-                        } catch (e) {
-                            fpm = new FeatureProcessorManager(project.voice.language)
+            project.task('generateFeatureFiles') {
+                def featureFile = project.file("$project.sourceSets.data.output.resourcesDir/halfphoneUnitFeatureDefinition_ac.txt")
+                def joinCostFile = project.file("$project.sourceSets.data.output.resourcesDir/joinCostWeights.txt")
+                outputs.files project.files(featureFile, joinCostFile)
+                doLast {
+                    def fpm
+                    try {
+                        fpm = new FeatureProcessorManager(project.voice.locale)
+                    } catch (e) {
+                        fpm = new FeatureProcessorManager(project.voice.language)
+                    }
+                    featureFile.withWriter { dest ->
+                        dest.println 'ByteValuedFeatureProcessors'
+                        fpm.listByteValuedFeatureProcessorNames().tokenize().sort { a, b ->
+                            if (a == 'halfphone_unitname') return -1
+                            if (b == 'halfphone_unitname') return 1
+                            a <=> b
+                        }.each { name ->
+                            def weight = project.featureWeights[name] ?: 0
+                            def values = fpm.getFeatureProcessor(name).values.join(' ')
+                            dest.println "$weight | $name $values"
                         }
-                        featureFile.withWriter { dest ->
-                            dest.println 'ByteValuedFeatureProcessors'
-                            fpm.listByteValuedFeatureProcessorNames().tokenize().sort { a, b ->
-                                if (a == 'halfphone_unitname') return -1
-                                if (b == 'halfphone_unitname') return 1
-                                a <=> b
-                            }.each { name ->
-                                def weight = project.featureWeights[name] ?: 0
-                                def values = fpm.getFeatureProcessor(name).values.join(' ')
-                                dest.println "$weight | $name $values"
-                            }
-                            dest.println 'ShortValuedFeatureProcessors'
-                            fpm.listShortValuedFeatureProcessorNames().tokenize().each { name ->
-                                def weight = project.featureWeights[name] ?: 0
-                                def values = fpm.getFeatureProcessor(name).values.join(' ')
-                                dest.println "$weight | $name $values"
-                            }
-                            dest.println 'ContinuousFeatureProcessors'
-                            fpm.listContinuousFeatureProcessorNames().tokenize().each { name ->
-                                def weight = project.featureWeights[name] ?: 0
-                                dest.println "$weight | $name"
-                            }
+                        dest.println 'ShortValuedFeatureProcessors'
+                        fpm.listShortValuedFeatureProcessorNames().tokenize().each { name ->
+                            def weight = project.featureWeights[name] ?: 0
+                            def values = fpm.getFeatureProcessor(name).values.join(' ')
+                            dest.println "$weight | $name $values"
                         }
-                        joinCostFile.withWriter { dest ->
-                            (0..13).each { name ->
-                                def weight = project.featureWeights[name] ?: '1.0 linear'
-                                dest.println "${name.toString().padRight(2)} : $weight"
-                            }
+                        dest.println 'ContinuousFeatureProcessors'
+                        fpm.listContinuousFeatureProcessorNames().tokenize().each { name ->
+                            def weight = project.featureWeights[name] ?: 0
+                            dest.println "$weight | $name"
+                        }
+                    }
+                    joinCostFile.withWriter { dest ->
+                        (0..13).each { name ->
+                            def weight = project.featureWeights[name] ?: '1.0 linear'
+                            dest.println "${name.toString().padRight(2)} : $weight"
                         }
                     }
                 }
