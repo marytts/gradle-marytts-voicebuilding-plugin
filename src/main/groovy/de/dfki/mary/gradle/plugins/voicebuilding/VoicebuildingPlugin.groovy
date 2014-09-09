@@ -8,8 +8,6 @@ import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
 
-import marytts.features.FeatureProcessorManager
-
 import org.apache.commons.codec.digest.DigestUtils
 
 class VoicebuildingPluginVoiceExtension {
@@ -181,9 +179,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
             doLast {
                 def fpm
                 try {
-                    fpm = new FeatureProcessorManager(project.voice.locale)
+                    fpm = Class.forName("marytts.language.${voice.language}.features.FeatureProcessorManager").newInstance()
                 } catch (e) {
-                    fpm = new FeatureProcessorManager(project.voice.language)
+                    logger.warn "Reflection failed: $e"
+                    logger.warn "Instiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
+                    fpm = new marytts.features.FeatureProcessorManager(project.voice.maryLocale)
                 }
                 featureFile.withWriter { dest ->
                     dest.println 'ByteValuedFeatureProcessors'
