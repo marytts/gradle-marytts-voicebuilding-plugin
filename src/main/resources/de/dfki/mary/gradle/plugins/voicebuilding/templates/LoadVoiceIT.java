@@ -12,8 +12,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import marytts.LocalMaryInterface;
 import marytts.MaryInterface;
 import marytts.datatypes.MaryDataType;
-import marytts.htsengine.HMMVoice;
 import marytts.modules.synthesis.Voice;
+import marytts.${voice.type == 'hsmm' ? 'htsengine.HMMVoice' : 'unitselection.UnitSelectionVoice'};
 import marytts.util.MaryRuntimeUtils;
 import marytts.util.dom.DomUtils;
 
@@ -32,7 +32,7 @@ public class LoadVoiceIT {
     @Test
     public void canLoadVoice() throws Exception {
     	Config config = new Config();
-        Voice voice = new HMMVoice(config.getName(), null);
+        Voice voice = new ${voice.type == 'hsmm' ? 'HMM' : 'UnitSelection'}Voice(config.getName(), null);
         assertNotNull(voice);
     }
     
