@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Locale;
 
 import javax.sound.sampled.AudioInputStream;
@@ -18,8 +17,6 @@ import marytts.${voice.type == 'hsmm' ? 'htsengine.HMMVoice' : 'unitselection.Un
 import marytts.util.MaryRuntimeUtils;
 import marytts.util.dom.DomUtils;
 
-import org.apache.commons.io.IOUtils;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -28,13 +25,9 @@ import org.xml.sax.SAXException;
 
 public class LoadVoiceIT {
 
-	public static String exampleText;
-
 	@BeforeClass
 	public static void beforeClass() throws Exception {
 		MaryRuntimeUtils.ensureMaryStarted();
-		InputStream exampleStream = LoadVoiceIT.class.getResourceAsStream("TEXT.${voice.maryLocale}.example");
-		exampleText = IOUtils.toString(exampleStream, "UTF-8");
 	}
 
 	@Test
@@ -56,7 +49,9 @@ public class LoadVoiceIT {
 	public void canProcessTextToSpeech() throws Exception {
 		MaryInterface mary = new LocalMaryInterface();
 		mary.setVoice(new Config().getName());
-		AudioInputStream audio = mary.generateAudio(exampleText);
+		Locale locale = new Locale(${voice.maryLocale.split('_').collect{ "\"$it\"" }.join(', ')});
+		String example = MaryDataType.getExampleText(MaryDataType.TEXT, locale);
+		AudioInputStream audio = mary.generateAudio(example);
 		assertNotNull(audio);
 	}
 
@@ -66,7 +61,8 @@ public class LoadVoiceIT {
 		Locale locale = new Locale(${voice.maryLocale.split('_').collect{ "\"$it\"" }.join(', ')});
 		mary.setLocale(locale);
 		mary.setOutputType(MaryDataType.TARGETFEATURES.name());
-		String out = mary.generateText(exampleText);
+		String example = MaryDataType.getExampleText(MaryDataType.TEXT, locale);
+		String out = mary.generateText(example);
 		assertNotNull(out);
 	}
 
