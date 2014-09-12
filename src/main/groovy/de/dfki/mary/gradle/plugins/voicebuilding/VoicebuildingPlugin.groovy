@@ -21,6 +21,7 @@ class VoicebuildingPluginVoiceExtension {
     def locale
     def localeXml
     def maryLocale
+    def maryLocaleXml
     def region
     def samplingRate
     def type
@@ -40,6 +41,10 @@ class VoicebuildingPluginVoiceExtension {
 
     def getMaryLocale() {
         maryLocale = maryLocale ?: language.equalsIgnoreCase(getRegion()) ? language : getLocale()
+    }
+
+    def getMaryLocaleXml() {
+        maryLocaleXml = maryLocaleXml ?: language.equalsIgnoreCase(getRegion()) ? language : getLocaleXml()
     }
 
     def getNameCamelCase() {

@@ -8,6 +8,6 @@
             <location folder="${location2_isFolder}" href="${location2}"/>
             <location folder="${location3_isFolder}" href="${location3}"/>
         </package>
-        <depends language="${voice.language}" version="${maryttsVersion}"/>
+        <depends language="${voice.maryLocaleXml}" version="${maryttsVersion}"/>
     </voice>
 </marytts-install>
