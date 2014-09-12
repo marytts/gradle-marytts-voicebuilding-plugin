@@ -3,7 +3,7 @@
     <voice gender="${voice.gender}" locale="${voice.maryLocale}" name="${voice.name}" type="${voice.type}" version="${version}">
         <description>${voice.description}</description>
         <license href="${license.url}"/>
-        <package filename="${fileName}" md5sum="${fileHash}" size="${fileSize}">
+        <package filename="${zipFile.name}" md5sum="${zipFileHash}" size="${zipFile.size()}">
             <location folder="${location1_isFolder}" href="${location1}"/>
             <location folder="${location2_isFolder}" href="${location2}"/>
             <location folder="${location3_isFolder}" href="${location3}"/>
