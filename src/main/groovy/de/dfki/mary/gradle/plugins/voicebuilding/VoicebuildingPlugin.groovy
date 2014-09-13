@@ -26,14 +26,13 @@ class VoicebuildingPlugin implements Plugin<Project> {
         license = project.extensions.create 'license', VoicebuildingPluginLicenseExtension
         project.ext {
             maryttsVersion = '5.1'
-            maryttsRepoUrl = 'https://oss.jfrog.org/artifactory/libs-release/'
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
         }
 
         project.repositories.jcenter()
         project.repositories.maven {
-            url project.maryttsRepoUrl
+            url 'https://oss.jfrog.org/artifactory/libs-release/'
         }
 
         project.sourceSets {
@@ -51,12 +50,10 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        project.jar {
-            manifest {
-                attributes('Created-By': "${System.properties['java.version']} (${System.properties['java.vendor']})",
-                        'Built-By': System.properties['user.name'],
-                        'Built-With': "gradle-${project.gradle.gradleVersion}, groovy-${GroovySystem.version}")
-            }
+        project.jar.manifest {
+            attributes('Created-By': "${System.properties['java.version']} (${System.properties['java.vendor']})",
+                    'Built-By': System.properties['user.name'],
+                    'Built-With': "gradle-${project.gradle.gradleVersion}, groovy-${GroovySystem.version}")
         }
 
         project.afterEvaluate {
@@ -83,9 +80,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             expand project.properties
         }
 
-        project.compileJava {
-            dependsOn 'generateSource'
-        }
+        project.compileJava.dependsOn 'generateSource'
 
         project.task('generateTestSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/ConfigTest.java"))
@@ -97,9 +92,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             expand project.properties
         }
 
-        project.compileTestJava {
-            dependsOn 'generateTestSource'
-        }
+        project.compileTestJava.dependsOn 'generateTestSource'
 
         project.task('generateServiceLoader') {
             def serviceLoaderFile = project.file("$project.sourceSets.main.output.resourcesDir/META-INF/services/marytts.config.MaryConfig")
@@ -180,10 +173,8 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        project.processDataResources {
-            rename {
-                "lib/voices/$voice.name/$it"
-            }
+        project.processDataResources.rename {
+            "lib/voices/$voice.name/$it"
         }
 
         project.test {
@@ -220,9 +211,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        project.jar {
-            dependsOn 'generatePom'
-        }
+        project.jar.dependsOn 'generatePom'
 
         project.task('legacyComponentZip', type: Zip, dependsOn: ['jar', 'processDataResources']) {
             from project.sourceSets.data.output.resourcesDir
