@@ -213,9 +213,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.jar.dependsOn 'generatePom'
 
-        project.task('legacyComponentZip', type: Zip, dependsOn: ['jar', 'processDataResources']) {
-            from project.sourceSets.data.output.resourcesDir
-            from project.tasks['jar'].outputs.files, {
+        project.task('legacyComponentZip', type: Zip) {
+            from project.processDataResources
+            from(project.jar) {
                 rename {
                     "lib/$it"
                 }
