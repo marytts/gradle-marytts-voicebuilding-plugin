@@ -8,6 +8,8 @@ import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
 
+import groovy.xml.*
+
 import org.apache.commons.codec.digest.DigestUtils
 
 class VoicebuildingPlugin implements Plugin<Project> {
@@ -222,18 +224,29 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('legacyComponentXml', dependsOn: 'legacyComponentZip') << {
-            project.ext {
-                zipFile = project.tasks['legacyComponentZip'].outputs.files.singleFile
-                zipFileHash = DigestUtils.md5Hex(new FileInputStream(zipFile))
-            }
-            project.copy {
-                from project.file(getClass().getResource("$templateDir/component-descriptor.xml"))
-                into project.distsDir
-                rename {
-                    "$project.name-$project.version-$it"
+        project.task('legacyComponentXml', dependsOn: 'legacyComponentZip') {
+            def zipFile = project.legacyComponentZip.outputs.files.singleFile
+            def xmlFile = project.file("$project.distsDir/$project.name-$project.version-component-descriptor.xml")
+            inputs.files zipFile
+            outputs.files xmlFile
+            doLast {
+                def zipFileHash = DigestUtils.md5Hex(new FileInputStream(zipFile))
+                def builder = new StreamingMarkupBuilder()
+                def xml = builder.bind {
+                    'mary-install'(xmlns: 'http://mary.dfki.de/installer') {
+                        voice(gender: voice.gender, locale: voice.maryLocale, name: voice.name, type: voice.type, version: project.version) {
+                            description voice.description
+                            license(href: license.url)
+                            'package'(filename: zipFile.name, md5sum: zipFileHash, size: zipFile.size()) {
+                                location(folder: project.location1_isFolder, href: project.location1)
+                                location(folder: project.location2_isFolder, href: project.location2)
+                                location(folder: project.location3_isFolder, href: project.location3)
+                            }
+                            depends(language: voice.maryLocaleXml, version: project.maryttsVersion)
+                        }
+                    }
                 }
-                expand project.properties
+                xmlFile.text = XmlUtil.serialize(xml)
             }
         }
     }
