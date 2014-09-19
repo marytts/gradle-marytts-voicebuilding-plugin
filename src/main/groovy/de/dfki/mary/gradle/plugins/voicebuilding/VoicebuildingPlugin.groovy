@@ -69,6 +69,15 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
             addTasks(project)
         }
+
+        project.task('legacyComponentZip', type: Zip) {
+            from project.processDataResources
+            from(project.jar) {
+                rename {
+                    "lib/$it"
+                }
+            }
+        }
     }
 
     private void addTasks(Project project) {
@@ -214,15 +223,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.jar.dependsOn 'generatePom'
-
-        project.task('legacyComponentZip', type: Zip) {
-            from project.processDataResources
-            from(project.jar) {
-                rename {
-                    "lib/$it"
-                }
-            }
-        }
 
         project.task('legacyComponentXml', dependsOn: 'legacyComponentZip') {
             def zipFile = project.legacyComponentZip.outputs.files.singleFile
