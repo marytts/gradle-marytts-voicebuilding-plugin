@@ -246,7 +246,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 def zipFileHash = DigestUtils.md5Hex(new FileInputStream(zipFile))
                 def builder = new StreamingMarkupBuilder()
                 def xml = builder.bind {
-                    'mary-install'(xmlns: 'http://mary.dfki.de/installer') {
+                    'marytts-install'(xmlns: 'http://mary.dfki.de/installer') {
                         voice(gender: voice.gender, locale: voice.maryLocale, name: voice.name, type: voice.type, version: project.version) {
                             description voice.description
                             license(href: license.url)
