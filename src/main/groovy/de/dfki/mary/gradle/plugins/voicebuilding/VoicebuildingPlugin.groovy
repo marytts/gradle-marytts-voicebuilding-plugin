@@ -66,9 +66,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 compile "de.dfki.mary:marytts-lang-$voice.language:$project.maryttsVersion"
                 testCompile "junit:junit:4.11"
             }
-            if (voice.type == 'unit selection') {
-                project.apply from: 'weights.gradle'
-            }
 
             addTasks(project)
         }
@@ -147,42 +144,47 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 project.file(destDir).mkdirs()
             }
             doLast {
-                def fpm
                 try {
-                    fpm = Class.forName("marytts.language.${voice.language}.features.FeatureProcessorManager").newInstance()
+                    project.apply from: 'weights.gradle'
+                    def fpm
+                    try {
+                        fpm = Class.forName("marytts.language.${voice.language}.features.FeatureProcessorManager").newInstance()
+                    } catch (e) {
+                        logger.info "Reflection failed: $e"
+                        logger.info "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
+                        fpm = new marytts.features.FeatureProcessorManager(project.voice.maryLocale)
+                    }
+                    featureFile.withWriter { dest ->
+                        dest.println 'ByteValuedFeatureProcessors'
+                        fpm.listByteValuedFeatureProcessorNames().tokenize().sort { a, b ->
+                            if (a == 'halfphone_unitname') return -1
+                            if (b == 'halfphone_unitname') return 1
+                            a <=> b
+                        }.each { name ->
+                            def weight = project.featureWeights[name] ?: 0
+                            def values = fpm.getFeatureProcessor(name).values.join(' ')
+                            dest.println "$weight | $name $values"
+                        }
+                        dest.println 'ShortValuedFeatureProcessors'
+                        fpm.listShortValuedFeatureProcessorNames().tokenize().each { name ->
+                            def weight = project.featureWeights[name] ?: 0
+                            def values = fpm.getFeatureProcessor(name).values.join(' ')
+                            dest.println "$weight | $name $values"
+                        }
+                        dest.println 'ContinuousFeatureProcessors'
+                        fpm.listContinuousFeatureProcessorNames().tokenize().each { name ->
+                            def weight = project.featureWeights[name] ?: 0
+                            dest.println "$weight | $name"
+                        }
+                    }
+                    joinCostFile.withWriter { dest ->
+                        (0..13).each { name ->
+                            def weight = project.featureWeights[name] ?: '1.0 linear'
+                            dest.println "${name.toString().padRight(2)} : $weight"
+                        }
+                    }
                 } catch (e) {
-                    logger.info "Reflection failed: $e"
-                    logger.info "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
-                    fpm = new marytts.features.FeatureProcessorManager(project.voice.maryLocale)
-                }
-                featureFile.withWriter { dest ->
-                    dest.println 'ByteValuedFeatureProcessors'
-                    fpm.listByteValuedFeatureProcessorNames().tokenize().sort { a, b ->
-                        if (a == 'halfphone_unitname') return -1
-                        if (b == 'halfphone_unitname') return 1
-                        a <=> b
-                    }.each { name ->
-                        def weight = project.featureWeights[name] ?: 0
-                        def values = fpm.getFeatureProcessor(name).values.join(' ')
-                        dest.println "$weight | $name $values"
-                    }
-                    dest.println 'ShortValuedFeatureProcessors'
-                    fpm.listShortValuedFeatureProcessorNames().tokenize().each { name ->
-                        def weight = project.featureWeights[name] ?: 0
-                        def values = fpm.getFeatureProcessor(name).values.join(' ')
-                        dest.println "$weight | $name $values"
-                    }
-                    dest.println 'ContinuousFeatureProcessors'
-                    fpm.listContinuousFeatureProcessorNames().tokenize().each { name ->
-                        def weight = project.featureWeights[name] ?: 0
-                        dest.println "$weight | $name"
-                    }
-                }
-                joinCostFile.withWriter { dest ->
-                    (0..13).each { name ->
-                        def weight = project.featureWeights[name] ?: '1.0 linear'
-                        dest.println "${name.toString().padRight(2)} : $weight"
-                    }
+                    logger.info "No weights definition found -- assuming resources are provided..."
                 }
             }
         }
