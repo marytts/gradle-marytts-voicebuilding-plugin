@@ -248,7 +248,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 def xml = builder.bind {
                     'marytts-install'(xmlns: 'http://mary.dfki.de/installer') {
                         voice(gender: voice.gender, locale: voice.maryLocale, name: voice.name, type: voice.type, version: project.version) {
-                            description voice.description
+                            delegate.description voice.description
                             license(href: license.url)
                             'package'(filename: zipFile.name, md5sum: zipFileHash, size: zipFile.size()) {
                                 location(folder: true, href: "http://lnv-90208.sb.dfki.de/download/$project.maryttsVersion/")
