@@ -253,7 +253,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                             delegate.description voice.description
                             license(href: license.url)
                             'package'(filename: zipFile.name, md5sum: zipFileHash, size: zipFile.size()) {
-                                location(folder: true, href: "http://lnv-90208.sb.dfki.de/download/$project.maryttsVersion/")
+                                location(folder: true, href: "http://mary.dfki.de/download/$project.maryttsVersion/")
                             }
                             depends(language: voice.maryLocaleXml, version: project.maryttsVersion)
                         }
