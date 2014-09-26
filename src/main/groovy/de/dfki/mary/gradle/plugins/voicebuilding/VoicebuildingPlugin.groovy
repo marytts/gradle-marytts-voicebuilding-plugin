@@ -109,7 +109,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
             data {
                 resources {
-                    srcDir 'data'
                     output.dir "$project.buildDir/data"
                 }
             }
