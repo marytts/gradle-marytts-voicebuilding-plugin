@@ -1,4 +1,4 @@
-package de.dfki.mary.gradle.plugins.voicebuilding
+package de.dfki.mary.voicebuilding
 
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
@@ -15,7 +15,7 @@ import groovy.xml.*
 import org.apache.commons.codec.digest.DigestUtils
 
 class VoicebuildingPlugin implements Plugin<Project> {
-    final templateDir = "/de/dfki/mary/gradle/plugins/voicebuilding/templates"
+    final templateDir = "/de/dfki/mary/voicebuilding/templates"
     def voice
     def license
 

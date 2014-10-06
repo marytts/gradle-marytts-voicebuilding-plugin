@@ -1,4 +1,4 @@
-package de.dfki.mary.gradle.plugins.voicebuilding
+package de.dfki.mary.voicebuilding
 
 class VoicebuildingPluginLicenseExtension {
     def name
