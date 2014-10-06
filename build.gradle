@@ -27,6 +27,16 @@ dependencies {
             "commons-codec:commons-codec:1.9"
 }
 
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "https://api.bintray.com/maven/marytts/marytts/gradle-marytts-voicebuilding-plugin") {
+                authentication(userName: bintrayUser, password: bintrayKey)
+            }
+        }
+    }
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion '2.1'
 }
