@@ -1,12 +1,20 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+group 'de.dfki.mary'
+version '0.5.1'
+
 repositories {
     jcenter()
     maven {
-        url maryttsRepoUrl
+        url 'http://oss.jfrog.org/artifactory/libs-release/'
     }
 }
 
 dependencies {
-    compile "de.dfki.mary:marytts-common:$maryttsVersion",
+    compile localGroovy(),
+            gradleApi(),
+            "de.dfki.mary:marytts-common:$maryttsVersion",
             "de.dfki.mary:marytts-runtime:$maryttsVersion",
             "de.dfki.mary:marytts-lang-de:$maryttsVersion",
             "de.dfki.mary:marytts-lang-en:$maryttsVersion",
