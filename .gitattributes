@@ -1,0 +1,4 @@
+* text=auto
+*.pdf binary
+*.inf binary
+*.bat text eol=crlf
