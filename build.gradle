@@ -1,3 +1,22 @@
+repositories {
+    jcenter()
+    maven {
+        url maryttsRepoUrl
+    }
+}
+
+dependencies {
+    compile "de.dfki.mary:marytts-common:$maryttsVersion",
+            "de.dfki.mary:marytts-runtime:$maryttsVersion",
+            "de.dfki.mary:marytts-lang-de:$maryttsVersion",
+            "de.dfki.mary:marytts-lang-en:$maryttsVersion",
+            "de.dfki.mary:marytts-lang-fr:$maryttsVersion",
+            "de.dfki.mary:marytts-lang-ru:$maryttsVersion",
+            "de.dfki.mary:marytts-lang-te:$maryttsVersion",
+            "de.dfki.mary:marytts-lang-tr:$maryttsVersion",
+            "commons-codec:commons-codec:1.9"
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion '2.1'
 }
