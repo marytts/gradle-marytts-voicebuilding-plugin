@@ -44,9 +44,13 @@ publishing {
     repositories {
         maven {
             url 'https://api.bintray.com/maven/marytts/marytts/gradle-marytts-voicebuilding-plugin'
-            credentials {
-                username bintrayUser
-                password bintrayKey
+            if (hasProperty('bintrayUser') && hasProperty('bintrayKey')) {
+                credentials {
+                    username bintrayUser
+                    password bintrayKey
+                }
+            } else {
+                logger.warn 'Properties bintrayUser and bintrayKey not set; publishing will fail'
             }
         }
     }
