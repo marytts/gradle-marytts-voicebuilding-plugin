@@ -32,18 +32,18 @@ class VoicebuildingPluginVoiceExtension {
     }
 
     def getMaryLocale() {
-        maryLocale = maryLocale ?: language.equalsIgnoreCase(getRegion()) ? language : getLocale()
+        maryLocale = maryLocale ?: language?.equalsIgnoreCase(getRegion()) ? language : getLocale()
     }
 
     def getMaryLocaleXml() {
-        maryLocaleXml = maryLocaleXml ?: language.equalsIgnoreCase(getRegion()) ? language : getLocaleXml()
+        maryLocaleXml = maryLocaleXml ?: language?.equalsIgnoreCase(getRegion()) ? language : getLocaleXml()
     }
 
     def getNameCamelCase() {
-        nameCamelCase = nameCamelCase ?: name.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
+        nameCamelCase = nameCamelCase ?: name?.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
     }
 
     def getRegion() {
-        region = region ?: language.toUpperCase()
+        region = region ?: language?.toUpperCase()
     }
 }
