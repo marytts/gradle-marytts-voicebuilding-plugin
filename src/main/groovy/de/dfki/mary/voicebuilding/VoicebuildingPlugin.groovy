@@ -195,6 +195,48 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
+        project.task('generatePhoneUnitFeatures') {
+            dependsOn 'legacyInit', 'generateFeatureList'
+            inputs.files project.legacyTranscriptionAligner
+            outputs.files inputs.files.collect {
+                new File("$project.buildDir/phonefeatures", it.name.replace('.xml', '.pfeats'))
+            }
+            def mary
+            doFirst {
+                mary = new marytts.LocalMaryInterface()
+                mary.locale = new Locale(project.voice.maryLocale)
+                mary.inputType = 'ALLOPHONES'
+                mary.outputType = 'TARGETFEATURES'
+            }
+            doLast {
+                [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
+                    def doc = marytts.util.dom.DomUtils.parseDocument inFile
+                    outFile.text = mary.generateText doc
+                }
+            }
+        }
+
+        project.task('generateHalfPhoneUnitFeatures') {
+            dependsOn 'legacyInit', 'generateFeatureList'
+            inputs.files project.legacyTranscriptionAligner
+            outputs.files inputs.files.collect {
+                new File("$project.buildDir/halfphonefeatures", it.name.replace('.xml', '.hpfeats'))
+            }
+            def mary
+            doFirst {
+                mary = new marytts.LocalMaryInterface()
+                mary.locale = new Locale(project.voice.maryLocale)
+                mary.inputType = 'ALLOPHONES'
+                mary.outputType = 'HALFPHONE_TARGETFEATURES'
+            }
+            doLast {
+                [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
+                    def doc = marytts.util.dom.DomUtils.parseDocument inFile
+                    outFile.text = mary.generateText doc
+                }
+            }
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
