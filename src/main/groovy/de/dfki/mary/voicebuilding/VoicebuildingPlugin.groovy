@@ -117,6 +117,12 @@ class VoicebuildingPlugin implements Plugin<Project> {
             project.ext.htkDir = new File(proc.in.text)?.parent
         }
 
+        project.task('configureEhmm') {
+            def proc = 'which ehmm'.execute()
+            proc.waitFor()
+            project.ext.ehmmDir = new File(proc.in.text)?.parentFile?.parent
+        }
+
         project.task('legacyInit', type: Copy) {
             description "Initialize DatabaseLayout for legacy VoiceImportTools"
             from project.file(getClass().getResource("$templateDir/database.config"))
@@ -160,6 +166,17 @@ class VoicebuildingPlugin implements Plugin<Project> {
             dependsOn 'legacyInit', 'configureHTK'
             inputs.files project.fileTree("$project.buildDir/wav").include('*.wav'), 'generateAllophones'
             outputs.files project.fileTree("$project.buildDir/htk/lab").include('*.lab')
+        }
+
+        project.task('legacyEHMMLabeler', type: LegacyVoiceImportTask) {
+            dependsOn 'legacyInit', 'configureEhmm'
+            inputs.files project.fileTree("$project.buildDir/wav").include('*.wav'), 'generateAllophones'
+            outputs.files project.fileTree("$project.buildDir/ehmm/lab").include('*.lab')
+        }
+
+        project.task('legacyLabelPauseDeleter', type: LegacyVoiceImportTask) {
+            inputs.files 'legacyEHMMLabeler'
+            outputs.files project.fileTree("$project.buildDir/lab").include('*.lab')
         }
 
         project.task('generateSource', type: Copy) {
