@@ -105,6 +105,12 @@ class VoicebuildingPlugin implements Plugin<Project> {
             project.ext.praat = proc.in.text
         }
 
+        project.task('configureSpeechTools') {
+            def proc = 'which ch_track'.execute()
+            proc.waitFor()
+            project.ext.speechToolsDir = new File(proc.in.text)?.parentFile?.parent
+        }
+
         project.task('legacyInit', type: Copy) {
             description "Initialize DatabaseLayout for legacy VoiceImportTools"
             from project.file(getClass().getResource("$templateDir/database.config"))
@@ -113,9 +119,15 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
-            dependsOn 'legacyInit'
+            dependsOn 'legacyInit', 'configurePraat'
             inputs.files project.fileTree("$project.buildDir/wav").include('*.wav')
             outputs.files project.fileTree("$project.buildDir/pm").include('*.pm')
+        }
+
+        project.task('legacyMCEPMaker', type: LegacyVoiceImportTask) {
+            dependsOn 'legacyInit', 'configureSpeechTools'
+            inputs.files project.fileTree("$project.buildDir/wav").include('*.wav')
+            outputs.files project.fileTree("$project.buildDir/mcep").include('*.mcep')
         }
 
         project.task('generateSource', type: Copy) {
