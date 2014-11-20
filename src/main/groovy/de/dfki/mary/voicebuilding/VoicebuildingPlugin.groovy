@@ -130,6 +130,26 @@ class VoicebuildingPlugin implements Plugin<Project> {
             outputs.files project.fileTree("$project.buildDir/mcep").include('*.mcep')
         }
 
+        project.task('generateAllophones') {
+            dependsOn 'legacyInit'
+            inputs.files project.fileTree("$project.buildDir/text").include('*.txt')
+            outputs.files inputs.files.collect {
+                new File("$project.buildDir/prompt_allophones", it.name.replace('.txt', '.xml'))
+            }
+            def mary
+            doFirst {
+                mary = new marytts.LocalMaryInterface()
+                mary.locale = new Locale(project.voice.maryLocale)
+                mary.outputType = 'ALLOPHONES'
+            }
+            doLast {
+                [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
+                    def doc = mary.generateXML inFile.text
+                    outFile.text = XmlUtil.serialize doc.documentElement
+                }
+            }
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
