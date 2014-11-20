@@ -179,6 +179,17 @@ class VoicebuildingPlugin implements Plugin<Project> {
             outputs.files project.fileTree("$project.buildDir/lab").include('*.lab')
         }
 
+        project.task('generateFeatureList') {
+            dependsOn 'legacyInit'
+            def featureFile = project.file("$project.buildDir/mary/features.txt")
+            outputs.files featureFile
+            doLast {
+                def fpm = new marytts.features.FeatureProcessorManager(project.voice.maryLocale)
+                def featureNames = fpm.listByteValuedFeatureProcessorNames().tokenize() + fpm.listShortValuedFeatureProcessorNames().tokenize()
+                featureFile.text = featureNames.join('\n')
+            }
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
