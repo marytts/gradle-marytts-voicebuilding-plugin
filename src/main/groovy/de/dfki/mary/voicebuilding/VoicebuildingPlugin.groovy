@@ -92,6 +92,13 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
 
+        project.task('legacyInit', type: Copy) {
+            description "Initialize DatabaseLayout for legacy VoiceImportTools"
+            from project.file(getClass().getResource("$templateDir/database.config"))
+            into project.buildDir
+            expand project.properties
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
