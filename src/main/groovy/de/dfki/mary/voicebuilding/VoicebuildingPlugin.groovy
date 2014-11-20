@@ -247,6 +247,12 @@ class VoicebuildingPlugin implements Plugin<Project> {
             outputs.files new File("$project.buildDir/mary", 'timeline_basenames.mry')
         }
 
+        project.task('legacyMCepTimelineMaker', type: LegacyVoiceImportTask) {
+            dependsOn 'legacyInit'
+            inputs.files project.legacyPraatPitchmarker, project.legacyMCEPMaker
+            outputs.files new File("$project.buildDir/mary", 'timeline_mcep.mry')
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
