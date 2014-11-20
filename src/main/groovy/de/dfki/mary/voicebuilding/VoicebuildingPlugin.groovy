@@ -99,6 +99,12 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
 
+        project.task('configurePraat') {
+            def proc = 'which praat'.execute()
+            proc.waitFor()
+            project.ext.praat = proc.in.text
+        }
+
         project.task('legacyInit', type: Copy) {
             description "Initialize DatabaseLayout for legacy VoiceImportTools"
             from project.file(getClass().getResource("$templateDir/database.config"))
