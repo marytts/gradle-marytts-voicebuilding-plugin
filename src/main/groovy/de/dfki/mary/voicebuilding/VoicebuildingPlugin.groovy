@@ -8,6 +8,7 @@ import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.publish.ivy.IvyPublication
 import org.gradle.api.publish.ivy.plugins.IvyPublishPlugin
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Zip
 
 import groovy.xml.*
@@ -39,6 +40,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.repositories.maven {
             url 'https://oss.jfrog.org/artifactory/libs-release/'
         }
+        project.repositories.mavenLocal()
+
+        project.configurations.create 'legacy'
 
         project.sourceSets {
             main {
@@ -64,6 +68,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$voice.language:$project.maryttsVersion"
+                legacy "de.dfki.mary:marytts-builder:$project.maryttsVersion"
                 testCompile "junit:junit:4.11"
             }
 
@@ -97,6 +102,16 @@ class VoicebuildingPlugin implements Plugin<Project> {
             from project.file(getClass().getResource("$templateDir/database.config"))
             into project.buildDir
             expand project.properties
+        }
+
+        project.task('legacyPraatPitchmarker', type: JavaExec) {
+            dependsOn 'legacyInit'
+            inputs.files project.fileTree("$project.buildDir/wav").include('*.wav')
+            outputs.files project.fileTree("$project.buildDir/pm").include('*.pm')
+            classpath project.configurations.legacy, project.configurations.compile
+            main 'marytts.tools.voiceimport.DatabaseImportMain'
+            args name.replace('legacy', '')
+            systemProperties = ['user.dir': project.buildDir]
         }
 
         project.task('generateSource', type: Copy) {
