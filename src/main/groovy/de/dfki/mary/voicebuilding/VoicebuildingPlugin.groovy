@@ -242,6 +242,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
             outputs.files new File("$project.buildDir/mary", 'timeline_waveforms.mry')
         }
 
+        project.task('legacyBasenameTimelineMaker', type: LegacyVoiceImportTask) {
+            inputs.files project.legacyPraatPitchmarker
+            outputs.files new File("$project.buildDir/mary", 'timeline_basenames.mry')
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
