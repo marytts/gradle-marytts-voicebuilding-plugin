@@ -15,6 +15,8 @@ import groovy.xml.*
 
 import org.apache.commons.codec.digest.DigestUtils
 
+import de.dfki.mary.voicebuilding.tasks.legacy.LegacyVoiceImportTask
+
 class VoicebuildingPlugin implements Plugin<Project> {
     final templateDir = "/de/dfki/mary/voicebuilding/templates"
     def voice
@@ -104,14 +106,10 @@ class VoicebuildingPlugin implements Plugin<Project> {
             expand project.properties
         }
 
-        project.task('legacyPraatPitchmarker', type: JavaExec) {
+        project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
             dependsOn 'legacyInit'
             inputs.files project.fileTree("$project.buildDir/wav").include('*.wav')
             outputs.files project.fileTree("$project.buildDir/pm").include('*.pm')
-            classpath project.configurations.legacy, project.configurations.compile
-            main 'marytts.tools.voiceimport.DatabaseImportMain'
-            args name.replace('legacy', '')
-            systemProperties = ['user.dir': project.buildDir]
         }
 
         project.task('generateSource', type: Copy) {
