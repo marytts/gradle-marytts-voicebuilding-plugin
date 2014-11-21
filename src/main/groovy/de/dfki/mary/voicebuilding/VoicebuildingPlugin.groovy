@@ -205,7 +205,14 @@ class VoicebuildingPlugin implements Plugin<Project> {
             def featureFile = project.file("$project.buildDir/mary/features.txt")
             outputs.files featureFile
             doLast {
-                def fpm = new marytts.features.FeatureProcessorManager(project.voice.maryLocale)
+                def fpm
+                try {
+                    fpm = Class.forName("marytts.language.${voice.language}.features.FeatureProcessorManager").newInstance()
+                } catch (e) {
+                    logger.info "Reflection failed: $e"
+                    logger.info "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
+                    fpm = new marytts.features.FeatureProcessorManager(project.voice.maryLocale)
+                }
                 def featureNames = fpm.listByteValuedFeatureProcessorNames().tokenize() + fpm.listShortValuedFeatureProcessorNames().tokenize()
                 featureFile.text = featureNames.join('\n')
             }
