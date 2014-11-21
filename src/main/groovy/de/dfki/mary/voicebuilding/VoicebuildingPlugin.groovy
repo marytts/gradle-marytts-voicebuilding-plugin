@@ -315,6 +315,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
             outputs.files project.file("$project.buildDir/mary/joinCostFeatures.mry")
         }
 
+        project.task('legacyCARTBuilder', type: LegacyVoiceImportTask) {
+            inputs.files project.legacyAcousticFeatureFileWriter
+            outputs.files project.file("$project.buildDir/mary/cart.mry")
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
