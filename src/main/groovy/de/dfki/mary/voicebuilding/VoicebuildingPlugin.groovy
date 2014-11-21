@@ -36,6 +36,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             maryttsVersion = '5.1'
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
+            legacyBuildDir = "$project.buildDir/mary"
         }
 
         project.repositories.jcenter()
@@ -128,6 +129,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
             from project.file(getClass().getResource("$templateDir/database.config"))
             into project.buildDir
             expand project.properties
+            doLast {
+                project.file(project.legacyBuildDir).mkdirs()
+            }
         }
 
         project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
@@ -202,7 +206,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('generateFeatureList') {
             dependsOn 'legacyInit'
-            ext.featureFile = project.file("$project.buildDir/mary/features.txt")
+            ext.featureFile = project.file("$project.legacyBuildDir/features.txt")
             outputs.files featureFile
             doLast {
                 def fpm
@@ -266,58 +270,58 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('legacyWaveTimelineMaker', type: LegacyVoiceImportTask) {
             inputs.files project.legacyPraatPitchmarker
-            outputs.files new File("$project.buildDir/mary", 'timeline_waveforms.mry')
+            outputs.files new File("$project.legacyBuildDir", 'timeline_waveforms.mry')
         }
 
         project.task('legacyBasenameTimelineMaker', type: LegacyVoiceImportTask) {
             inputs.files project.legacyPraatPitchmarker
-            outputs.files new File("$project.buildDir/mary", 'timeline_basenames.mry')
+            outputs.files new File("$project.legacyBuildDir", 'timeline_basenames.mry')
         }
 
         project.task('legacyMCepTimelineMaker', type: LegacyVoiceImportTask) {
             dependsOn 'legacyInit'
             inputs.files project.legacyPraatPitchmarker, project.legacyMCEPMaker
-            outputs.files new File("$project.buildDir/mary", 'timeline_mcep.mry')
+            outputs.files new File("$project.legacyBuildDir", 'timeline_mcep.mry')
         }
 
         project.task('legacyPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
             inputs.files project.legacyPraatPitchmarker, project.legacyPhoneUnitLabelComputer
-            outputs.files new File("$project.buildDir/mary", 'phoneUnits.mry')
+            outputs.files new File("$project.legacyBuildDir", 'phoneUnits.mry')
         }
 
         project.task('legacyHalfPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
             inputs.files project.legacyPraatPitchmarker, project.legacyHalfPhoneUnitLabelComputer
-            outputs.files new File("$project.buildDir/mary", 'halfphoneUnits.mry')
+            outputs.files new File("$project.legacyBuildDir", 'halfphoneUnits.mry')
         }
 
         project.task('legacyPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
             inputs.files project.generatePhoneUnitFeatures
-            outputs.files project.files("$project.buildDir/mary/phoneFeatures.mry", "$project.buildDir/mary/phoneUnitFeatureDefinition.txt")
+            outputs.files project.files("$project.legacyBuildDir/phoneFeatures.mry", "$project.legacyBuildDir/phoneUnitFeatureDefinition.txt")
         }
 
         project.task('legacyHalfPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
             inputs.files project.generateHalfPhoneUnitFeatures
-            outputs.files project.files("$project.buildDir/mary/halfphoneFeatures.mry", "$project.buildDir/mary/halfphoneUnitFeatureDefinition.txt")
+            outputs.files project.files("$project.legacyBuildDir/halfphoneFeatures.mry", "$project.legacyBuildDir/halfphoneUnitFeatureDefinition.txt")
         }
 
         project.task('legacyF0PolynomialFeatureFileWriter', type: LegacyVoiceImportTask) {
             inputs.files project.legacyHalfPhoneUnitfileWriter, project.legacyWaveTimelineMaker, project.legacyHalfPhoneFeatureFileWriter
-            outputs.files project.file("$project.buildDir/mary/syllableF0Polynomials.mry")
+            outputs.files project.file("$project.legacyBuildDir/syllableF0Polynomials.mry")
         }
 
         project.task('legacyAcousticFeatureFileWriter', type: LegacyVoiceImportTask) {
             inputs.files project.legacyHalfPhoneUnitfileWriter, project.legacyF0PolynomialFeatureFileWriter, project.legacyHalfPhoneFeatureFileWriter
-            outputs.files project.files("$project.buildDir/mary/halfphoneFeatures_ac.mry", "$project.buildDir/mary/halfphoneUnitFeatureDefinition_ac.txt")
+            outputs.files project.files("$project.legacyBuildDir/halfphoneFeatures_ac.mry", "$project.legacyBuildDir/halfphoneUnitFeatureDefinition_ac.txt")
         }
 
         project.task('legacyJoinCostFileMaker', type: LegacyVoiceImportTask) {
             inputs.files project.legacyMCEPMaker, project.legacyMCepTimelineMaker, project.legacyHalfPhoneUnitfileWriter, project.legacyAcousticFeatureFileWriter
-            outputs.files project.file("$project.buildDir/mary/joinCostFeatures.mry")
+            outputs.files project.file("$project.legacyBuildDir/joinCostFeatures.mry")
         }
 
         project.task('legacyCARTBuilder', type: LegacyVoiceImportTask) {
             inputs.files project.legacyAcousticFeatureFileWriter
-            outputs.files project.file("$project.buildDir/mary/cart.mry")
+            outputs.files project.file("$project.legacyBuildDir/cart.mry")
         }
 
         project.task('generateSource', type: Copy) {
