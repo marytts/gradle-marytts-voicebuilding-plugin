@@ -202,7 +202,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('generateFeatureList') {
             dependsOn 'legacyInit'
-            def featureFile = project.file("$project.buildDir/mary/features.txt")
+            ext.featureFile = project.file("$project.buildDir/mary/features.txt")
             outputs.files featureFile
             doLast {
                 def fpm
@@ -230,6 +230,8 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 mary.locale = new Locale(project.voice.maryLocale)
                 mary.inputType = 'ALLOPHONES'
                 mary.outputType = 'TARGETFEATURES'
+                def features = project.generateFeatureList.featureFile.readLines().minus(['phone', 'halfphone_lr', 'halfphone_unitname']).plus(0, ['phone'])
+                mary.outputTypeParams = features.join(' ')
             }
             doLast {
                 [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
@@ -251,6 +253,8 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 mary.locale = new Locale(project.voice.maryLocale)
                 mary.inputType = 'ALLOPHONES'
                 mary.outputType = 'HALFPHONE_TARGETFEATURES'
+                def features = project.generateFeatureList.featureFile.readLines().minus(['halfphone_unitname']).plus(0, ['halfphone_unitname'])
+                mary.outputTypeParams = features.join(' ')
             }
             doLast {
                 [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
