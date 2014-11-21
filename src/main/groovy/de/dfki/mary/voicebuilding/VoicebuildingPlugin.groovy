@@ -176,7 +176,23 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('legacyLabelPauseDeleter', type: LegacyVoiceImportTask) {
             inputs.files 'legacyEHMMLabeler'
-            outputs.files project.fileTree("$project.buildDir/lab").include('*.lab')
+            outputs.files inputs.files.collect {
+                new File("$project.buildDir/lablab", it.name)
+            }
+        }
+
+        project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
+            inputs.files project.legacyLabelPauseDeleter
+            outputs.files inputs.files.collect {
+                new File("$project.buildDir/phonelab", it.name)
+            }
+        }
+
+        project.task('legacyHalfPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
+            inputs.files project.legacyLabelPauseDeleter
+            outputs.files inputs.files.collect {
+                new File("$project.buildDir/halfphonelab", it.name.replace('.lab', '.hplab'))
+            }
         }
 
         project.task('legacyTranscriptionAligner', type: LegacyVoiceImportTask) {
