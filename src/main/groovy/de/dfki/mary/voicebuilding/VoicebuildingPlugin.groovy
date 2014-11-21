@@ -280,6 +280,16 @@ class VoicebuildingPlugin implements Plugin<Project> {
             outputs.files new File("$project.buildDir/mary", 'timeline_mcep.mry')
         }
 
+        project.task('legacyPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
+            inputs.files project.legacyPraatPitchmarker, project.legacyPhoneUnitLabelComputer
+            outputs.files new File("$project.buildDir/mary", 'phoneUnits.mry')
+        }
+
+        project.task('legacyHalfPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
+            inputs.files project.legacyPraatPitchmarker, project.legacyHalfPhoneUnitLabelComputer
+            outputs.files new File("$project.buildDir/mary", 'halfphoneUnits.mry')
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
