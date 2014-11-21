@@ -286,7 +286,8 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('legacyPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
             inputs.files project.legacyPraatPitchmarker, project.legacyPhoneUnitLabelComputer
-            outputs.files new File("$project.legacyBuildDir", 'phoneUnits.mry')
+            ext.unitFile = new File(project.legacyBuildDir, 'phoneUnits.mry')
+            outputs.files unitFile
         }
 
         project.task('legacyHalfPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
@@ -296,7 +297,8 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('legacyPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
             inputs.files project.legacyPhoneUnitfileWriter
-            outputs.files project.files("$project.legacyBuildDir/phoneFeatures.mry", "$project.legacyBuildDir/phoneUnitFeatureDefinition.txt")
+            ext.featureFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
+            outputs.files featureFile, project.file("$project.legacyBuildDir/phoneUnitFeatureDefinition.txt")
         }
 
         project.task('legacyHalfPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
@@ -322,6 +324,53 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.task('legacyCARTBuilder', type: LegacyVoiceImportTask) {
             inputs.files project.legacyAcousticFeatureFileWriter
             outputs.files project.file("$project.legacyBuildDir/cart.mry")
+        }
+
+        project.task('extractDurationFeatures') {
+            inputs.files project.legacyPhoneFeatureFileWriter, project.legacyPhoneUnitfileWriter
+            def featsFile = project.file("$temporaryDir/dur.feats")
+            outputs.files featsFile
+            doLast {
+                def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
+                def featureDefinition = featureFile.featureDefinition
+                def unitFile = new marytts.unitselection.data.UnitFileReader(project.legacyPhoneUnitfileWriter.unitFile.path)
+                featsFile.withWriter { feats ->
+                    (0..unitFile.numberOfUnits - 1).each { u ->
+                        def unit = unitFile.getUnit u
+                        def samples = unit.duration
+                        def duration = samples / unitFile.sampleRate
+                        if (duration > 0.01) {
+                            def features = featureFile.getFeatureVector u
+                            feats.println "$duration ${featureDefinition.toFeatureString features}"
+                        }
+                    }
+                }
+            }
+        }
+
+        project.task('generateDurationFeaturesDescription') {
+            inputs.files project.legacyPhoneFeatureFileWriter
+            def descFile = project.file("$temporaryDir/dur.desc")
+            outputs.files descFile
+            doLast {
+                def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
+                def featureDefinition = featureFile.featureDefinition
+                descFile.withWriter { desc ->
+                    desc.println '('
+                    desc.println '( segment_duration float )'
+                    featureDefinition.featureNameArray.eachWithIndex { feature, f ->
+                        def values = featureDefinition.getPossibleValues f
+                        desc.print "( $feature "
+                        if (featureDefinition.isContinuousFeature(f) || values.length == 20 && values.last() == '19') {
+                            desc.print 'float'
+                        } else {
+                            desc.print values.collect { "\"${it.replace '"', '\\\"'}\"" }.join(' ')
+                        }
+                        desc.println " )"
+                    }
+                    desc.println " )"
+                }
+            }
         }
 
         project.task('generateSource', type: Copy) {
