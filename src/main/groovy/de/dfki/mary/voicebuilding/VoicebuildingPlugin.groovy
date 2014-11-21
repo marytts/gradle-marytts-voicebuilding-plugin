@@ -8,7 +8,7 @@ import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.publish.ivy.IvyPublication
 import org.gradle.api.publish.ivy.plugins.IvyPublishPlugin
 import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Zip
 
 import groovy.xml.*
@@ -328,7 +328,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('extractDurationFeatures') {
             inputs.files project.legacyPhoneFeatureFileWriter, project.legacyPhoneUnitfileWriter
-            def featsFile = project.file("$temporaryDir/dur.feats")
+            ext.featsFile = project.file("$temporaryDir/dur.feats")
             outputs.files featsFile
             doLast {
                 def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
@@ -350,7 +350,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('generateDurationFeaturesDescription') {
             inputs.files project.legacyPhoneFeatureFileWriter
-            def descFile = project.file("$temporaryDir/dur.desc")
+            ext.descFile = project.file("$temporaryDir/dur.desc")
             outputs.files descFile
             doLast {
                 def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
@@ -371,6 +371,20 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     desc.println " )"
                 }
             }
+        }
+
+        project.task('trainDurationCart', type: Exec) {
+            inputs.files project.extractDurationFeatures, project.generateDurationFeaturesDescription
+            def treeFile = project.file("$temporaryDir/dur.tree")
+            outputs.files treeFile
+            dependsOn project.legacyInit, project.configureSpeechTools
+            executable "$project.speechToolsDir/bin/wagon"
+            args = [
+                    '-data', project.extractDurationFeatures.featsFile,
+                    '-desc', project.generateDurationFeaturesDescription.descFile,
+                    '-stop', 10,
+                    '-output', treeFile
+            ]
         }
 
         project.task('generateSource', type: Copy) {
