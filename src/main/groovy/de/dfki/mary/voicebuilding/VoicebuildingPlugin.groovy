@@ -305,6 +305,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
             outputs.files project.file("$project.buildDir/mary/syllableF0Polynomials.mry")
         }
 
+        project.task('legacyAcousticFeatureFileWriter', type: LegacyVoiceImportTask) {
+            inputs.files project.legacyHalfPhoneUnitfileWriter, project.legacyF0PolynomialFeatureFileWriter, project.legacyHalfPhoneFeatureFileWriter
+            outputs.files project.files("$project.buildDir/mary/halfphoneFeatures_ac.mry", "$project.buildDir/mary/halfphoneUnitFeatureDefinition_ac.txt")
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
