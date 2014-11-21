@@ -135,19 +135,19 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
-            dependsOn 'legacyInit', 'configurePraat'
+            dependsOn project.legacyInit, project.configurePraat
             inputs.files project.fileTree("$project.buildDir/wav").include('*.wav')
             outputs.files project.fileTree("$project.buildDir/pm").include('*.pm')
         }
 
         project.task('legacyMCEPMaker', type: LegacyVoiceImportTask) {
-            dependsOn 'legacyInit', 'configureSpeechTools'
+            dependsOn project.legacyInit, project.configureSpeechTools
             inputs.files project.fileTree("$project.buildDir/wav").include('*.wav')
             outputs.files project.fileTree("$project.buildDir/mcep").include('*.mcep')
         }
 
         project.task('generateAllophones') {
-            dependsOn 'legacyInit'
+            dependsOn project.legacyInit
             inputs.files project.fileTree("$project.buildDir/text").include('*.txt')
             outputs.files inputs.files.collect {
                 new File("$project.buildDir/prompt_allophones", it.name.replace('.txt', '.xml'))
@@ -167,19 +167,19 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('legacyHTKLabeler', type: LegacyVoiceImportTask) {
-            dependsOn 'legacyInit', 'configureHTK'
-            inputs.files project.fileTree("$project.buildDir/wav").include('*.wav'), 'generateAllophones'
+            dependsOn project.legacyInit, project.configureHTK
+            inputs.files project.fileTree("$project.buildDir/wav").include('*.wav'), project.generateAllophones
             outputs.files project.fileTree("$project.buildDir/htk/lab").include('*.lab')
         }
 
         project.task('legacyEHMMLabeler', type: LegacyVoiceImportTask) {
-            dependsOn 'legacyInit', 'configureEhmm'
-            inputs.files project.fileTree("$project.buildDir/wav").include('*.wav'), 'generateAllophones'
+            dependsOn project.legacyInit, project.configureEhmm
+            inputs.files project.fileTree("$project.buildDir/wav").include('*.wav'), project.generateAllophones
             outputs.files project.fileTree("$project.buildDir/ehmm/lab").include('*.lab')
         }
 
         project.task('legacyLabelPauseDeleter', type: LegacyVoiceImportTask) {
-            inputs.files 'legacyEHMMLabeler'
+            inputs.files project.legacyEHMMLabeler
             outputs.files inputs.files.collect {
                 new File("$project.buildDir/lablab", it.name)
             }
@@ -200,12 +200,12 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('legacyTranscriptionAligner', type: LegacyVoiceImportTask) {
-            inputs.files 'generateAllophones', 'legacyLabelPauseDeleter'
+            inputs.files project.generateAllophones, project.legacyLabelPauseDeleter
             outputs.files project.fileTree("$project.buildDir/allophones").include('*.xml')
         }
 
         project.task('generateFeatureList') {
-            dependsOn 'legacyInit'
+            dependsOn project.legacyInit
             ext.featureFile = project.file("$project.legacyBuildDir/features.txt")
             outputs.files featureFile
             doLast {
@@ -223,7 +223,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('generatePhoneUnitFeatures') {
-            dependsOn 'legacyInit', 'generateFeatureList'
+            dependsOn project.legacyInit, project.generateFeatureList
             inputs.files project.legacyTranscriptionAligner
             outputs.files inputs.files.collect {
                 new File("$project.buildDir/phonefeatures", it.name.replace('.xml', '.pfeats'))
@@ -246,7 +246,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('generateHalfPhoneUnitFeatures') {
-            dependsOn 'legacyInit', 'generateFeatureList'
+            dependsOn project.legacyInit, project.generateFeatureList
             inputs.files project.legacyTranscriptionAligner
             outputs.files inputs.files.collect {
                 new File("$project.buildDir/halfphonefeatures", it.name.replace('.xml', '.hpfeats'))
@@ -279,7 +279,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('legacyMCepTimelineMaker', type: LegacyVoiceImportTask) {
-            dependsOn 'legacyInit'
+            dependsOn project.legacyInit
             inputs.files project.legacyPraatPitchmarker, project.legacyMCEPMaker
             outputs.files new File("$project.legacyBuildDir", 'timeline_mcep.mry')
         }
@@ -333,7 +333,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             expand project.properties
         }
 
-        project.compileJava.dependsOn 'generateSource'
+        project.compileJava.dependsOn project.generateSource
 
         project.task('generateTestSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/ConfigTest.java"))
@@ -345,7 +345,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             expand project.properties
         }
 
-        project.compileTestJava.dependsOn 'generateTestSource'
+        project.compileTestJava.dependsOn project.generateTestSource
 
         project.task('generateServiceLoader') {
             def serviceLoaderFile = project.file("$project.sourceSets.main.output.resourcesDir/META-INF/services/marytts.config.MaryConfig")
@@ -425,9 +425,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
             rename {
                 "marytts/voice/$project.voice.nameCamelCase/$it"
             }
-            dependsOn 'generateServiceLoader', 'generateVoiceConfig'
+            dependsOn project.generateServiceLoader, project.generateVoiceConfig
             if (project.voice.type == 'unit selection') {
-                dependsOn 'generateFeatureFiles'
+                dependsOn project.generateFeatureFiles
             }
         }
 
@@ -469,9 +469,10 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        project.jar.dependsOn 'generatePom'
+        project.jar.dependsOn project.generatePom
 
-        project.task('legacyComponentXml', dependsOn: 'legacyComponentZip') {
+        project.task('legacyComponentXml') {
+            dependsOn project.legacyComponentZip
             def zipFile = project.legacyComponentZip.outputs.files.singleFile
             def xmlFile = project.file("$project.distsDir/$project.name-$project.version-component-descriptor.xml")
             inputs.files zipFile
