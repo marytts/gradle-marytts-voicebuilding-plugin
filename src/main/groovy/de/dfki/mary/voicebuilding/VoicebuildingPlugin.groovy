@@ -310,6 +310,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
             outputs.files project.files("$project.buildDir/mary/halfphoneFeatures_ac.mry", "$project.buildDir/mary/halfphoneUnitFeatureDefinition_ac.txt")
         }
 
+        project.task('legacyJoinCostFileMaker', type: LegacyVoiceImportTask) {
+            inputs.files project.legacyMCEPMaker, project.legacyMCepTimelineMaker, project.legacyHalfPhoneUnitfileWriter, project.legacyAcousticFeatureFileWriter
+            outputs.files project.file("$project.buildDir/mary/joinCostFeatures.mry")
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
