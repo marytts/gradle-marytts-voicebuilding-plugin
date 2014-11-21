@@ -295,7 +295,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            inputs.files project.generatePhoneUnitFeatures
+            inputs.files project.legacyPhoneUnitfileWriter
             outputs.files project.files("$project.legacyBuildDir/phoneFeatures.mry", "$project.legacyBuildDir/phoneUnitFeatureDefinition.txt")
         }
 
