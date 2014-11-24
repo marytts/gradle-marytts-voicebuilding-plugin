@@ -451,7 +451,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                         ]
                     }
                     // proceed to reconstruct F0 values from voiced segments, if any
-                    def voicedSegs = sylSegs.grep { it['isVoiced'] }
+                    def voicedSegs = sylSegs.grep { it['isVowel'] }
                     if (voicedSegs) {
                         // left F0
                         def firstVoicedSeg = voicedSegs.first()
