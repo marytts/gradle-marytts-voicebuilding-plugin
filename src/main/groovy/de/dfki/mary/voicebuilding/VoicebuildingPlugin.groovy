@@ -591,7 +591,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             def serviceLoaderFile = project.file("$project.sourceSets.main.output.resourcesDir/META-INF/services/marytts.config.MaryConfig")
             outputs.files serviceLoaderFile
             doFirst {
-                project.file(serviceLoaderFile.parent).mkdirs()
+                serviceLoaderFile.parentFile.mkdirs()
             }
             doLast {
                 serviceLoaderFile.text = "marytts.voice.${voice.nameCamelCase}.Config"
@@ -608,13 +608,10 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('generateFeatureFiles') {
-            def destDir = "$project.sourceSets.main.output.resourcesDir/marytts/voice/$voice.nameCamelCase"
-            def featureFile = project.file("$destDir/halfphoneUnitFeatureDefinition_ac.txt")
-            def joinCostFile = project.file("$destDir/joinCostWeights.txt")
+            def destDir = project.file("$project.sourceSets.main.output.resourcesDir/marytts/voice/$voice.nameCamelCase")
+            def featureFile = new File(destDir, 'halfphoneUnitFeatureDefinition_ac.txt')
+            def joinCostFile = new File(destDir, 'joinCostWeights.txt')
             outputs.files featureFile, joinCostFile
-            doFirst {
-                project.file(destDir).mkdirs()
-            }
             doLast {
                 try {
                     project.apply from: 'weights.gradle'
