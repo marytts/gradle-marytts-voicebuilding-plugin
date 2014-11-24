@@ -735,5 +735,21 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 xmlFile.text = XmlUtil.serialize(xml)
             }
         }
+
+        project.task('visualizeTaskDependencyGraph') << {
+            project.file('build.dot').withWriter { dot ->
+                dot.println 'digraph G {'
+                dot.println 'rankdir=BT;'
+                dot.println 'node [shape=box];'
+                dot.println 'edge [dir="back"];'
+                project.tasks.each { task ->
+                    dot.println "$task.name;"
+                    task.taskDependencies.getDependencies(task).each { otherTask ->
+                        dot.println "$task.name -> $otherTask.name;"
+                    }
+                }
+                dot.println "}"
+            }
+        }
     }
 }
