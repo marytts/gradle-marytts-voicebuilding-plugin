@@ -155,20 +155,22 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('legacyMCEPMaker', type: LegacyVoiceImportTask) {
             dependsOn project.legacyInit, project.configureSpeechTools
-            inputs.files project.fileTree("$project.buildDir/wav").include('*.wav')
+            inputs.files project.legacyPraatPitchmarker
             outputs.files inputs.files.collect {
-                new File("$project.buildDir/mcep", it.name.replace('.wav', '.mcep'))
+                new File("$project.buildDir/mcep", it.name.replace('.pm', '.mcep'))
             }
         }
 
         project.task('generateAllophones') {
             dependsOn project.legacyInit
             inputs.files project.fileTree("$project.buildDir/text").include('*.txt')
+            def destDir = project.file("$project.buildDir/prompt_allophones")
             outputs.files inputs.files.collect {
-                new File("$project.buildDir/prompt_allophones", it.name.replace('.txt', '.xml'))
+                new File(destDir, it.name.replace('.txt', '.xml'))
             }
             def mary
             doFirst {
+                destDir.mkdirs()
                 mary = new LocalMaryInterface()
                 mary.locale = new Locale(project.voice.maryLocale)
                 mary.outputType = 'ALLOPHONES'
@@ -314,7 +316,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyPhoneUnitfileWriter
+            inputs.files project.legacyPhoneUnitfileWriter, project.generatePhoneUnitFeatures
             ext.featureFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
             outputs.files featureFile, project.file("$project.legacyBuildDir/phoneUnitFeatureDefinition.txt")
         }
@@ -406,7 +408,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('extractF0Features') {
-            inputs.files project.legacyPhoneFeatureFileWriter, project.legacyPhoneUnitfileWriter
+            inputs.files project.legacyPhoneFeatureFileWriter, project.legacyPhoneUnitfileWriter, project.legacyWaveTimelineMaker
             ext.leftFeatsFile = project.file("$temporaryDir/f0.left.feats")
             ext.midFeatsFile = project.file("$temporaryDir/f0.mid.feats")
             ext.rightFeatsFile = project.file("$temporaryDir/f0.right.feats")
