@@ -46,4 +46,8 @@ class VoicebuildingPluginVoiceExtension {
     def getRegion() {
         region = region ?: language?.toUpperCase()
     }
+
+    def getSamplingRate() {
+        samplingRate = samplingRate ?: 16000
+    }
 }
