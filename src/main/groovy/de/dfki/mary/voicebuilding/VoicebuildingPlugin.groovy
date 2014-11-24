@@ -484,6 +484,48 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
+        project.task('trainLeftF0Cart', type: Exec) {
+            inputs.files project.extractF0Features.leftFeatsFile, project.generateF0FeaturesDescription
+            def treeFile = project.file("$temporaryDir/f0.left.tree")
+            outputs.files treeFile
+            dependsOn project.legacyInit, project.configureSpeechTools, project.extractF0Features
+            executable "$project.speechToolsDir/bin/wagon"
+            args = [
+                    '-data', project.extractF0Features.leftFeatsFile,
+                    '-desc', project.generateF0FeaturesDescription.descFile,
+                    '-stop', 10,
+                    '-output', treeFile
+            ]
+        }
+
+        project.task('trainMidF0Cart', type: Exec) {
+            inputs.files project.extractF0Features.midFeatsFile, project.generateF0FeaturesDescription
+            def treeFile = project.file("$temporaryDir/f0.mid.tree")
+            outputs.files treeFile
+            dependsOn project.legacyInit, project.configureSpeechTools, project.extractF0Features
+            executable "$project.speechToolsDir/bin/wagon"
+            args = [
+                    '-data', project.extractF0Features.midFeatsFile,
+                    '-desc', project.generateF0FeaturesDescription.descFile,
+                    '-stop', 10,
+                    '-output', treeFile
+            ]
+        }
+
+        project.task('trainRightF0Cart', type: Exec) {
+            inputs.files project.extractF0Features.rightFeatsFile, project.generateF0FeaturesDescription
+            def treeFile = project.file("$temporaryDir/f0.right.tree")
+            outputs.files treeFile
+            dependsOn project.legacyInit, project.configureSpeechTools, project.extractF0Features
+            executable "$project.speechToolsDir/bin/wagon"
+            args = [
+                    '-data', project.extractF0Features.rightFeatsFile,
+                    '-desc', project.generateF0FeaturesDescription.descFile,
+                    '-stop', 10,
+                    '-output', treeFile
+            ]
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
