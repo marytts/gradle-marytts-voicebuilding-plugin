@@ -526,6 +526,25 @@ class VoicebuildingPlugin implements Plugin<Project> {
             ]
         }
 
+        project.task('processCarts') {
+            inputs.files project.trainDurationCart, project.trainLeftF0Cart, project.trainMidF0Cart, project.trainRightF0Cart
+            outputs.files inputs.files.collect {
+                new File(project.legacyBuildDir, it.name)
+            }
+            dependsOn project.legacyPhoneFeatureFileWriter
+            doLast {
+                def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
+                def featureDefinition = featureFile.featureDefinition
+                [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
+                    def wagonCartReader = new marytts.cart.io.WagonCARTReader(marytts.cart.LeafNode.LeafType.FloatLeafNode)
+                    def rootNode = wagonCartReader.load(new BufferedReader(new FileReader(inFile)), featureDefinition)
+                    def cart = new marytts.cart.CART(rootNode, featureDefinition)
+                    def maryCartWriter = new marytts.cart.io.MaryCARTWriter()
+                    maryCartWriter.dumpMaryCART(cart, outFile.path);
+                }
+            }
+        }
+
         project.task('generateSource', type: Copy) {
             from project.file(getClass().getResource("$templateDir/Config.java"))
             into project.generatedSrcDir
