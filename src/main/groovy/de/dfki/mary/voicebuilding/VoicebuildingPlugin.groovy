@@ -17,6 +17,17 @@ import org.apache.commons.codec.digest.DigestUtils
 
 import de.dfki.mary.voicebuilding.tasks.legacy.LegacyVoiceImportTask
 
+import marytts.LocalMaryInterface
+import marytts.cart.CART
+import marytts.cart.LeafNode
+import marytts.cart.io.MaryCARTWriter
+import marytts.cart.io.WagonCARTReader
+import marytts.features.FeatureProcessorManager
+import marytts.unitselection.data.FeatureFileReader
+import marytts.unitselection.data.TimelineReader
+import marytts.unitselection.data.UnitFileReader
+import marytts.util.dom.DomUtils
+
 class VoicebuildingPlugin implements Plugin<Project> {
     final templateDir = "/de/dfki/mary/voicebuilding/templates"
     def voice
@@ -154,7 +165,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
             def mary
             doFirst {
-                mary = new marytts.LocalMaryInterface()
+                mary = new LocalMaryInterface()
                 mary.locale = new Locale(project.voice.maryLocale)
                 mary.outputType = 'ALLOPHONES'
             }
@@ -215,7 +226,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 } catch (e) {
                     logger.info "Reflection failed: $e"
                     logger.info "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
-                    fpm = new marytts.features.FeatureProcessorManager(project.voice.maryLocale)
+                    fpm = new FeatureProcessorManager(project.voice.maryLocale)
                 }
                 def featureNames = fpm.listByteValuedFeatureProcessorNames().tokenize() + fpm.listShortValuedFeatureProcessorNames().tokenize()
                 featureFile.text = featureNames.join('\n')
@@ -230,7 +241,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
             def mary
             doFirst {
-                mary = new marytts.LocalMaryInterface()
+                mary = new LocalMaryInterface()
                 mary.locale = new Locale(project.voice.maryLocale)
                 mary.inputType = 'ALLOPHONES'
                 mary.outputType = 'TARGETFEATURES'
@@ -239,7 +250,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
             doLast {
                 [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
-                    def doc = marytts.util.dom.DomUtils.parseDocument inFile
+                    def doc = DomUtils.parseDocument inFile
                     outFile.text = mary.generateText doc
                 }
             }
@@ -253,7 +264,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
             def mary
             doFirst {
-                mary = new marytts.LocalMaryInterface()
+                mary = new LocalMaryInterface()
                 mary.locale = new Locale(project.voice.maryLocale)
                 mary.inputType = 'ALLOPHONES'
                 mary.outputType = 'HALFPHONE_TARGETFEATURES'
@@ -262,7 +273,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
             doLast {
                 [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
-                    def doc = marytts.util.dom.DomUtils.parseDocument inFile
+                    def doc = DomUtils.parseDocument inFile
                     outFile.text = mary.generateText doc
                 }
             }
@@ -332,9 +343,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
             ext.featsFile = project.file("$temporaryDir/dur.feats")
             outputs.files featsFile
             doLast {
-                def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
+                def featureFile = FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
                 def featureDefinition = featureFile.featureDefinition
-                def unitFile = new marytts.unitselection.data.UnitFileReader(project.legacyPhoneUnitfileWriter.unitFile.path)
+                def unitFile = new UnitFileReader(project.legacyPhoneUnitfileWriter.unitFile.path)
                 featsFile.withWriter { feats ->
                     (0..unitFile.numberOfUnits - 1).each { u ->
                         def unit = unitFile.getUnit u
@@ -354,7 +365,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             ext.descFile = project.file("$temporaryDir/dur.desc")
             outputs.files descFile
             doLast {
-                def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
+                def featureFile = FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
                 def featureDefinition = featureFile.featureDefinition
                 descFile.withWriter { desc ->
                     desc.println '('
@@ -400,10 +411,10 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 def midFeats = new FileWriter(midFeatsFile)
                 def rightFeats = new FileWriter(rightFeatsFile)
                 // MaryTTS files needed to extract F0 baked into unit datagram durations
-                def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
+                def featureFile = FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
                 def featureDefinition = featureFile.featureDefinition
-                def unitFile = new marytts.unitselection.data.UnitFileReader(project.legacyPhoneUnitfileWriter.unitFile.path)
-                def waveTimeline = new marytts.unitselection.data.TimelineReader(project.legacyWaveTimelineMaker.timelineFile.path)
+                def unitFile = new UnitFileReader(project.legacyPhoneUnitfileWriter.unitFile.path)
+                def waveTimeline = new TimelineReader(project.legacyWaveTimelineMaker.timelineFile.path)
                 // in the absence of high-level feature value accessors, need feature indices
                 def numSegsFromSylStartFeatureIndex = featureDefinition.getFeatureIndex 'segs_from_syl_start'
                 def numSegsFromEndStartFeatureIndex = featureDefinition.getFeatureIndex 'segs_from_syl_end'
@@ -464,7 +475,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             ext.descFile = project.file("$temporaryDir/f0.desc")
             outputs.files descFile
             doLast {
-                def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
+                def featureFile = FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
                 def featureDefinition = featureFile.featureDefinition
                 descFile.withWriter { desc ->
                     desc.println '('
@@ -533,13 +544,13 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
             dependsOn project.legacyPhoneFeatureFileWriter
             doLast {
-                def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
+                def featureFile = FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
                 def featureDefinition = featureFile.featureDefinition
                 [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
-                    def wagonCartReader = new marytts.cart.io.WagonCARTReader(marytts.cart.LeafNode.LeafType.FloatLeafNode)
+                    def wagonCartReader = new WagonCARTReader(LeafNode.LeafType.FloatLeafNode)
                     def rootNode = wagonCartReader.load(new BufferedReader(new FileReader(inFile)), featureDefinition)
-                    def cart = new marytts.cart.CART(rootNode, featureDefinition)
-                    def maryCartWriter = new marytts.cart.io.MaryCARTWriter()
+                    def cart = new CART(rootNode, featureDefinition)
+                    def maryCartWriter = new MaryCARTWriter()
                     maryCartWriter.dumpMaryCART(cart, outFile.path);
                 }
             }
@@ -605,7 +616,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     } catch (e) {
                         logger.info "Reflection failed: $e"
                         logger.info "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
-                        fpm = new marytts.features.FeatureProcessorManager(project.voice.maryLocale)
+                        fpm = new FeatureProcessorManager(project.voice.maryLocale)
                     }
                     featureFile.withWriter { dest ->
                         dest.println 'ByteValuedFeatureProcessors'
