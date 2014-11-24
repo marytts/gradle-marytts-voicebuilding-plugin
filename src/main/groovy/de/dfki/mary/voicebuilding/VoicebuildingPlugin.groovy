@@ -653,7 +653,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                         }
                     }
                 } catch (e) {
-                    logger.info "No weights definition found -- assuming resources are provided..."
+                    logger.warn "No weights definition found -- assuming resources are provided..."
                 }
             }
         }
