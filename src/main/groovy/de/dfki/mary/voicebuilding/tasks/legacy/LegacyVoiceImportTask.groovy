@@ -7,7 +7,7 @@ class LegacyVoiceImportTask extends JavaExec {
     LegacyVoiceImportTask() {
         classpath project.configurations.legacy, project.configurations.compile
         main 'marytts.tools.voiceimport.DatabaseImportMain'
-        systemProperties = ['user.dir': project.buildDir]
+        workingDir project.buildDir
         args name.replace('legacy', '')
     }
 
