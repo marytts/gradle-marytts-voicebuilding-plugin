@@ -148,13 +148,17 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
             dependsOn project.legacyInit, project.configurePraat
             inputs.files project.fileTree("$project.buildDir/wav").include('*.wav')
-            outputs.files project.fileTree("$project.buildDir/pm").include('*.pm')
+            outputs.files inputs.files.collect {
+                new File("$project.buildDir/pm", it.name.replace('.wav', '.pm'))
+            }
         }
 
         project.task('legacyMCEPMaker', type: LegacyVoiceImportTask) {
             dependsOn project.legacyInit, project.configureSpeechTools
             inputs.files project.fileTree("$project.buildDir/wav").include('*.wav')
-            outputs.files project.fileTree("$project.buildDir/mcep").include('*.mcep')
+            outputs.files inputs.files.collect {
+                new File("$project.buildDir/mcep", it.name.replace('.wav', '.mcep'))
+            }
         }
 
         project.task('generateAllophones') {
@@ -212,7 +216,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('legacyTranscriptionAligner', type: LegacyVoiceImportTask) {
             inputs.files project.generateAllophones, project.legacyLabelPauseDeleter
-            outputs.files project.fileTree("$project.buildDir/allophones").include('*.xml')
+            outputs.files project.generateAllophones.outputs.files.collect {
+                new File("$project.buildDir/allophones", it.name)
+            }
         }
 
         project.task('generateFeatureList') {
