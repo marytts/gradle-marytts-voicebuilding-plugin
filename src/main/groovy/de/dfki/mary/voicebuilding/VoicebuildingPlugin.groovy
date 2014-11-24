@@ -322,7 +322,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('legacyHalfPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            inputs.files project.generateHalfPhoneUnitFeatures
+            inputs.files project.legacyHalfPhoneUnitfileWriter, project.generateHalfPhoneUnitFeatures
             outputs.files project.files("$project.legacyBuildDir/halfphoneFeatures.mry", "$project.legacyBuildDir/halfphoneUnitFeatureDefinition.txt")
         }
 
