@@ -192,7 +192,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.task('legacyLabelPauseDeleter', type: LegacyVoiceImportTask) {
             inputs.files project.legacyEHMMLabeler
             outputs.files inputs.files.collect {
-                new File("$project.buildDir/lablab", it.name)
+                new File("$project.buildDir/lab", it.name)
             }
         }
 
