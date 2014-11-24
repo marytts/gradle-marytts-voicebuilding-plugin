@@ -270,7 +270,8 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('legacyWaveTimelineMaker', type: LegacyVoiceImportTask) {
             inputs.files project.legacyPraatPitchmarker
-            outputs.files new File("$project.legacyBuildDir", 'timeline_waveforms.mry')
+            ext.timelineFile = new File(project.legacyBuildDir, 'timeline_waveforms.mry')
+            outputs.files timelineFile
         }
 
         project.task('legacyBasenameTimelineMaker', type: LegacyVoiceImportTask) {
@@ -385,6 +386,102 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     '-stop', 10,
                     '-output', treeFile
             ]
+        }
+
+        project.task('extractF0Features') {
+            inputs.files project.legacyPhoneFeatureFileWriter, project.legacyPhoneUnitfileWriter
+            ext.leftFeatsFile = project.file("$temporaryDir/f0.left.feats")
+            ext.midFeatsFile = project.file("$temporaryDir/f0.mid.feats")
+            ext.rightFeatsFile = project.file("$temporaryDir/f0.right.feats")
+            outputs.files leftFeatsFile, midFeatsFile, rightFeatsFile
+            doLast {
+                // open destination files for writing
+                def leftFeats = new FileWriter(leftFeatsFile)
+                def midFeats = new FileWriter(midFeatsFile)
+                def rightFeats = new FileWriter(rightFeatsFile)
+                // MaryTTS files needed to extract F0 baked into unit datagram durations
+                def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
+                def featureDefinition = featureFile.featureDefinition
+                def unitFile = new marytts.unitselection.data.UnitFileReader(project.legacyPhoneUnitfileWriter.unitFile.path)
+                def waveTimeline = new marytts.unitselection.data.TimelineReader(project.legacyWaveTimelineMaker.timelineFile.path)
+                // in the absence of high-level feature value accessors, need feature indices
+                def numSegsFromSylStartFeatureIndex = featureDefinition.getFeatureIndex 'segs_from_syl_start'
+                def numSegsFromEndStartFeatureIndex = featureDefinition.getFeatureIndex 'segs_from_syl_end'
+                def phoneFeatureIndex = featureDefinition.getFeatureIndex 'phone'
+                def isVowelFeatureIndex = featureDefinition.getFeatureIndex 'ph_vc'
+                def isVoicedConsonantFeatureIndex = featureDefinition.getFeatureIndex 'ph_cvox'
+                // iterate over all units
+                for (def u = 0; u < unitFile.numberOfUnits; u++) {
+                    def sylSegs = []
+                    // in absence of syllable structure, use segment counter features
+                    def featureVector = featureFile.getFeatureVector(u)
+                    def firstSegInSyl = u + featureVector.getFeatureAsInt(numSegsFromSylStartFeatureIndex)
+                    def lastSegInSyl = u + featureVector.getFeatureAsInt(numSegsFromEndStartFeatureIndex)
+                    // reconstruct relevant features per segment in syllable
+                    (firstSegInSyl..lastSegInSyl).each {
+                        featureVector = featureFile.getFeatureVector it
+                        def phone = featureVector.getFeatureAsString(phoneFeatureIndex, featureDefinition)
+                        def isVowel = featureVector.getFeatureAsString(isVowelFeatureIndex, featureDefinition) == '+'
+                        def isVoicedConsonant = featureVector.getFeatureAsString(isVoicedConsonantFeatureIndex, featureDefinition) == '+'
+                        sylSegs << [
+                                'unitIndex': it,
+                                'phone'    : phone,
+                                'isVoiced' : isVowel || isVoicedConsonant,
+                                'isVowel'  : isVowel,
+                                'features' : featureVector
+                        ]
+                    }
+                    // proceed to reconstruct F0 values from voiced segments, if any
+                    def voicedSegs = sylSegs.grep { it['isVoiced'] }
+                    if (voicedSegs) {
+                        // left F0
+                        def firstVoicedSeg = voicedSegs.first()
+                        def firstVoicedDatagrams = waveTimeline.getDatagrams(unitFile.getUnit(firstVoicedSeg['unitIndex']), unitFile.sampleRate)
+                        def leftF0 = waveTimeline.sampleRate / firstVoicedDatagrams.first().duration
+                        leftFeats.println "$leftF0 ${featureDefinition.toFeatureString firstVoicedSeg['features']}"
+                        // mid F0
+                        def firstVowel = voicedSegs.grep { it['isVowel'] }.first()
+                        def vowelDatagrams = waveTimeline.getDatagrams(unitFile.getUnit(firstVowel['unitIndex']), unitFile.sampleRate)
+                        def midF0 = waveTimeline.sampleRate / vowelDatagrams[vowelDatagrams.length / 2 as int].duration
+                        midFeats.println "$midF0 ${featureDefinition.toFeatureString firstVowel['features']}"
+                        // right F0
+                        def lastVoicedSeg = voicedSegs.last()
+                        def lastVoicedDatagrams = waveTimeline.getDatagrams(unitFile.getUnit(lastVoicedSeg['unitIndex']), unitFile.sampleRate)
+                        def rightF0 = waveTimeline.sampleRate / lastVoicedDatagrams.last().duration
+                        rightFeats.println "$rightF0 ${featureDefinition.toFeatureString lastVoicedSeg['features']}"
+                    }
+                    // increment to end of syllable
+                    u = lastSegInSyl
+                }
+                leftFeats.close()
+                midFeats.close()
+                rightFeats.close()
+            }
+        }
+
+        project.task('generateF0FeaturesDescription') {
+            inputs.files project.legacyPhoneFeatureFileWriter
+            ext.descFile = project.file("$temporaryDir/f0.desc")
+            outputs.files descFile
+            doLast {
+                def featureFile = marytts.unitselection.data.FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
+                def featureDefinition = featureFile.featureDefinition
+                descFile.withWriter { desc ->
+                    desc.println '('
+                    desc.println '( f0 float )'
+                    featureDefinition.featureNameArray.eachWithIndex { feature, f ->
+                        def values = featureDefinition.getPossibleValues f
+                        desc.print "( $feature "
+                        if (featureDefinition.isContinuousFeature(f) || values.length == 20 && values.last() == '19') {
+                            desc.print 'float'
+                        } else {
+                            desc.print values.collect { "\"${it.replace '"', '\\\"'}\"" }.join(' ')
+                        }
+                        desc.println " )"
+                    }
+                    desc.println " )"
+                }
+            }
         }
 
         project.task('generateSource', type: Copy) {
