@@ -169,6 +169,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 new File(destDir, it.name.replace('.txt', '.xml'))
             }
             def mary
+            def parser = new XmlSlurper(false, false)
             doFirst {
                 destDir.mkdirs()
                 mary = new LocalMaryInterface()
@@ -178,7 +179,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
             doLast {
                 [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
                     def doc = mary.generateXML inFile.text
-                    outFile.text = XmlUtil.serialize doc.documentElement
+                    def xmlStr = XmlUtil.serialize doc.documentElement
+                    def xml = parser.parseText xmlStr
+                    outFile.text = XmlUtil.serialize xml
                 }
             }
         }
