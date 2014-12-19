@@ -44,7 +44,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         voice = project.extensions.create 'voice', VoicebuildingPluginVoiceExtension, project
         license = project.extensions.create 'license', VoicebuildingPluginLicenseExtension
         project.ext {
-            maryttsVersion = '5.1'
+            maryttsVersion = '5.2-SNAPSHOT'
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
             legacyBuildDir = "$project.buildDir/mary"
@@ -54,7 +54,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.repositories.maven {
             url 'https://oss.jfrog.org/artifactory/libs-release/'
         }
-        project.repositories.mavenLocal()
+        project.repositories.maven {
+            url 'https://oss.jfrog.org/artifactory/libs-snapshot/'
+        }
 
         project.configurations.create 'legacy'
 

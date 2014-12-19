@@ -11,6 +11,9 @@ repositories {
     maven {
         url 'http://oss.jfrog.org/artifactory/libs-release/'
     }
+    maven {
+        url 'http://oss.jfrog.org/artifactory/libs-snapshot/'
+    }
 }
 
 dependencies {
