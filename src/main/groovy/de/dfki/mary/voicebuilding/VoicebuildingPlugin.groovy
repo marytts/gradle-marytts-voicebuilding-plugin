@@ -82,7 +82,10 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$voice.language:$project.maryttsVersion"
-                legacy "de.dfki.mary:marytts-builder:$project.maryttsVersion"
+                legacy("de.dfki.mary:marytts-builder:$project.maryttsVersion") {
+                    exclude module: 'mwdumper'
+                    exclude module: 'sgt'
+                }
                 testCompile "junit:junit:4.11"
             }
 
