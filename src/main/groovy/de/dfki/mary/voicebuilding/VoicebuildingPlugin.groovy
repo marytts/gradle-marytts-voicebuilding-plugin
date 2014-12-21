@@ -29,7 +29,7 @@ import marytts.unitselection.data.UnitFileReader
 import marytts.util.dom.DomUtils
 
 class VoicebuildingPlugin implements Plugin<Project> {
-    final templateDir = "/de/dfki/mary/voicebuilding/templates"
+
     def voice
     def license
 
@@ -80,6 +80,27 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     'Built-By': System.properties['user.name'],
                     'Built-With': "gradle-${project.gradle.gradleVersion}, groovy-${GroovySystem.version}")
         }
+
+        project.task('templates') {
+            outputs.files([
+                    'Config.java',
+                    'ConfigTest.java',
+                    'database.config',
+                    'LoadVoiceIT.java',
+                    'voice.config',
+                    'voice-hsmm.config'
+            ].collect {
+                project.file "$temporaryDir/$it"
+            })
+            doLast {
+                outputs.files.each { outputFile ->
+                    outputFile.withOutputStream { stream ->
+                        stream << getClass().getResourceAsStream("/de/dfki/mary/voicebuilding/templates/$outputFile.name")
+                    }
+                }
+            }
+        }
+
 
         project.afterEvaluate {
             project.dependencies {
@@ -142,8 +163,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('legacyInit', type: Copy) {
             description "Initialize DatabaseLayout for legacy VoiceImportTools"
-            from project.file(getClass().getResource("$templateDir/database.config"))
+            from project.templates
             into project.buildDir
+            include 'database.config'
             expand project.properties
             doLast {
                 project.file(project.legacyBuildDir).mkdirs()
@@ -573,8 +595,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('generateSource', type: Copy) {
-            from project.file(getClass().getResource("$templateDir/Config.java"))
+            from project.templates
             into project.generatedSrcDir
+            include 'Config.java'
             rename {
                 "marytts/voice/$project.voice.nameCamelCase/$it"
             }
@@ -584,9 +607,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.compileJava.dependsOn project.generateSource
 
         project.task('generateTestSource', type: Copy) {
-            from project.file(getClass().getResource("$templateDir/ConfigTest.java"))
-            from project.file(getClass().getResource("$templateDir/LoadVoiceIT.java"))
+            from project.templates
             into project.generatedTestSrcDir
+            include 'ConfigTest.java', 'LoadVoiceIT.java'
             rename {
                 "marytts/voice/$project.voice.nameCamelCase/$it"
             }
@@ -607,8 +630,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('generateVoiceConfig', type: Copy) {
-            from project.file(getClass().getResource("$templateDir/voice${project.voice.type == "hsmm" ? "-hsmm" : ""}.config"))
+            from project.templates
             into project.sourceSets.main.output.resourcesDir
+            include project.voice.type == 'hsmm' ? 'voice-hsmm.config' : 'voice.config'
             rename {
                 "marytts/voice/$project.voice.nameCamelCase/voice.config"
             }
