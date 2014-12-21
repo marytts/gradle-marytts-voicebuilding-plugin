@@ -17,17 +17,10 @@ repositories {
 }
 
 dependencies {
-    compile localGroovy(),
-            gradleApi(),
-            "de.dfki.mary:marytts-common:$maryttsVersion",
-            "de.dfki.mary:marytts-runtime:$maryttsVersion",
-            "de.dfki.mary:marytts-lang-de:$maryttsVersion",
-            "de.dfki.mary:marytts-lang-en:$maryttsVersion",
-            "de.dfki.mary:marytts-lang-fr:$maryttsVersion",
-            "de.dfki.mary:marytts-lang-ru:$maryttsVersion",
-            "de.dfki.mary:marytts-lang-te:$maryttsVersion",
-            "de.dfki.mary:marytts-lang-tr:$maryttsVersion",
-            "commons-codec:commons-codec:1.9"
+    compile localGroovy()
+    compile gradleApi()
+    compile "de.dfki.mary:marytts-runtime:$maryttsVersion"
+    compile 'commons-codec:commons-codec:1.9'
 }
 
 task sourceJar(type: Jar) {
