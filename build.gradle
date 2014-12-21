@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'de.dfki.mary'
-version '0.5.1'
+version '0.5.2-SNAPSHOT'
 
 repositories {
     jcenter()
