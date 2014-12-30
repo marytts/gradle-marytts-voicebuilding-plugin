@@ -233,21 +233,21 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyLabelPauseDeleter
+            inputs.files project.fileTree("$project.buildDir/lab").include('*.lab')
             outputs.files inputs.files.collect {
                 new File("$project.buildDir/phonelab", it.name)
             }
         }
 
         project.task('legacyHalfPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyLabelPauseDeleter
+            inputs.files project.fileTree("$project.buildDir/lab").include('*.lab')
             outputs.files inputs.files.collect {
                 new File("$project.buildDir/halfphonelab", it.name.replace('.lab', '.hplab'))
             }
         }
 
         project.task('legacyTranscriptionAligner', type: LegacyVoiceImportTask) {
-            inputs.files project.generateAllophones, project.legacyLabelPauseDeleter
+            inputs.files project.generateAllophones, project.fileTree("$project.buildDir/lab").include('*.lab')
             outputs.files project.generateAllophones.outputs.files.collect {
                 new File("$project.buildDir/allophones", it.name)
             }
