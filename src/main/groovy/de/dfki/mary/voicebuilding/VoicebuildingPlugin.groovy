@@ -50,12 +50,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
             legacyBuildDir = "$project.buildDir/mary"
         }
 
-        project.repositories.jcenter()
-        project.repositories.maven {
-            url 'https://oss.jfrog.org/artifactory/libs-release/'
-        }
-        project.repositories.maven {
-            url 'https://oss.jfrog.org/artifactory/libs-snapshot/'
+        project.repositories {
+            jcenter()
+            maven {
+                url 'http://oss.jfrog.org/artifactory/repo'
+            }
         }
 
         project.configurations.create 'legacy'
