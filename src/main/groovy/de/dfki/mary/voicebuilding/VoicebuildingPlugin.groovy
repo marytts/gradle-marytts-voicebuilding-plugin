@@ -108,6 +108,12 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
 
             addTasks(project)
+
+            project.artifacts {
+                if (project.voice.type == 'unit selection') {
+                    archives project.dataZip
+                }
+            }
         }
 
         project.task('legacyComponentZip', type: Zip) {
@@ -117,6 +123,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     "lib/$it"
                 }
             }
+        }
+
+        project.task('dataZip', type: Zip) {
+            from project.processDataResources
+            classifier 'data'
         }
     }
 
