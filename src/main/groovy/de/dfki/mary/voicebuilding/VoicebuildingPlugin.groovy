@@ -44,7 +44,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         voice = project.extensions.create 'voice', VoicebuildingPluginVoiceExtension, project
         license = project.extensions.create 'license', VoicebuildingPluginLicenseExtension
         project.ext {
-            maryttsVersion = '5.2-SNAPSHOT'
+            maryttsVersion = '5.1.2'
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
             legacyBuildDir = "$project.buildDir/mary"

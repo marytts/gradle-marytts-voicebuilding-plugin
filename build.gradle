@@ -16,7 +16,7 @@ repositories {
 dependencies {
     compile localGroovy()
     compile gradleApi()
-    compile "de.dfki.mary:marytts-runtime:$maryttsVersion"
+    compile "de.dfki.mary:marytts-runtime:5.1.2"
     compile 'commons-codec:commons-codec:1.9'
 }
 
