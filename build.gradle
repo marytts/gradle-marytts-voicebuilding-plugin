@@ -13,11 +13,16 @@ repositories {
     }
 }
 
+def maryttsVersion = '5.1.2'
+
 dependencies {
     compile localGroovy()
     compile gradleApi()
-    compile "de.dfki.mary:marytts-runtime:5.1.2"
+    compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion
     compile 'commons-codec:commons-codec:1.9'
+    ['de', 'en', 'fr', 'it', 'ru', 'sv', 'te', 'tr'].each { locale ->
+        runtime group: 'de.dfki.mary', name: "marytts-lang-$locale", version: maryttsVersion
+    }
 }
 
 task sourceJar(type: Jar) {
