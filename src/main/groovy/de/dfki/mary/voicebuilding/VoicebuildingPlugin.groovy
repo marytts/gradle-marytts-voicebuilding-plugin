@@ -640,6 +640,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
             def featureFile = new File(destDir, 'halfphoneUnitFeatureDefinition_ac.txt')
             def joinCostFile = new File(destDir, 'joinCostWeights.txt')
             outputs.files featureFile, joinCostFile
+            doFirst {
+                destDir.mkdirs()
+            }
             doLast {
                 try {
                     project.apply from: 'weights.gradle'
