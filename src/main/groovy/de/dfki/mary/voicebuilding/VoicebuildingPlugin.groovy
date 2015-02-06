@@ -261,7 +261,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             doLast {
                 def fpm
                 try {
-                    fpm = Class.forName("marytts.language.${voice.language}.features.FeatureProcessorManager").newInstance()
+                    fpm = Class.forName("marytts.language.${project.voice.language}.features.FeatureProcessorManager").newInstance()
                 } catch (e) {
                     logger.info "Reflection failed: $e"
                     logger.info "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
@@ -653,7 +653,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     project.apply from: 'weights.gradle'
                     def fpm
                     try {
-                        fpm = Class.forName("marytts.language.${voice.language}.features.FeatureProcessorManager").newInstance()
+                        fpm = Class.forName("marytts.language.${project.voice.language}.features.FeatureProcessorManager").newInstance()
                     } catch (e) {
                         logger.info "Reflection failed: $e"
                         logger.info "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
