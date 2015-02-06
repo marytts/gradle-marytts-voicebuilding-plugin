@@ -772,19 +772,23 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.task('generateJsonDescriptor') {
             def jsonFile = new File(project.distsDir, "$project.name-${project.version}.json")
             outputs.files jsonFile
+            doFirst {
+                project.distsDir.mkdirs()
+            }
             doLast {
                 def json = new JsonBuilder()
                 json.voice {
                     'name' project.voice.name
                     'language' project.voice.language
-                    'locale' project.voice.maryLocale
-                    'license' {
-                        'name' project.license.name
-                        'url' project.license.url
-                    }
+                    'gender' project.voice.gender
+                    'type' project.voice.type
                     'description' project.voice.description
+                    'license' {
+                        'name' project.voice.license.name
+                        'url' project.voice.license.url
+                    }
                 }
-                jsonFile << json.toPrettyString()
+                jsonFile.text = json.toPrettyString()
             }
         }
 
