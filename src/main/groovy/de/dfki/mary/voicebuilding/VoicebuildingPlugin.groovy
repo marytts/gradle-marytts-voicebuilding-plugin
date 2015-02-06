@@ -30,7 +30,6 @@ import marytts.util.dom.DomUtils
 class VoicebuildingPlugin implements Plugin<Project> {
 
     def voice
-    def license
 
     @Override
     void apply(Project project) {
@@ -40,12 +39,14 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.sourceCompatibility = JavaVersion.VERSION_1_7
 
         voice = project.extensions.create 'voice', VoicebuildingPluginVoiceExtension, project
-        license = project.extensions.create 'license', VoicebuildingPluginLicenseExtension
         project.ext {
             maryttsVersion = '5.1.2'
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
             legacyBuildDir = "$project.buildDir/mary"
+            new ConfigSlurper().parse(project.file('voice.groovy').toURL()).each { key, value ->
+                set key, value
+            }
         }
 
         project.repositories {
@@ -753,7 +754,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     'marytts-install'(xmlns: 'http://mary.dfki.de/installer') {
                         voice(gender: voice.gender, locale: voice.maryLocale, name: voice.name, type: voice.type, version: project.version) {
                             delegate.description voice.description
-                            license(href: license.url)
+                            license(href: project.license.url)
                             'package'(filename: zipFile.name, md5sum: zipFileHash, size: zipFile.size()) {
                                 location(folder: true, href: "http://mary.dfki.de/download/$project.maryttsVersion/")
                             }
