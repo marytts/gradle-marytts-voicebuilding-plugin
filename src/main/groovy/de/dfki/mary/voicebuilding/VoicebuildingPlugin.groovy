@@ -1,5 +1,6 @@
 package de.dfki.mary.voicebuilding
 
+import groovy.json.JsonBuilder
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -761,6 +762,25 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     }
                 }
                 xmlFile.text = XmlUtil.serialize(xml)
+            }
+        }
+
+        project.task('generateJsonDescriptor') {
+            def jsonFile = new File(project.distsDir, "$project.name-${project.version}.json")
+            outputs.files jsonFile
+            doLast {
+                def json = new JsonBuilder()
+                json.voice {
+                    'name' project.voice.name
+                    'language' project.voice.language
+                    'locale' project.voice.maryLocale
+                    'license' {
+                        'name' project.license.name
+                        'url' project.license.url
+                    }
+                    'description' project.voice.description
+                }
+                jsonFile << json.toPrettyString()
             }
         }
 
