@@ -66,7 +66,7 @@ public class LoadVoiceIT {
 		assertNotNull(out);
 	}
 
-	@Test${voice.maryLocale in ['de', 'en_US'] ? '' : '(expected = java.lang.AssertionError.class)'}
+	@Test${voice.maryLocale in ['fr'] ? '(expected = java.lang.AssertionError.class)' : ''}
 	public void canProcessTokensToTargetfeatures() throws Exception {
 		MaryInterface mary = new LocalMaryInterface();
 		Locale locale = new Locale(${voice.maryLocale.split('_').collect{ "\"$it\"" }.join(', ')});
@@ -78,7 +78,7 @@ public class LoadVoiceIT {
 		assertNotNull(out);
 	}
 
-	@Test${voice.maryLocale in ['de', 'en_US'] ? '' : '(expected = java.lang.AssertionError.class)'}
+	@Test${voice.maryLocale in ['fr'] ? '(expected = java.lang.AssertionError.class)' : ''}
 	public void canProcessTokensToSpeech() throws Exception {
 		MaryInterface mary = new LocalMaryInterface();
 		Locale locale = new Locale(${voice.maryLocale.split('_').collect{ "\"$it\"" }.join(', ')});
