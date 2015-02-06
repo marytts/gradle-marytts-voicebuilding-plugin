@@ -29,8 +29,6 @@ import marytts.util.dom.DomUtils
 
 class VoicebuildingPlugin implements Plugin<Project> {
 
-    def voice
-
     @Override
     void apply(Project project) {
         project.plugins.apply JavaPlugin
@@ -38,16 +36,15 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.sourceCompatibility = JavaVersion.VERSION_1_7
 
-        voice = project.extensions.create 'voice', VoicebuildingPluginVoiceExtension, project
         project.ext {
             maryttsVersion = '5.1.2'
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
             legacyBuildDir = "$project.buildDir/mary"
-            new ConfigSlurper().parse(project.file('voice.groovy').toURL()).each { key, value ->
             new ConfigSlurper().parse(project.file('voice.groovy').text).each { key, value ->
                 set key, value
             }
+            nameCamelCase = voice.name?.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
         }
 
         project.repositories {
@@ -102,7 +99,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             project.dependencies {
-                compile "de.dfki.mary:marytts-lang-$voice.language:$project.maryttsVersion"
+                compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
                 legacy("de.dfki.mary:marytts-builder:$project.maryttsVersion") {
                     exclude module: 'mwdumper'
                     exclude module: 'sgt'
@@ -639,7 +636,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('generateFeatureFiles') {
-            def destDir = project.file("$project.sourceSets.main.output.resourcesDir/marytts/voice/$voice.nameCamelCase")
+            def destDir = project.file("$project.sourceSets.main.output.resourcesDir/marytts/voice/$project.voice.nameCamelCase")
             def featureFile = new File(destDir, 'halfphoneUnitFeatureDefinition_ac.txt')
             def joinCostFile = new File(destDir, 'joinCostWeights.txt')
             outputs.files featureFile, joinCostFile
