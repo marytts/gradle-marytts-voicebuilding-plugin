@@ -45,6 +45,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
             legacyBuildDir = "$project.buildDir/mary"
             new ConfigSlurper().parse(project.file('voice.groovy').toURL()).each { key, value ->
+            new ConfigSlurper().parse(project.file('voice.groovy').text).each { key, value ->
                 set key, value
             }
         }
