@@ -44,7 +44,12 @@ class VoicebuildingPlugin implements Plugin<Project> {
             new ConfigSlurper().parse(project.file('voice.groovy').text).each { key, value ->
                 set key, value
             }
-            nameCamelCase = voice.name?.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
+            voice.nameCamelCase = voice.name?.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
+            voice.region = voice.region ?: voice.language?.toUpperCase()
+            voice.locale = voice.locale ?: [voice.language, voice.region].join('_')
+            voice.maryLocale = voice.language?.equalsIgnoreCase(voice.region) ? voice.language : voice.locale
+            voice.localeXml = [voice.language, voice.region].join('-')
+            voice.maryLocaleXml = voice.language?.equalsIgnoreCase(voice.region) ? voice.language : voice.localeXml
         }
 
         project.repositories {
@@ -621,7 +626,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 serviceLoaderFile.parentFile.mkdirs()
             }
             doLast {
-                serviceLoaderFile.text = "marytts.voice.${voice.nameCamelCase}.Config"
+                serviceLoaderFile.text = "marytts.voice.${project.voice.nameCamelCase}.Config"
             }
         }
 
@@ -700,7 +705,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.processDataResources.rename {
-            "lib/voices/$voice.name/$it"
+            "lib/voices/$project.voice.name/$it"
         }
 
         project.test {
@@ -720,11 +725,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
             doLast {
                 project.pom { pom ->
                     pom.project {
-                        description voice.description
+                        description project.voice.description
                         licenses {
                             license {
-                                name project.license.name
-                                url project.license.url
+                                name project.voice.license.name
+                                url project.voice.license.url
                             }
                         }
                     }
@@ -750,13 +755,13 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 def builder = new StreamingMarkupBuilder()
                 def xml = builder.bind {
                     'marytts-install'(xmlns: 'http://mary.dfki.de/installer') {
-                        voice(gender: voice.gender, locale: voice.maryLocale, name: voice.name, type: voice.type, version: project.version) {
-                            delegate.description voice.description
-                            license(href: project.license.url)
+                        voice(gender: project.voice.gender, locale: project.voice.maryLocale, name: project.voice.name, type: project.voice.type, version: project.version) {
+                            delegate.description project.voice.description
+                            license(href: project.voice.license.url)
                             'package'(filename: zipFile.name, md5sum: zipFileHash, size: zipFile.size()) {
                                 location(folder: true, href: "http://mary.dfki.de/download/$project.maryttsVersion/")
                             }
-                            depends(language: voice.maryLocaleXml, version: project.maryttsVersion)
+                            depends(language: project.voice.maryLocaleXml, version: project.maryttsVersion)
                         }
                     }
                 }
