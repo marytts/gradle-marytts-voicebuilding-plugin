@@ -771,6 +771,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('generateJsonDescriptor') {
             def jsonFile = new File(project.distsDir, "$project.name-${project.version}.json")
+            inputs.files project.uploadArchives.artifacts
             outputs.files jsonFile
             doFirst {
                 project.distsDir.mkdirs()
@@ -786,6 +787,12 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     'license' {
                         'name' project.voice.license.name
                         'url' project.voice.license.url
+                    }
+                    'files' inputs.files.collect {
+                        ant.checksum(file: it, property: 'md5')
+                        ['name': it.name,
+                         'size': it.size(),
+                         'md5' : ant.md5]
                     }
                 }
                 jsonFile.text = json.toPrettyString()
