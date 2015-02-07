@@ -29,8 +29,6 @@ import marytts.util.dom.DomUtils
 
 class VoicebuildingPlugin implements Plugin<Project> {
 
-    def voice
-
     @Override
     void apply(Project project) {
         project.plugins.apply JavaPlugin
@@ -38,16 +36,20 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.sourceCompatibility = JavaVersion.VERSION_1_7
 
-        voice = project.extensions.create 'voice', VoicebuildingPluginVoiceExtension, project
         project.ext {
             maryttsVersion = '5.1.2'
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
             legacyBuildDir = "$project.buildDir/mary"
-            new ConfigSlurper().parse(project.file('voice.groovy').toURL()).each { key, value ->
             new ConfigSlurper().parse(project.file('voice.groovy').text).each { key, value ->
                 set key, value
             }
+            voice.nameCamelCase = voice.name?.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
+            voice.region = voice.region ?: voice.language?.toUpperCase()
+            voice.locale = voice.locale ?: [voice.language, voice.region].join('_')
+            voice.maryLocale = voice.language?.equalsIgnoreCase(voice.region) ? voice.language : voice.locale
+            voice.localeXml = [voice.language, voice.region].join('-')
+            voice.maryLocaleXml = voice.language?.equalsIgnoreCase(voice.region) ? voice.language : voice.localeXml
         }
 
         project.repositories {
@@ -102,7 +104,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             project.dependencies {
-                compile "de.dfki.mary:marytts-lang-$voice.language:$project.maryttsVersion"
+                compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
                 legacy("de.dfki.mary:marytts-builder:$project.maryttsVersion") {
                     exclude module: 'mwdumper'
                     exclude module: 'sgt'
@@ -259,7 +261,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             doLast {
                 def fpm
                 try {
-                    fpm = Class.forName("marytts.language.${voice.language}.features.FeatureProcessorManager").newInstance()
+                    fpm = Class.forName("marytts.language.${project.voice.language}.features.FeatureProcessorManager").newInstance()
                 } catch (e) {
                     logger.info "Reflection failed: $e"
                     logger.info "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
@@ -624,7 +626,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 serviceLoaderFile.parentFile.mkdirs()
             }
             doLast {
-                serviceLoaderFile.text = "marytts.voice.${voice.nameCamelCase}.Config"
+                serviceLoaderFile.text = "marytts.voice.${project.voice.nameCamelCase}.Config"
             }
         }
 
@@ -639,7 +641,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.task('generateFeatureFiles') {
-            def destDir = project.file("$project.sourceSets.main.output.resourcesDir/marytts/voice/$voice.nameCamelCase")
+            def destDir = project.file("$project.sourceSets.main.output.resourcesDir/marytts/voice/$project.voice.nameCamelCase")
             def featureFile = new File(destDir, 'halfphoneUnitFeatureDefinition_ac.txt')
             def joinCostFile = new File(destDir, 'joinCostWeights.txt')
             outputs.files featureFile, joinCostFile
@@ -651,7 +653,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     project.apply from: 'weights.gradle'
                     def fpm
                     try {
-                        fpm = Class.forName("marytts.language.${voice.language}.features.FeatureProcessorManager").newInstance()
+                        fpm = Class.forName("marytts.language.${project.voice.language}.features.FeatureProcessorManager").newInstance()
                     } catch (e) {
                         logger.info "Reflection failed: $e"
                         logger.info "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
@@ -703,7 +705,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.processDataResources.rename {
-            "lib/voices/$voice.name/$it"
+            "lib/voices/$project.voice.name/$it"
         }
 
         project.test {
@@ -723,11 +725,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
             doLast {
                 project.pom { pom ->
                     pom.project {
-                        description voice.description
+                        description project.voice.description
                         licenses {
                             license {
-                                name project.license.name
-                                url project.license.url
+                                name project.voice.license.name
+                                url project.voice.license.url
                             }
                         }
                     }
@@ -753,13 +755,13 @@ class VoicebuildingPlugin implements Plugin<Project> {
                 def builder = new StreamingMarkupBuilder()
                 def xml = builder.bind {
                     'marytts-install'(xmlns: 'http://mary.dfki.de/installer') {
-                        voice(gender: voice.gender, locale: voice.maryLocale, name: voice.name, type: voice.type, version: project.version) {
-                            delegate.description voice.description
-                            license(href: project.license.url)
+                        voice(gender: project.voice.gender, locale: project.voice.maryLocale, name: project.voice.name, type: project.voice.type, version: project.version) {
+                            delegate.description project.voice.description
+                            license(href: project.voice.license.url)
                             'package'(filename: zipFile.name, md5sum: zipFileHash, size: zipFile.size()) {
                                 location(folder: true, href: "http://mary.dfki.de/download/$project.maryttsVersion/")
                             }
-                            depends(language: voice.maryLocaleXml, version: project.maryttsVersion)
+                            depends(language: project.voice.maryLocaleXml, version: project.maryttsVersion)
                         }
                     }
                 }
@@ -769,20 +771,34 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('generateJsonDescriptor') {
             def jsonFile = new File(project.distsDir, "$project.name-${project.version}.json")
+            inputs.files project.uploadArchives.artifacts
             outputs.files jsonFile
+            doFirst {
+                project.distsDir.mkdirs()
+            }
             doLast {
                 def json = new JsonBuilder()
-                json.voice {
+                json {
+                    'group' project.group
+                    'artifact' project.name
+                    'version' project.version
                     'name' project.voice.name
                     'language' project.voice.language
-                    'locale' project.voice.maryLocale
-                    'license' {
-                        'name' project.license.name
-                        'url' project.license.url
-                    }
+                    'gender' project.voice.gender
+                    'type' project.voice.type
                     'description' project.voice.description
+                    'license' {
+                        'name' project.voice.license.name
+                        'url' project.voice.license.url
+                    }
+                    'files' inputs.files.collect {
+                        ant.checksum(file: it, property: 'md5')
+                        ['name'      : it.name,
+                         'size'      : it.size(),
+                         'md5'       : ant.md5]
+                    }
                 }
-                jsonFile << json.toPrettyString()
+                jsonFile.text = json.toPrettyString()
             }
         }
 
