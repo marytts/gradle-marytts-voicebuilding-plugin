@@ -52,6 +52,8 @@ class VoicebuildingPlugin implements Plugin<Project> {
             voice.maryLocaleXml = voice.language?.equalsIgnoreCase(voice.region) ? voice.language : voice.localeXml
         }
 
+        project.status = project.version.endsWith('SNAPSHOT') ? 'integration' : 'release'
+
         project.repositories {
             jcenter()
             maven {
