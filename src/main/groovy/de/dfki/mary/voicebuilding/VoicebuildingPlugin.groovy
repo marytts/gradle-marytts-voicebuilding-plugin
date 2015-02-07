@@ -778,7 +778,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
             doLast {
                 def json = new JsonBuilder()
-                json.voice {
+                json {
                     'group' project.group
                     'artifact' project.name
                     'version' project.version
@@ -793,9 +793,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     }
                     'files' inputs.files.collect {
                         ant.checksum(file: it, property: 'md5')
-                        ['name': it.name,
-                         'size': it.size(),
-                         'md5' : ant.md5]
+                        ['name'      : it.name,
+                         'size'      : it.size(),
+                         'md5'       : ant.md5]
                     }
                 }
                 jsonFile.text = json.toPrettyString()
