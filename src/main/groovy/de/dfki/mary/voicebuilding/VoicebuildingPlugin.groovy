@@ -779,6 +779,9 @@ class VoicebuildingPlugin implements Plugin<Project> {
             doLast {
                 def json = new JsonBuilder()
                 json.voice {
+                    'group' project.group
+                    'artifact' project.name
+                    'version' project.version
                     'name' project.voice.name
                     'language' project.voice.language
                     'gender' project.voice.gender
