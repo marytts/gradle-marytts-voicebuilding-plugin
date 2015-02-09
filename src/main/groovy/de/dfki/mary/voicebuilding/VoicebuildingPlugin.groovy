@@ -793,11 +793,10 @@ class VoicebuildingPlugin implements Plugin<Project> {
                         'name' project.voice.license.name
                         'url' project.voice.license.url
                     }
-                    'files' inputs.files.collect {
+                    'files' inputs.files.collectEntries {
                         ant.checksum(file: it, algorithm: 'SHA-1', property: "${it.name}.sha1")
-                        ['name': it.name,
-                         'size': it.size(),
-                         'sha1': ant.properties["${it.name}.sha1"]]
+                        [(it.name): ['size': it.size(),
+                                     'sha1': ant.properties["${it.name}.sha1"]]]
                     }
                 }
                 jsonFile.text = json.toPrettyString()
