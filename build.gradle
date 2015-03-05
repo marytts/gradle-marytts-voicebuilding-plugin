@@ -54,6 +54,4 @@ publishing {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion '2.2.1'
-}
+wrapper.gradleVersion '2.3'
