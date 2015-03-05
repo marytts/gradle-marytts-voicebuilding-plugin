@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'de.dfki.mary'
-version '0.5.2.1'
+version '0.5.3-SNAPSHOT'
 
 repositories {
     maven {
