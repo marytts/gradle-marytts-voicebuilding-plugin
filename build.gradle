@@ -38,8 +38,8 @@ plugindev {
 }
 
 bintray {
-    user = "$bintrayUser"
-    key = "$bintrayApiKey"
+    user = project.properties.bintrayUser ?: null
+    key = project.properties.bintrayApiKey ?: null
     pkg.userOrg = 'marytts'
     pkg.repo = 'marytts'
 }
