@@ -53,5 +53,3 @@ publishing {
         }
     }
 }
-
-wrapper.gradleVersion '2.3'
