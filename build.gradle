@@ -1,13 +1,13 @@
 plugins {
     id 'groovy'
     id 'maven-publish'
-    id 'nu.studer.plugindev' version '1.0.3'
 }
 
 group 'de.dfki.mary'
 version '0.5.3-SNAPSHOT'
 
 repositories {
+    jcenter()
     maven {
         url 'https://oss.jfrog.org/artifactory/repo'
     }
@@ -17,6 +17,7 @@ def maryttsVersion = '5.1.2'
 
 dependencies {
     compile localGroovy()
+    compile gradleApi()
     compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion
     compile 'commons-codec:commons-codec:1.9'
     ['de', 'en', 'fr', 'it', 'ru', 'sv', 'te', 'tr'].each { locale ->
@@ -24,24 +25,33 @@ dependencies {
     }
 }
 
-plugindev {
-    pluginImplementationClass 'de.dfki.mary.voicebuilding.VoicebuildingPlugin'
-    pluginDescription 'A replacement for the legacy VoiceImportTools in MaryTTS'
-    pluginLicense 'GPL-3.0'
-    pluginTags 'gradle', 'plugin', 'marytts', 'voicebuilding'
-    authorId 'ingmar'
-    authorName 'Ingmar Steiner'
-    authorEmail 'steiner@coli.uni-saarland.de'
-    projectUrl 'https://github.com/marytts/gradle-marytts-voicebuilding-plugin'
-    projectInceptionYear '2013'
-    done()
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
 }
 
-bintray {
-    user = project.properties.bintrayUser ?: null
-    key = project.properties.bintrayApiKey ?: null
-    pkg.userOrg = 'marytts'
-    pkg.repo = 'marytts'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
+    repositories {
+        maven {
+            url 'https://api.bintray.com/maven/marytts/marytts/gradle-marytts-voicebuilding-plugin'
+            if (hasProperty('bintrayUser') && hasProperty('bintrayKey')) {
+                credentials {
+                    username bintrayUser
+                    password bintrayKey
+                }
+            } else {
+                logger.warn 'Properties bintrayUser and bintrayKey not set; publishing will fail'
+            }
+        }
+    }
 }
 
 wrapper.gradleVersion '2.3'
