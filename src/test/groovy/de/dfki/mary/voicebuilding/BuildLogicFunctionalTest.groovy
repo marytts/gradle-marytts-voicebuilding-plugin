@@ -37,11 +37,19 @@ class BuildLogicFunctionalTest {
         }
 
         apply plugin: 'de.dfki.mary.voicebuilding'
-    """
+        """
+        new File(projectDir, 'voice.groovy') << """
+        voice {
+            name = 'my_voice'
+            language = 'en'
+            region = 'US'
+        }
+        """
     }
 
     @Test
     void testBuild() {
-        def result = gradle.buildAndFail()
+        def result = gradle.build()
+        assert result.task(':help').outcome == SUCCESS
     }
 }
