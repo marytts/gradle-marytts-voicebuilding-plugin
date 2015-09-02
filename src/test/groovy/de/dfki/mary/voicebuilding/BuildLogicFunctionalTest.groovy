@@ -35,12 +35,13 @@ class BuildLogicFunctionalTest {
                 classpath files($pluginClasspath)
             }
         }
+
+        apply plugin: 'de.dfki.mary.voicebuilding'
     """
     }
 
     @Test
     void testBuild() {
-        def result = gradle.build()
-        assert result.task(':help').outcome == SUCCESS
+        def result = gradle.buildAndFail()
     }
 }
