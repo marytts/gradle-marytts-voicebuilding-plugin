@@ -1,13 +1,13 @@
 plugins {
     id 'groovy'
     id 'maven-publish'
-    id 'nu.studer.plugindev' version '1.0.3'
 }
 
 group 'de.dfki.mary'
 version '0.5.3-SNAPSHOT'
 
 repositories {
+    jcenter()
     maven {
         url 'https://oss.jfrog.org/artifactory/repo'
     }
@@ -17,31 +17,50 @@ def maryttsVersion = '5.1.2'
 
 dependencies {
     compile localGroovy()
+    compile gradleApi()
     compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion
     compile 'commons-codec:commons-codec:1.9'
     ['de', 'en', 'fr', 'it', 'ru', 'sv', 'te', 'tr'].each { locale ->
         runtime group: 'de.dfki.mary', name: "marytts-lang-$locale", version: maryttsVersion
     }
+    testCompile gradleTestKit()
+    testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
 }
 
-plugindev {
-    pluginImplementationClass 'de.dfki.mary.voicebuilding.VoicebuildingPlugin'
-    pluginDescription 'A replacement for the legacy VoiceImportTools in MaryTTS'
-    pluginLicense 'GPL-3.0'
-    pluginTags 'gradle', 'plugin', 'marytts', 'voicebuilding'
-    authorId 'ingmar'
-    authorName 'Ingmar Steiner'
-    authorEmail 'steiner@coli.uni-saarland.de'
-    projectUrl 'https://github.com/marytts/gradle-marytts-voicebuilding-plugin'
-    projectInceptionYear '2013'
-    done()
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
 }
 
-bintray {
-    user = "$bintrayUser"
-    key = "$bintrayApiKey"
-    pkg.userOrg = 'marytts'
-    pkg.repo = 'marytts'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
 }
 
-wrapper.gradleVersion '2.3'
+test {
+    useTestNG()
+}
+
+// Write the plugin's classpath to a file to share with the tests
+task createClasspathManifest {
+    def outputDir = file("$buildDir/$name")
+
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+    }
+}
+
+// Add the classpath file to the test runtime classpath
+dependencies {
+    testRuntime files(createClasspathManifest)
+}
