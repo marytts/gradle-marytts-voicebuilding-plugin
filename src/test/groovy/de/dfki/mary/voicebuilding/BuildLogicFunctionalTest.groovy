@@ -41,13 +41,6 @@ class BuildLogicFunctionalTest {
 
         apply plugin: 'de.dfki.mary.voicebuilding'
         """
-        new File(projectDir, 'voice.groovy') << """
-        voice {
-            name = "$voiceName"
-            language = "$voiceLocale.language"
-            region = "$voiceLocale.country"
-        }
-        """
     }
 
     @Test
