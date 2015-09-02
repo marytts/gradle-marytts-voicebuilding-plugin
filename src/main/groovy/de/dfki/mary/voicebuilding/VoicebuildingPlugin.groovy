@@ -36,20 +36,13 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.sourceCompatibility = JavaVersion.VERSION_1_7
 
+        project.extensions.add 'voice', VoiceExtension
+
         project.ext {
             maryttsVersion = '5.1.2'
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
             legacyBuildDir = "$project.buildDir/mary"
-            new ConfigSlurper().parse(project.file('voice.groovy').text).each { key, value ->
-                set key, value
-            }
-            voice.nameCamelCase = voice.name?.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
-            voice.region = voice.region ?: voice.language?.toUpperCase()
-            voice.locale = voice.locale ?: [voice.language, voice.region].join('_')
-            voice.maryLocale = voice.language?.equalsIgnoreCase(voice.region) ? voice.language : voice.locale
-            voice.localeXml = [voice.language, voice.region].join('-')
-            voice.maryLocaleXml = voice.language?.equalsIgnoreCase(voice.region) ? voice.language : voice.localeXml
         }
 
         project.status = project.version.endsWith('SNAPSHOT') ? 'integration' : 'release'
