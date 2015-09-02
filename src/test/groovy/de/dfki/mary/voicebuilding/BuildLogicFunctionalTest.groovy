@@ -12,6 +12,9 @@ class BuildLogicFunctionalTest {
     def gradle
     def buildFile
 
+    def voiceName = 'cmu-slt'
+    def voiceLocale = Locale.US
+
     @BeforeSuite
     void setup() {
         def projectDir = Files.createTempDirectory(null).toFile()
@@ -37,12 +40,9 @@ class BuildLogicFunctionalTest {
         }
 
         apply plugin: 'de.dfki.mary.voicebuilding'
-        """
-        new File(projectDir, 'voice.groovy') << """
+
         voice {
-            name = 'my_voice'
-            language = 'en'
-            region = 'US'
+            name = "$voiceName"
         }
         """
     }
@@ -51,5 +51,26 @@ class BuildLogicFunctionalTest {
     void testBuild() {
         def result = gradle.build()
         assert result.task(':help').outcome == SUCCESS
+    }
+
+    @Test
+    void testModel() {
+        def result = gradle.withArguments('model').build()
+        println result.standardOutput
+        assert result.task(':model').outcome == SUCCESS
+    }
+
+    @Test
+    void testVoiceProps() {
+        buildFile << """
+        task testVoiceProps << {
+            assert voice.name == "$voiceName"
+            assert voice.language == "$voiceLocale.language"
+            assert voice.region == "$voiceLocale.country"
+        }
+        """
+        def result = gradle.withArguments('testVoiceProps').build()
+        println result.standardOutput
+        assert result.task(':testVoiceProps').outcome == SUCCESS
     }
 }
