@@ -12,7 +12,7 @@ class BuildLogicFunctionalTest {
     def gradle
     def buildFile
 
-    def voiceName = 'my_voice'
+    def voiceName = 'cmu-slt'
     def voiceLocale = Locale.US
 
     @BeforeSuite
@@ -40,6 +40,10 @@ class BuildLogicFunctionalTest {
         }
 
         apply plugin: 'de.dfki.mary.voicebuilding'
+
+        voice {
+            name = "$voiceName"
+        }
         """
     }
 
