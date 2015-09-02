@@ -38,7 +38,9 @@ class BuildLogicFunctionalTest {
 
         apply plugin: 'de.dfki.mary.voicebuilding'
         """
-        new File(projectDir, 'voice.groovy') << """"""
+        new File(projectDir, 'voice.groovy') << """
+        voice
+        """
     }
 
     @Test
