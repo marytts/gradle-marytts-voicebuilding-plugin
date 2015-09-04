@@ -13,6 +13,7 @@ allprojects {
         compile localGroovy()
         compile gradleApi()
         testCompile gradleTestKit()
+        testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
     }
 
     test {
@@ -53,7 +54,6 @@ dependencies {
     ['de', 'en', 'fr', 'it', 'ru', 'sv', 'te', 'tr'].each { locale ->
         runtime group: 'de.dfki.mary', name: "marytts-lang-$locale", version: maryttsVersion
     }
-    testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
 }
 
 task sourceJar(type: Jar) {
