@@ -1,13 +1,45 @@
-plugins {
-    id 'groovy'
-    id 'maven-publish'
+allprojects {
+    apply plugin: 'groovy'
+    apply plugin: 'maven-publish'
+
+    group 'de.dfki.mary'
+    version '0.5.3-SNAPSHOT'
+
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        compile localGroovy()
+        compile gradleApi()
+        testCompile gradleTestKit()
+        testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
+    }
+
+    test {
+        useTestNG()
+    }
+
+    // Write the plugin's classpath to a file to share with the tests
+    task createClasspathManifest {
+        def outputDir = file("$buildDir/$name")
+
+        inputs.files sourceSets.main.runtimeClasspath
+        outputs.dir outputDir
+
+        doLast {
+            outputDir.mkdirs()
+            file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+        }
+    }
+
+    // Add the classpath file to the test runtime classpath
+    dependencies {
+        testRuntime files(createClasspathManifest)
+    }
 }
 
-group 'de.dfki.mary'
-version '0.5.3-SNAPSHOT'
-
 repositories {
-    jcenter()
     maven {
         url 'https://oss.jfrog.org/artifactory/repo'
     }
@@ -16,15 +48,12 @@ repositories {
 def maryttsVersion = '5.1.2'
 
 dependencies {
-    compile localGroovy()
-    compile gradleApi()
+    compile project('data-plugin')
     compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion
     compile 'commons-codec:commons-codec:1.9'
     ['de', 'en', 'fr', 'it', 'ru', 'sv', 'te', 'tr'].each { locale ->
         runtime group: 'de.dfki.mary', name: "marytts-lang-$locale", version: maryttsVersion
     }
-    testCompile gradleTestKit()
-    testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
 }
 
 task sourceJar(type: Jar) {
@@ -41,26 +70,4 @@ publishing {
             }
         }
     }
-}
-
-test {
-    useTestNG()
-}
-
-// Write the plugin's classpath to a file to share with the tests
-task createClasspathManifest {
-    def outputDir = file("$buildDir/$name")
-
-    inputs.files sourceSets.main.runtimeClasspath
-    outputs.dir outputDir
-
-    doLast {
-        outputDir.mkdirs()
-        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
-    }
-}
-
-// Add the classpath file to the test runtime classpath
-dependencies {
-    testRuntime files(createClasspathManifest)
 }

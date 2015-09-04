@@ -14,6 +14,7 @@ import groovy.xml.*
 
 import org.apache.commons.codec.digest.DigestUtils
 
+import de.dfki.mary.voicebuilding.data.VoicebuildingDataPlugin
 import de.dfki.mary.voicebuilding.tasks.legacy.LegacyVoiceImportTask
 
 import marytts.LocalMaryInterface
@@ -33,6 +34,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply JavaPlugin
         project.plugins.apply MavenPlugin
+        project.plugins.apply VoicebuildingDataPlugin
 
         project.sourceCompatibility = JavaVersion.VERSION_1_7
 
