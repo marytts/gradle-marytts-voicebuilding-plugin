@@ -58,4 +58,15 @@ class BuildLogicFunctionalTest {
         def result = gradle.withArguments('testConfigurations').build()
         assert result.task(':testConfigurations').outcome == SUCCESS
     }
+
+    @Test
+    void testSourceSets() {
+        buildFile << """
+        task testSourceSets << {
+            assert sourceSets.data
+        }
+        """
+        def result = gradle.withArguments('testSourceSets').build()
+        assert result.task(':testSourceSets').outcome == SUCCESS
+    }
 }

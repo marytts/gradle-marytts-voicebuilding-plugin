@@ -10,5 +10,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         project.plugins.apply JavaPlugin
 
         project.configurations.create 'data'
+
+        project.sourceSets.create 'data'
     }
 }
