@@ -3,8 +3,6 @@ package de.dfki.mary.voicebuilding
 import org.gradle.testkit.runner.GradleRunner
 import org.testng.annotations.*
 
-import java.nio.file.Files
-
 import static org.gradle.testkit.runner.TaskOutcome.*
 
 class BuildLogicFunctionalTest {
@@ -17,7 +15,8 @@ class BuildLogicFunctionalTest {
 
     @BeforeSuite
     void setup() {
-        def projectDir = Files.createTempDirectory(null).toFile()
+        def projectDir = new File(System.properties.testProjectDir)
+        projectDir.mkdirs()
         gradle = GradleRunner.create().withProjectDir(projectDir)
         buildFile = new File(projectDir, 'build.gradle')
 
