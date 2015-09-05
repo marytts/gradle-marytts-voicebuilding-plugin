@@ -18,7 +18,7 @@ class BuildLogicFunctionalTest {
         def projectDir = new File(System.properties.testProjectDir)
         projectDir.mkdirs()
         gradle = GradleRunner.create().withProjectDir(projectDir)
-        if (System.properties.offline as boolean) {
+        if (System.properties.offline.toBoolean()) {
             gradle = gradle.withArguments('--offline')
         }
         buildFile = new File(projectDir, 'build.gradle')
