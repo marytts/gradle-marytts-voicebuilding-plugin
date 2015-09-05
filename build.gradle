@@ -19,6 +19,10 @@ allprojects {
     test {
         useTestNG()
 
+        testLogging {
+            exceptionFormat = 'full'
+        }
+
         // test project under build, but nuke it first to be sure it's clean
         def testProjectDir = "$buildDir/testProject"
         systemProperty 'testProjectDir', testProjectDir
