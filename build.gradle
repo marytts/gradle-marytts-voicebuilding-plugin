@@ -18,6 +18,20 @@ allprojects {
 
     test {
         useTestNG()
+
+        testLogging {
+            exceptionFormat = 'full'
+        }
+
+        // test project under build, but nuke it first to be sure it's clean
+        def testProjectDir = "$buildDir/testProject"
+        systemProperty 'testProjectDir', testProjectDir
+        doFirst {
+            delete testProjectDir
+        }
+
+        // propagate offline status to test project
+        systemProperty 'offline', gradle.startParameter.offline
     }
 
     // Write the plugin's classpath to a file to share with the tests

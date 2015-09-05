@@ -1,9 +1,7 @@
-package de.dfki.mary.voicebuilding
+package de.dfki.mary.voicebuilding.data
 
 import org.gradle.testkit.runner.GradleRunner
 import org.testng.annotations.*
-
-import java.nio.file.Files
 
 import static org.gradle.testkit.runner.TaskOutcome.*
 
@@ -14,8 +12,12 @@ class BuildLogicFunctionalTest {
 
     @BeforeSuite
     void setup() {
-        def projectDir = Files.createTempDirectory(null).toFile()
+        def projectDir = new File(System.properties.testProjectDir)
+        projectDir.mkdirs()
         gradle = GradleRunner.create().withProjectDir(projectDir)
+        if (System.properties.offline.toBoolean()) {
+            gradle = gradle.withArguments('--offline')
+        }
         buildFile = new File(projectDir, 'build.gradle')
 
         def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
@@ -44,5 +46,27 @@ class BuildLogicFunctionalTest {
     void testBuild() {
         def result = gradle.build()
         assert result.task(':help').outcome == SUCCESS
+    }
+
+    @Test
+    void testConfigurations() {
+        buildFile << """
+        task testConfigurations << {
+            assert configurations.data
+        }
+        """
+        def result = gradle.withArguments('testConfigurations').build()
+        assert result.task(':testConfigurations').outcome == SUCCESS
+    }
+
+    @Test
+    void testSourceSets() {
+        buildFile << """
+        task testSourceSets << {
+            assert sourceSets.data
+        }
+        """
+        def result = gradle.withArguments('testSourceSets').build()
+        assert result.task(':testSourceSets').outcome == SUCCESS
     }
 }
