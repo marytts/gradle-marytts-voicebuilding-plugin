@@ -29,9 +29,6 @@ allprojects {
         doFirst {
             delete testProjectDir
         }
-
-        // propagate offline status to test project
-        systemProperty 'offline', gradle.startParameter.offline
     }
 
     // Write the plugin's classpath to a file to share with the tests
