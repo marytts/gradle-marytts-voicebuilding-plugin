@@ -59,6 +59,12 @@ class BuildLogicFunctionalTest {
         voice {
             name = "$voiceName"
         }
+
+        task testVoiceProps << {
+            assert voice.name == "$voiceName"
+            assert voice.language == "$voiceLocale.language"
+            assert voice.region == "$voiceLocale.country"
+        }
         """
     }
 
@@ -77,13 +83,6 @@ class BuildLogicFunctionalTest {
 
     @Test
     void testVoiceProps() {
-        buildFile << """
-        task testVoiceProps << {
-            assert voice.name == "$voiceName"
-            assert voice.language == "$voiceLocale.language"
-            assert voice.region == "$voiceLocale.country"
-        }
-        """
         def result = gradle.withArguments('testVoiceProps').build()
         println result.standardOutput
         assert result.task(':testVoiceProps').outcome == SUCCESS
