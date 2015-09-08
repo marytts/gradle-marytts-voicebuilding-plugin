@@ -10,6 +10,9 @@ class BuildLogicFunctionalTest {
     def gradle
     def buildFile
 
+    def dataDependencyName = 'cmu_time_awb'
+    def dataDependency = "org.festvox:$dataDependencyName::ldom@tar.bz2"
+
     @BeforeSuite
     void setup() {
         def projectDir = new File(System.properties.testProjectDir)
@@ -44,12 +47,20 @@ class BuildLogicFunctionalTest {
             flatDir dirs: "$projectDir.parent/testKitGradleHome"
         }
 
+        dependencies {
+            data "$dataDependency"
+        }
+
         task testConfigurations << {
             assert configurations.data
         }
 
         task testSourceSets << {
             assert sourceSets.data
+        }
+
+        task testDependencies << {
+            assert configurations.data.dependencies.find { it.name == "$dataDependencyName" }
         }
         """
     }
@@ -70,5 +81,11 @@ class BuildLogicFunctionalTest {
     void testSourceSets() {
         def result = gradle.withArguments('testSourceSets').build()
         assert result.task(':testSourceSets').outcome == SUCCESS
+    }
+
+    @Test
+    void testDependencies() {
+        def result = gradle.withArguments('testDependencies').build()
+        assert result.task(':testDependencies').outcome == SUCCESS
     }
 }
