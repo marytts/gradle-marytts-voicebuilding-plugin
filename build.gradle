@@ -29,9 +29,6 @@ allprojects {
         doFirst {
             delete testProjectDir
         }
-
-        // propagate offline status to test project
-        systemProperty 'offline', gradle.startParameter.offline
     }
 
     // Write the plugin's classpath to a file to share with the tests
@@ -50,6 +47,12 @@ allprojects {
     // Add the classpath file to the test runtime classpath
     dependencies {
         testRuntime files(createClasspathManifest)
+    }
+
+    task copyTestRuntimeDependencies(type: Copy) {
+        from configurations.testRuntime
+        into "$buildDir/testKitGradleHome"
+        test.dependsOn it
     }
 }
 
