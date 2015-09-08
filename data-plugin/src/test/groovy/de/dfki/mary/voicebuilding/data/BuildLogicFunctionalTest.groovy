@@ -59,6 +59,13 @@ class BuildLogicFunctionalTest {
         task testDependencies << {
             assert configurations.data.dependencies.find { it.name == "$dataDependencyName" }
         }
+
+        task testProcessDataResources {
+            dependsOn processDataResources
+            doLast {
+                assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.wav').files
+            }
+        }
         """
     }
 
@@ -84,5 +91,12 @@ class BuildLogicFunctionalTest {
     void testDependencies() {
         def result = gradle.withArguments('testDependencies').build()
         assert result.task(':testDependencies').outcome == SUCCESS
+    }
+
+    @Test
+    void testProcessDataResources() {
+        def result = gradle.withArguments('testProcessDataResources').build()
+        assert result.task(':processDataResources').outcome in [SUCCESS, UP_TO_DATE]
+        assert result.task(':testProcessDataResources').outcome == SUCCESS
     }
 }
