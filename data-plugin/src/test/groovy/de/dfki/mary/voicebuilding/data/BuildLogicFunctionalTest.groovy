@@ -39,6 +39,10 @@ class BuildLogicFunctionalTest {
         }
 
         apply plugin: 'de.dfki.mary.voicebuilding-data'
+
+        repositories {
+            flatDir dirs: "$projectDir.parent/testKitGradleHome"
+        }
         """
     }
 

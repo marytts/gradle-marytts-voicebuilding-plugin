@@ -51,6 +51,12 @@ allprojects {
     dependencies {
         testRuntime files(createClasspathManifest)
     }
+
+    task copyTestRuntimeDependencies(type: Copy) {
+        from configurations.testRuntime
+        into "$buildDir/testKitGradleHome"
+        test.dependsOn it
+    }
 }
 
 repositories {
