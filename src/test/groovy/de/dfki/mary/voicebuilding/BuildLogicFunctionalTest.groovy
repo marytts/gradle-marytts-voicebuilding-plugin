@@ -43,19 +43,6 @@ class BuildLogicFunctionalTest {
 
         apply plugin: 'de.dfki.mary.voicebuilding'
 
-        repositories {
-            ivy {
-                url 'http://festvox.org/examples'
-                layout 'pattern', {
-                    artifact '[module]_[classifier]/packed/[artifact].[ext]'
-                }
-            }
-        }
-
-        dependencies {
-            data group: 'org.festvox', name: 'cmu_time_awb', version: '1.0', classifier: 'ldom', ext: 'tar.bz2'
-        }
-
         voice {
             name = "$voiceName"
         }
