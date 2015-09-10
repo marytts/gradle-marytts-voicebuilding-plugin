@@ -59,6 +59,43 @@ class BuildLogicFunctionalTest {
         task testDependencies << {
             assert configurations.data.dependencies.find { it.name == "$dataDependencyName" }
         }
+
+        processDataResources {
+            from configurations.data
+            filesMatching '*.tar.bz2', { tarFileDetails ->
+                copy {
+                    from tarTree(tarFileDetails.file)
+                    into destinationDir
+                    include '**/wav/*.wav', '**/lab/*.lab', '**/etc/*.data'
+                    eachFile {
+                        it.path = 'unpacked/' + it.name
+                    }
+                    includeEmptyDirs = false
+                }
+                tarFileDetails.exclude()
+            }
+
+            doLast {
+                // extract text prompts
+                fileTree(destinationDir).include('**/*.data').each { dataFile ->
+                     dataFile.eachLine { line ->
+                         def m = line =~ /\\( (?<utt>.+) "(?<text>.+)" \\)/
+                         if (m.matches()) {
+                             file("\$destinationDir/unpacked/\${m.group('utt')}.txt").text = m.group('text')
+                         }
+                     }
+                 }
+            }
+        }
+
+        task testProcessDataResources {
+            dependsOn processDataResources
+            doLast {
+                assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.wav').files
+                assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.lab').files
+                assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.txt').files
+            }
+        }
         """
     }
 
@@ -84,5 +121,12 @@ class BuildLogicFunctionalTest {
     void testDependencies() {
         def result = gradle.withArguments('testDependencies').build()
         assert result.task(':testDependencies').outcome == SUCCESS
+    }
+
+    @Test
+    void testProcessDataResources() {
+        def result = gradle.withArguments('testProcessDataResources').build()
+        assert result.task(':processDataResources').outcome in [SUCCESS, UP_TO_DATE]
+        assert result.task(':testProcessDataResources').outcome == SUCCESS
     }
 }
