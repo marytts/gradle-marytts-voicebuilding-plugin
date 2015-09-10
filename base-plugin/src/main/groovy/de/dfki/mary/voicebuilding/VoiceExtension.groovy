@@ -20,23 +20,23 @@ class VoiceExtension {
         samplingRate = 16000
     }
 
-    def nameCamelCase = {
+    String getNameCamelCase() {
         name?.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
     }
 
-    def locale = {
-        locale ?: [language, region].join('_')
+    String getLocale() {
+        [language, region].join('_')
     }
 
-    def localeXml = {
+    String getLocaleXml() {
         [language, region].join('-')
     }
 
-    def maryLocale = {
+    String getMaryLocale() {
         language?.equalsIgnoreCase(region) ? language : locale
     }
 
-    def maryLocaleXml = {
+    String getMaryLocaleXml() {
         language?.equalsIgnoreCase(region) ? language : localeXml
     }
 }
