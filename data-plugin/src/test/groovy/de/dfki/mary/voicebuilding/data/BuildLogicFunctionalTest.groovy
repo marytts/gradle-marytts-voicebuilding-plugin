@@ -129,4 +129,11 @@ class BuildLogicFunctionalTest {
         assert result.task(':processDataResources').outcome in [SUCCESS, UP_TO_DATE]
         assert result.task(':testProcessDataResources').outcome == SUCCESS
     }
+
+    @Test
+    void testGenerateAllophones() {
+        def result = gradle.withArguments('generateAllophones').build()
+        assert result.task(':processDataResources').outcome in [SUCCESS, UP_TO_DATE]
+        assert result.task(':generateAllophones').outcome == SUCCESS
+    }
 }
