@@ -48,15 +48,15 @@ class BuildLogicFunctionalTest {
             data "$dataDependency"
         }
 
-        task testConfigurations << {
+        task testConfigurations(group: 'Verification') << {
             assert configurations.data
         }
 
-        task testSourceSets << {
+        task testSourceSets(group: 'Verification') << {
             assert sourceSets.data
         }
 
-        task testDependencies << {
+        task testDependencies(group: 'Verification') << {
             assert configurations.data.dependencies.find { it.name == "$dataDependencyName" }
         }
 
@@ -90,6 +90,7 @@ class BuildLogicFunctionalTest {
         }
 
         task testProcessDataResources {
+            group 'Verification'
             dependsOn processDataResources
             doLast {
                 assert fileTree(sourceSets.data.output.resourcesDir).include('wav/*.wav').files
@@ -99,6 +100,7 @@ class BuildLogicFunctionalTest {
         }
 
         task testGenerateAllophones {
+            group 'Verification'
             dependsOn generateAllophones
             doLast {
                 assert fileTree("\$sourceSets.data.output.resourcesDir/prompt_allophones").include('*.xml').files
