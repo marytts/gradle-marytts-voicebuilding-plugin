@@ -19,8 +19,8 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.task('generateAllophones') {
             dependsOn project.processDataResources
-            inputs.files project.fileTree("$project.buildDir/text").include('*.txt')
-            def destDir = project.file("$project.buildDir/prompt_allophones")
+            inputs.files project.fileTree("$project.sourceSets.data.output.resourcesDir/text").include('*.txt')
+            def destDir = project.file("$project.sourceSets.data.output.resourcesDir/prompt_allophones")
             outputs.files inputs.files.collect {
                 new File(destDir, it.name.replace('.txt', '.xml'))
             }
