@@ -96,6 +96,13 @@ class BuildLogicFunctionalTest {
                 assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.txt').files
             }
         }
+
+        task testGenerateAllophones {
+            dependsOn generateAllophones
+            doLast {
+                assert fileTree("\$sourceSets.data.output.resourcesDir/prompt_allophones").include('*.xml').files
+            }
+        }
         """
     }
 
@@ -135,5 +142,9 @@ class BuildLogicFunctionalTest {
         def result = gradle.withArguments('generateAllophones').build()
         assert result.task(':processDataResources').outcome in [SUCCESS, UP_TO_DATE]
         assert result.task(':generateAllophones').outcome == SUCCESS
+        result = gradle.withArguments('testGenerateAllophones').build()
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':testGenerateAllophones').outcome == SUCCESS
     }
 }
