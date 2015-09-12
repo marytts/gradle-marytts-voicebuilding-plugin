@@ -68,7 +68,7 @@ class BuildLogicFunctionalTest {
                     into destinationDir
                     include '**/wav/*.wav', '**/lab/*.lab', '**/etc/*.data'
                     eachFile {
-                        it.path = 'unpacked/' + it.name
+                        it.path = 'wav/' + it.name
                     }
                     includeEmptyDirs = false
                 }
@@ -77,11 +77,12 @@ class BuildLogicFunctionalTest {
 
             doLast {
                 // extract text prompts
+                file("\$destinationDir/text").mkdirs()
                 fileTree(destinationDir).include('**/*.data').each { dataFile ->
                      dataFile.eachLine { line ->
                          def m = line =~ /\\( (?<utt>.+) "(?<text>.+)" \\)/
                          if (m.matches()) {
-                             file("\$destinationDir/unpacked/\${m.group('utt')}.txt").text = m.group('text')
+                             file("\$destinationDir/text/\${m.group('utt')}.txt").text = m.group('text')
                          }
                      }
                  }
@@ -91,9 +92,9 @@ class BuildLogicFunctionalTest {
         task testProcessDataResources {
             dependsOn processDataResources
             doLast {
-                assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.wav').files
+                assert fileTree(sourceSets.data.output.resourcesDir).include('wav/*.wav').files
                 assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.lab').files
-                assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.txt').files
+                assert fileTree(sourceSets.data.output.resourcesDir).include('text/*.txt').files
             }
         }
 
