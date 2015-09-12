@@ -186,31 +186,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('generateAllophones') {
-            dependsOn project.legacyInit
-            inputs.files project.fileTree("$project.buildDir/text").include('*.txt')
-            def destDir = project.file("$project.buildDir/prompt_allophones")
-            outputs.files inputs.files.collect {
-                new File(destDir, it.name.replace('.txt', '.xml'))
-            }
-            def mary
-            def parser = new XmlSlurper(false, false)
-            doFirst {
-                destDir.mkdirs()
-                mary = new LocalMaryInterface()
-                mary.locale = new Locale(project.voice.maryLocale)
-                mary.outputType = 'ALLOPHONES'
-            }
-            doLast {
-                [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
-                    def doc = mary.generateXML inFile.text
-                    def xmlStr = XmlUtil.serialize doc.documentElement
-                    def xml = parser.parseText xmlStr
-                    outFile.text = XmlUtil.serialize xml
-                }
-            }
-        }
-
         project.task('legacyHTKLabeler', type: LegacyVoiceImportTask) {
             dependsOn project.legacyInit, project.configureHTK
             inputs.files project.fileTree("$project.buildDir/wav").include('*.wav'), project.generateAllophones

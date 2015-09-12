@@ -44,7 +44,7 @@ class BuildLogicFunctionalTest {
             name = "$voiceName"
         }
 
-        task testVoiceProps << {
+        task testVoiceProps(group: 'Verification') << {
             assert voice.name == "$voiceName"
             assert voice.language == "$voiceLocale.language"
             assert voice.region == "$voiceLocale.country"

@@ -48,15 +48,15 @@ class BuildLogicFunctionalTest {
             data "$dataDependency"
         }
 
-        task testConfigurations << {
+        task testConfigurations(group: 'Verification') << {
             assert configurations.data
         }
 
-        task testSourceSets << {
+        task testSourceSets(group: 'Verification') << {
             assert sourceSets.data
         }
 
-        task testDependencies << {
+        task testDependencies(group: 'Verification') << {
             assert configurations.data.dependencies.find { it.name == "$dataDependencyName" }
         }
 
@@ -68,7 +68,7 @@ class BuildLogicFunctionalTest {
                     into destinationDir
                     include '**/wav/*.wav', '**/lab/*.lab', '**/etc/*.data'
                     eachFile {
-                        it.path = 'unpacked/' + it.name
+                        it.path = 'wav/' + it.name
                     }
                     includeEmptyDirs = false
                 }
@@ -77,11 +77,12 @@ class BuildLogicFunctionalTest {
 
             doLast {
                 // extract text prompts
+                file("\$destinationDir/text").mkdirs()
                 fileTree(destinationDir).include('**/*.data').each { dataFile ->
                      dataFile.eachLine { line ->
                          def m = line =~ /\\( (?<utt>.+) "(?<text>.+)" \\)/
                          if (m.matches()) {
-                             file("\$destinationDir/unpacked/\${m.group('utt')}.txt").text = m.group('text')
+                             file("\$destinationDir/text/\${m.group('utt')}.txt").text = m.group('text')
                          }
                      }
                  }
@@ -89,11 +90,20 @@ class BuildLogicFunctionalTest {
         }
 
         task testProcessDataResources {
+            group 'Verification'
             dependsOn processDataResources
             doLast {
-                assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.wav').files
+                assert fileTree(sourceSets.data.output.resourcesDir).include('wav/*.wav').files
                 assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.lab').files
-                assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.txt').files
+                assert fileTree(sourceSets.data.output.resourcesDir).include('text/*.txt').files
+            }
+        }
+
+        task testGenerateAllophones {
+            group 'Verification'
+            dependsOn generateAllophones
+            doLast {
+                assert fileTree("\$sourceSets.data.output.resourcesDir/prompt_allophones").include('*.xml').files
             }
         }
         """
@@ -128,5 +138,16 @@ class BuildLogicFunctionalTest {
         def result = gradle.withArguments('testProcessDataResources').build()
         assert result.task(':processDataResources').outcome in [SUCCESS, UP_TO_DATE]
         assert result.task(':testProcessDataResources').outcome == SUCCESS
+    }
+
+    @Test
+    void testGenerateAllophones() {
+        def result = gradle.withArguments('generateAllophones').build()
+        assert result.task(':processDataResources').outcome in [SUCCESS, UP_TO_DATE]
+        assert result.task(':generateAllophones').outcome == SUCCESS
+        result = gradle.withArguments('testGenerateAllophones').build()
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome in [SUCCESS, UP_TO_DATE]
+        assert result.task(':testGenerateAllophones').outcome == SUCCESS
     }
 }
