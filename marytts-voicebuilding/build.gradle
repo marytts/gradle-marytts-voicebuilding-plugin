@@ -1,0 +1,3 @@
+dependencies {
+    testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
+}

@@ -1,5 +1,7 @@
 package marytts
 
+import org.custommonkey.xmlunit.*
+
 import org.testng.annotations.*
 
 class TextToAllophonesConverterTest {
@@ -9,6 +11,7 @@ class TextToAllophonesConverterTest {
     @BeforeTest
     void setup() {
         converter = new TextToAllophonesConverter()
+        XMLUnit.ignoreWhitespace = true
     }
 
     @DataProvider
@@ -42,6 +45,8 @@ class TextToAllophonesConverterTest {
     @Test(dataProvider = 'data')
     void testConvert(text, expected) {
         def actual = converter.convert(text)
-        assert actual == expected
+        def comparison = XMLUnit.compareXML(expected, actual)
+        def data = new DetailedDiff(comparison)
+        assert data.similar()
     }
 }
