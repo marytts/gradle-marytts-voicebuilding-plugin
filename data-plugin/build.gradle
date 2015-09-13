@@ -1,3 +1,5 @@
+apply from: "$rootDir/testKitLogic.gradle"
+
 repositories {
     ivy {
         url 'http://festvox.org/examples'

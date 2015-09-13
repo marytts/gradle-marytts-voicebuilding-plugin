@@ -3,7 +3,6 @@ def maryttsVersion = '5.1.2'
 allprojects {
     apply plugin: 'groovy'
     apply plugin: 'maven-publish'
-    apply from: "$rootDir/testKitLogic.gradle"
 
     group 'de.dfki.mary'
     version '0.5.3-SNAPSHOT'
@@ -33,6 +32,8 @@ allprojects {
         }
     }
 }
+
+apply from: 'testKitLogic.gradle'
 
 repositories {
     maven {
