@@ -1,2 +1,3 @@
 rootProject.name = 'gradle-marytts-voicebuilding-plugin'
 include 'data-plugin'
+include 'marytts-voicebuilding'
