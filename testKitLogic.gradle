@@ -1,0 +1,33 @@
+test {
+    // test project under build, but nuke it first to be sure it's clean
+    def testProjectDir = "$buildDir/testProject"
+    systemProperty 'testProjectDir', testProjectDir
+    doFirst {
+        delete testProjectDir
+    }
+}
+
+// Write the plugin's classpath to a file to share with the tests
+task createClasspathManifest {
+    def outputDir = file("$buildDir/$name")
+
+    inputs.files sourceSets.main.runtimeClasspath
+    outputs.dir outputDir
+
+    doLast {
+        outputDir.mkdirs()
+        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+    }
+}
+
+// Add the classpath file to the test runtime classpath
+dependencies {
+    testCompile gradleTestKit()
+    testRuntime files(createClasspathManifest)
+}
+
+task copyTestRuntimeDependencies(type: Copy) {
+    from configurations.testRuntime
+    into "$buildDir/testKitGradleHome"
+    test.dependsOn it
+}
