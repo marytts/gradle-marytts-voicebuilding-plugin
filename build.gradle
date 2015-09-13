@@ -16,7 +16,6 @@ allprojects {
 
     dependencies {
         compile localGroovy()
-        compile gradleApi()
         compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion
         ['de', 'en', 'fr', 'it', 'ru', 'sv', 'te', 'tr'].each { locale ->
             runtime group: 'de.dfki.mary', name: "marytts-lang-$locale", version: maryttsVersion
@@ -42,6 +41,7 @@ repositories {
 }
 
 dependencies {
+    compile gradleApi()
     compile project('data-plugin')
     compile 'commons-codec:commons-codec:1.9'
 }

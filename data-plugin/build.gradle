@@ -10,5 +10,6 @@ repositories {
 }
 
 dependencies {
+    compile gradleApi()
     testRuntime group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
 }
