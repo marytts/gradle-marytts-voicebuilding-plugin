@@ -46,6 +46,7 @@ class BuildLogicFunctionalTest {
 
         dependencies {
             data "$dataDependency"
+            runtime group: 'de.dfki.mary', name: 'marytts-common', version: '5.1.2'
         }
 
         task testConfigurations(group: 'Verification') << {
@@ -106,6 +107,11 @@ class BuildLogicFunctionalTest {
                 assert fileTree("\$sourceSets.data.output.resourcesDir/prompt_allophones").include('*.xml').files
             }
         }
+
+        task testMaryJavaExec(type: JavaExec) {
+            classpath sourceSets.main.runtimeClasspath
+            main 'marytts.util.PrintSystemProperties'
+        }
         """
     }
 
@@ -140,7 +146,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':testProcessDataResources').outcome == SUCCESS
     }
 
-    @Test
+    @Test(enabled = false)
     void testGenerateAllophones() {
         def result = gradle.withArguments('generateAllophones').build()
         assert result.task(':processDataResources').outcome in [SUCCESS, UP_TO_DATE]
@@ -149,5 +155,11 @@ class BuildLogicFunctionalTest {
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':generateAllophones').outcome in [SUCCESS, UP_TO_DATE]
         assert result.task(':testGenerateAllophones').outcome == SUCCESS
+    }
+
+    @Test
+    void testMaryJavaExec() {
+        def result = gradle.withArguments('testMaryJavaExec').build()
+        assert result.task(':testMaryJavaExec').outcome == SUCCESS
     }
 }
