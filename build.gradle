@@ -1,5 +1,3 @@
-def maryttsVersion = '5.1.2'
-
 allprojects {
     apply plugin: 'groovy'
     apply plugin: 'maven-publish'
