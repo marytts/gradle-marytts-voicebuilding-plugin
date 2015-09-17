@@ -11,5 +11,6 @@ repositories {
 
 dependencies {
     compile gradleApi()
+    testRuntime project(':marytts-voicebuilding')
     testRuntime group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
 }
