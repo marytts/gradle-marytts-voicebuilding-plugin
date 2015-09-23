@@ -2,6 +2,8 @@ package de.dfki.mary.voicebuilding
 
 import groovy.xml.XmlUtil
 
+import de.dfki.mary.voicebuilding.tasks.*
+
 import marytts.LocalMaryInterface
 
 import org.gradle.api.Plugin
@@ -16,6 +18,12 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         project.configurations.create 'data'
 
         project.sourceSets.create 'data'
+
+        project.task('text', type: TextTask) {
+            inputs.files project.processDataResources
+            dataFile = project.file("$project.sourceSets.data.output.resourcesDir/$dataFileName")
+            textDir = project.file("$project.buildDir/text")
+        }
 
         project.task('generateAllophones') {
             dependsOn project.processDataResources
