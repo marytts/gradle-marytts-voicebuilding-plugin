@@ -11,6 +11,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 
 class VoicebuildingDataPlugin implements Plugin<Project> {
+
     @Override
     void apply(Project project) {
         project.plugins.apply JavaPlugin
@@ -21,13 +22,13 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.task('text', type: TextTask) {
             inputs.files project.processDataResources
-            dataFile = project.file("$project.sourceSets.data.output.resourcesDir/$dataFileName")
-            textDir = project.file("$project.buildDir/text")
+            srcFile = project.file("$project.sourceSets.data.output.resourcesDir/$srcFileName")
+            destDir = project.file("$project.buildDir/text")
         }
 
         project.task('generateAllophones', type: AllophonesExtractorTask) {
             inputs.files project.text
-            allophonesDir = project.file("$project.buildDir/prompt_allophones")
+            destDir = project.file("$project.buildDir/prompt_allophones")
         }
     }
 }

@@ -8,20 +8,20 @@ import org.gradle.api.tasks.TaskAction
 class TextTask extends DefaultTask {
 
     @Input
-    String dataFileName = 'time.data'
+    String srcFileName = 'time.data'
 
     @Input
-    File dataFile
+    File srcFile
 
     @OutputDirectory
-    File textDir
+    File destDir
 
     @TaskAction
     void extract() {
-        dataFile.eachLine { line ->
+        srcFile.eachLine { line ->
             def m = line =~ /\( (?<utt>.+) "(?<text>.+)" \)/
             if (m.matches()) {
-                new File("$textDir/${m.group('utt')}.txt").text = m.group('text')
+                new File("$destDir/${m.group('utt')}.txt").text = m.group('text')
             }
         }
     }
