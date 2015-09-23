@@ -14,7 +14,6 @@ import groovy.xml.*
 
 import org.apache.commons.codec.digest.DigestUtils
 
-import de.dfki.mary.voicebuilding.data.VoicebuildingDataPlugin
 import de.dfki.mary.voicebuilding.tasks.legacy.LegacyVoiceImportTask
 
 import marytts.LocalMaryInterface

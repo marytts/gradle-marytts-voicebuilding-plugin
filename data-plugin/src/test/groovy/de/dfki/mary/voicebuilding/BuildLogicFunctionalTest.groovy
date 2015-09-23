@@ -1,4 +1,4 @@
-package de.dfki.mary.voicebuilding.data
+package de.dfki.mary.voicebuilding
 
 import org.gradle.testkit.runner.GradleRunner
 import org.testng.annotations.*
