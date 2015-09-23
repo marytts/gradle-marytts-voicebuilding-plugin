@@ -163,17 +163,13 @@ class BuildLogicFunctionalTest {
         assert result.task(':testText').outcome == SUCCESS
     }
 
-    @Test(enabled = false)
+    @Test(dependsOnMethods = ['testText'])
     void testGenerateAllophones() {
-        def result = gradle.withArguments('generateAllophones').build()
-        assert result.task(':processDataResources').outcome in [SUCCESS, UP_TO_DATE]
-        println result.standardOutput
-        assert result.task(':generateAllophones').outcome == SUCCESS
-        result = gradle.withArguments('testGenerateAllophones').build()
+        def result = gradle.withArguments('generateAllophones').buildAndFail()
         println result.standardOutput
         assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome in [SUCCESS, UP_TO_DATE]
-        assert result.task(':testGenerateAllophones').outcome == SUCCESS
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == FAILED
     }
 
     @Test
