@@ -87,6 +87,14 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        task testText {
+            group 'Verification'
+            dependsOn text
+            doLast {
+                assert fileTree(buildDir).include('text/*.txt').files
+            }
+        }
+
         task testGenerateAllophones {
             group 'Verification'
             dependsOn generateAllophones
@@ -135,6 +143,17 @@ class BuildLogicFunctionalTest {
         result = gradle.withArguments('testProcessDataResources').build()
         println result.standardOutput
         assert result.task(':processDataResources').outcome == UP_TO_DATE
+    }
+
+    @Test(dependsOnMethods = ['testProcessDataResources'])
+    void testText() {
+        def result = gradle.withArguments('text').build()
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == SUCCESS
+        result = gradle.withArguments('testText').build()
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':testText').outcome == SUCCESS
     }
 
     @Test(enabled = false)
