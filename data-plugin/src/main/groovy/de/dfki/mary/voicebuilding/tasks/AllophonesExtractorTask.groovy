@@ -1,5 +1,6 @@
 package de.dfki.mary.voicebuilding.tasks
 
+import groovy.io.FileType
 import groovy.xml.XmlUtil
 
 import marytts.LocalMaryInterface
@@ -20,12 +21,14 @@ class AllophonesExtractorTask extends DefaultTask {
         // TODO: locale must be configurable
         mary.locale = Locale.US
         mary.outputType = 'ALLOPHONES'
-        inputs.sourceFiles.each { srcFile ->
-            def doc = mary.generateXML(srcFile.text)
-            def xmlStr = XmlUtil.serialize(doc.documentElement)
-            def xml = parser.parseText(xmlStr)
-            def destFile = new File(allophonesDir, srcFile.name.replace('.txt', '.xml'))
-            destFile.text = XmlUtil.serialize(xml)
+        inputs.files.each { textDir ->
+            textDir.eachFileMatch(FileType.FILES, ~/.+\.txt/) { srcFile ->
+                def doc = mary.generateXML(srcFile.text)
+                def xmlStr = XmlUtil.serialize(doc.documentElement)
+                def xml = parser.parseText(xmlStr)
+                def destFile = new File(allophonesDir, srcFile.name.replace('.txt', '.xml'))
+                destFile.text = XmlUtil.serialize(xml)
+            }
         }
     }
 }

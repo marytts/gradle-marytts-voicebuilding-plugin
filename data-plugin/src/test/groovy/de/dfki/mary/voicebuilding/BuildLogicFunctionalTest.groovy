@@ -99,7 +99,7 @@ class BuildLogicFunctionalTest {
             group 'Verification'
             dependsOn generateAllophones
             doLast {
-                assert fileTree("\$sourceSets.data.output.resourcesDir/prompt_allophones").include('*.xml').files
+                assert fileTree("\$buildDir/prompt_allophones").include('*.xml').files
             }
         }
 
@@ -165,11 +165,15 @@ class BuildLogicFunctionalTest {
 
     @Test(dependsOnMethods = ['testText'])
     void testGenerateAllophones() {
-        def result = gradle.withArguments('generateAllophones').buildAndFail()
+        def result = gradle.withArguments('generateAllophones').build()
         println result.standardOutput
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == FAILED
+        assert result.task(':generateAllophones').outcome == SUCCESS
+        result = gradle.withArguments('testGenerateAllophones').build()
+        println result.standardOutput
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':testGenerateAllophones').outcome == SUCCESS
     }
 
     @Test
