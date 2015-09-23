@@ -81,9 +81,9 @@ class BuildLogicFunctionalTest {
             group 'Verification'
             dependsOn processDataResources
             doLast {
-                assert fileTree(sourceSets.data.output.resourcesDir).include('wav/*.wav').files
-                assert fileTree(sourceSets.data.output.resourcesDir).include('**/*.lab').files
-                assert fileTree(sourceSets.data.output.resourcesDir).include('text/*.txt').files
+                assert fileTree(sourceSets.data.output.resourcesDir).include('*.wav').files
+                assert fileTree(sourceSets.data.output.resourcesDir).include('*.lab').files
+                assert fileTree(sourceSets.data.output.resourcesDir).include('*.data').files
             }
         }
 
@@ -126,11 +126,15 @@ class BuildLogicFunctionalTest {
         assert result.task(':testDependencies').outcome == SUCCESS
     }
 
-    @Test(enabled = false)
+    @Test
     void testProcessDataResources() {
         def result = gradle.withArguments('testProcessDataResources').build()
-        assert result.task(':processDataResources').outcome in [SUCCESS, UP_TO_DATE]
+        // hackery above means this is always up to date, but also always executes:
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':testProcessDataResources').outcome == SUCCESS
+        result = gradle.withArguments('testProcessDataResources').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
     }
 
     @Test(enabled = false)
