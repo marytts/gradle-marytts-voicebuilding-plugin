@@ -46,7 +46,7 @@ class BuildLogicFunctionalTest {
 
         dependencies {
             data "$dataDependency"
-            runtime group: 'de.dfki.mary', name: 'marytts-common', version: '5.1.2'
+            runtime group: 'de.dfki.mary', name: 'marytts-common', version: '5.1.1'
         }
 
         task('text', type: FestvoxTextTask) {
