@@ -9,3 +9,8 @@ jdk:
   - openjdk7
   - oraclejdk7
   - oraclejdk8
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/modules-2/files-2.1
+    - $HOME/.gradle/wrapper
