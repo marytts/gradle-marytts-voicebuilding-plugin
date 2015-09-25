@@ -46,7 +46,14 @@ class BuildLogicFunctionalTest {
 
         dependencies {
             data "$dataDependency"
-            runtime group: 'de.dfki.mary', name: 'marytts-common', version: '5.1.2'
+            runtime group: 'de.dfki.mary', name: 'marytts-common', version: '5.1.1'
+        }
+
+        task('text', type: FestvoxTextTask) {
+            dependsOn processDataResources
+            srcFile = file("\$sourceSets.data.output.resourcesDir/time.data")
+            destDir = file("\$buildDir/text")
+            generateAllophones.dependsOn it
         }
 
         task testConfigurations(group: 'Verification') << {
@@ -106,6 +113,24 @@ class BuildLogicFunctionalTest {
         task testMaryJavaExec(type: JavaExec) {
             classpath sourceSets.main.runtimeClasspath
             main 'marytts.util.PrintSystemProperties'
+        }
+
+        class FestvoxTextTask extends DefaultTask {
+            @Input
+            File srcFile
+
+            @OutputDirectory
+            File destDir
+
+            @TaskAction
+            void extract() {
+                srcFile.eachLine { line ->
+                    def m = line =~ /\\( (?<utt>.+) "(?<text>.+)" \\)/
+                    if (m.matches()) {
+                        new File("\$destDir/\${m.group('utt')}.txt").text = m.group('text')
+                    }
+                }
+            }
         }
         """
     }
