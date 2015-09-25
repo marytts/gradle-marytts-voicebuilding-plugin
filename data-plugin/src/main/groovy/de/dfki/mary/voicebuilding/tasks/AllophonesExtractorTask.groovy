@@ -7,10 +7,14 @@ import marytts.LocalMaryInterface
 import marytts.datatypes.MaryDataType
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 class AllophonesExtractorTask extends DefaultTask {
+
+    @InputDirectory
+    File srcDir
 
     @OutputDirectory
     File destDir
@@ -22,14 +26,12 @@ class AllophonesExtractorTask extends DefaultTask {
         // TODO: locale must be configurable
         mary.locale = Locale.US
         mary.outputType = MaryDataType.ALLOPHONES
-        inputs.files.each { srcDir ->
-            srcDir.eachFileMatch(FileType.FILES, ~/.+\.txt/) { srcFile ->
-                def doc = mary.generateXML(srcFile.text)
-                def xmlStr = XmlUtil.serialize(doc.documentElement)
-                def xml = parser.parseText(xmlStr)
-                def destFile = new File(destDir, srcFile.name.replace('.txt', '.xml'))
-                destFile.text = XmlUtil.serialize(xml)
-            }
+        srcDir.eachFileMatch(FileType.FILES, ~/.+\.txt/) { srcFile ->
+            def doc = mary.generateXML(srcFile.text)
+            def xmlStr = XmlUtil.serialize(doc.documentElement)
+            def xml = parser.parseText(xmlStr)
+            def destFile = new File(destDir, srcFile.name.replace('.txt', '.xml'))
+            destFile.text = XmlUtil.serialize(xml)
         }
     }
 }
