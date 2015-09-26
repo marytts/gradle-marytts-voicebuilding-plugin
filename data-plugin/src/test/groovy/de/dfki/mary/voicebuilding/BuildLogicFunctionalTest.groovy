@@ -111,6 +111,14 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        task testMcepMaker {
+            group 'Verification'
+            dependsOn mcepMaker
+            doLast {
+                assert fileTree("\$buildDir/mcep").include('*.mcep').files
+            }
+        }
+
         task testText {
             group 'Verification'
             dependsOn text
@@ -218,6 +226,23 @@ class BuildLogicFunctionalTest {
         assert result.task(':wav').outcome == UP_TO_DATE
         assert result.task(':praatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':testPraatPitchmarker').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testPraatPitchmarker'])
+    void testMcepMaker() {
+        def result = gradle.withArguments('mcepMaker').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':praatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':mcepMaker').outcome == SUCCESS
+        result = gradle.withArguments('testMcepMaker').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':praatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':mcepMaker').outcome == UP_TO_DATE
+        assert result.task(':testMcepMaker').outcome == SUCCESS
     }
 
     @Test(dependsOnMethods = ['testProcessDataResources'])
