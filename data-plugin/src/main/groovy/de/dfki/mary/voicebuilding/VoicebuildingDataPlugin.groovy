@@ -30,5 +30,11 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             srcDir = project.file("$project.buildDir/text")
             destDir = project.file("$project.buildDir/prompt_allophones")
         }
+
+        project.task('praatPitchmarker', type: PraatPitchmarkerTask) {
+            dependsOn project.wav
+            srcDir = project.file("$project.buildDir/wav")
+            destDir = project.file("$project.buildDir/pm")
+        }
     }
 }

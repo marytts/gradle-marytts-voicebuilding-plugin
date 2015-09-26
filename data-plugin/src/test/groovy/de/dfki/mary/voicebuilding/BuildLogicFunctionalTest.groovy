@@ -102,6 +102,14 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        task testPraatPitchmarker {
+            group 'Verification'
+            dependsOn praatPitchmarker
+            doLast {
+                assert fileTree("\$buildDir/pm").include('*.PointProcess').files
+            }
+        }
+
         task testText {
             group 'Verification'
             dependsOn text
@@ -194,6 +202,21 @@ class BuildLogicFunctionalTest {
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':wav').outcome == UP_TO_DATE
         assert result.task(':testWav').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testWav'])
+    void testPraatPitchmarker() {
+        def result = gradle.withArguments('praatPitchmarker').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':praatPitchmarker').outcome == SUCCESS
+        result = gradle.withArguments('testPraatPitchmarker').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':praatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':testPraatPitchmarker').outcome == SUCCESS
     }
 
     @Test(dependsOnMethods = ['testProcessDataResources'])
