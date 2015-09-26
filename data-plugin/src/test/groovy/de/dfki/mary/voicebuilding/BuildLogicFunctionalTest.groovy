@@ -94,6 +94,14 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        task testWav {
+            group 'Verification'
+            dependsOn wav
+            doLast {
+                assert fileTree("\$buildDir/wav").include('*.wav').files
+            }
+        }
+
         task testText {
             group 'Verification'
             dependsOn text
@@ -173,6 +181,19 @@ class BuildLogicFunctionalTest {
         result = gradle.withArguments('testProcessDataResources').build()
         println result.standardOutput
         assert result.task(':processDataResources').outcome == UP_TO_DATE
+    }
+
+    @Test(dependsOnMethods = ['testProcessDataResources'])
+    void testWav() {
+        def result = gradle.withArguments('wav').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == SUCCESS
+        result = gradle.withArguments('testWav').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':testWav').outcome == SUCCESS
     }
 
     @Test(dependsOnMethods = ['testProcessDataResources'])

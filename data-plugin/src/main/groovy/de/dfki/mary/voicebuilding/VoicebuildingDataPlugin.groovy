@@ -20,6 +20,12 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.sourceSets.create 'data'
 
+        project.task('wav', type: AudioConverterTask) {
+            dependsOn project.processDataResources
+            srcDir = project.file("$project.sourceSets.data.output.resourcesDir")
+            destDir = project.file("$project.buildDir/wav")
+        }
+
         project.task('generateAllophones', type: AllophonesExtractorTask) {
             srcDir = project.file("$project.buildDir/text")
             destDir = project.file("$project.buildDir/prompt_allophones")
