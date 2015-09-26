@@ -36,5 +36,12 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             srcDir = project.file("$project.buildDir/wav")
             destDir = project.file("$project.buildDir/pm")
         }
+
+        project.task('mcepMaker', type: MCEPMakerTask) {
+            dependsOn project.praatPitchmarker
+            srcDir = project.file("$project.buildDir/wav")
+            pmDir = project.file("$project.buildDir/pm")
+            destDir = project.file("$project.buildDir/mcep")
+        }
     }
 }
