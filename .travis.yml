@@ -13,6 +13,7 @@ jdk:
 addons:
   apt:
     packages:
+    - praat
     - sox
 
 cache:
