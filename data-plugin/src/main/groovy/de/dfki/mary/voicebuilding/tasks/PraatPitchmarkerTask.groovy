@@ -29,7 +29,8 @@ class PraatPitchmarkerTask extends DefaultTask {
     void process() {
         // generate praat script
         def scriptFile = project.file("$temporaryDir/script.praat")
-        def resource = getClass().getResourceAsStream('/marytts/tools/voiceimport/script.praat')
+        def resource = getClass().getResourceAsStream('script.praat')
+        assert resource
         scriptFile.withOutputStream { stream ->
             stream << resource
         }
