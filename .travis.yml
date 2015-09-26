@@ -18,5 +18,5 @@ addons:
 
 cache:
   directories:
-    - $HOME/.gradle/caches/modules-2/files-2.1
+    - $HOME/.gradle/caches/modules-2
     - $HOME/.gradle/wrapper
