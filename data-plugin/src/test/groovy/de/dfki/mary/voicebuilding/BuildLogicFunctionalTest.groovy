@@ -107,6 +107,7 @@ class BuildLogicFunctionalTest {
             dependsOn praatPitchmarker
             doLast {
                 assert fileTree("\$buildDir/pm").include('*.PointProcess').files
+                assert fileTree("\$buildDir/pm").include('*.pm').files
             }
         }
 

@@ -1,5 +1,7 @@
 package de.dfki.mary.voicebuilding.tasks
 
+import groovy.io.FileType
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
@@ -27,7 +29,8 @@ class PraatPitchmarkerTask extends DefaultTask {
     void process() {
         // generate praat script
         def scriptFile = project.file("$temporaryDir/script.praat")
-        def resource = getClass().getResourceAsStream('/marytts/tools/voiceimport/script.praat')
+        def resource = getClass().getResourceAsStream('script.praat')
+        assert resource
         scriptFile.withOutputStream { stream ->
             stream << resource
         }
@@ -43,6 +46,36 @@ class PraatPitchmarkerTask extends DefaultTask {
             args scriptFile, basenamesFile, srcDir, destDir, minPitch, maxPitch
         }
 
-        // TODO: convert to EST .pm files
+        // convert praat .PointProcess file to EST .pm file
+        destDir.eachFileMatch(FileType.FILES, ~/.+\.PointProcess/) { ppFile ->
+            def pmFile = project.file("$destDir/${ppFile.name.replace('.PointProcess', '.pm')}")
+            def nx
+            def times = []
+            ppFile.readLines().eachWithIndex { line, l ->
+                switch (l) {
+                    case { it < 5 }:
+                        // ignore praat header...
+                        break
+                    case 5:
+                        // ...up to line 5, which tells number of points
+                        nx = line
+                        break
+                    default:
+                        times << line
+                }
+            }
+            pmFile.withWriter { pm ->
+                pm.println 'EST_File Track'
+                pm.println 'DataType ascii'
+                pm.println 'NumFrames ' + nx
+                pm.println 'NumChannels 0'
+                pm.println 'NumAuxChannels 0'
+                pm.println 'EqualSpace 0'
+                pm.println 'BreaksPresent true'
+                pm.println 'CommentChar ;'
+                pm.println 'EST_Header_End'
+                pm.println times.collect { "${it as float}\t1" }.join('\n')
+            }
+        }
     }
 }
