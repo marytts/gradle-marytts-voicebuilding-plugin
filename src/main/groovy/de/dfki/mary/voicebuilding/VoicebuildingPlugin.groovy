@@ -146,18 +146,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
             project.ext.speechToolsDir = new File(proc.in.text)?.parentFile?.parent
         }
 
-        project.task('configureHTK') {
-            def proc = 'which HRest'.execute()
-            proc.waitFor()
-            project.ext.htkDir = new File(proc.in.text)?.parent
-        }
-
-        project.task('configureEhmm') {
-            def proc = 'which ehmm'.execute()
-            proc.waitFor()
-            project.ext.ehmmDir = new File(proc.in.text)?.parentFile?.parent
-        }
-
         project.task('legacyInit', type: Copy) {
             description "Initialize DatabaseLayout for legacy VoiceImportTools"
             from project.templates
@@ -182,25 +170,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
             inputs.files project.legacyPraatPitchmarker
             outputs.files inputs.files.collect {
                 new File("$project.buildDir/mcep", it.name.replace('.pm', '.mcep'))
-            }
-        }
-
-        project.task('legacyHTKLabeler', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyInit, project.configureHTK
-            inputs.files project.fileTree("$project.buildDir/wav").include('*.wav'), project.generateAllophones
-            outputs.files project.fileTree("$project.buildDir/htk/lab").include('*.lab')
-        }
-
-        project.task('legacyEHMMLabeler', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyInit, project.configureEhmm
-            inputs.files project.fileTree("$project.buildDir/wav").include('*.wav'), project.generateAllophones
-            outputs.files project.fileTree("$project.buildDir/ehmm/lab").include('*.lab')
-        }
-
-        project.task('legacyLabelPauseDeleter', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyEHMMLabeler
-            outputs.files inputs.files.collect {
-                new File("$project.buildDir/lab", it.name)
             }
         }
 
