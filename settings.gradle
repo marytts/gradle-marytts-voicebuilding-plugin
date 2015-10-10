@@ -1,4 +1,5 @@
 rootProject.name = 'gradle-marytts-voicebuilding-plugin'
-include 'festvox-plugin'
+include 'base-plugin'
 include 'data-plugin'
+include 'festvox-plugin'
 include 'marytts-voicebuilding'
