@@ -1,10 +1,6 @@
 package de.dfki.mary.voicebuilding
 
-import groovy.xml.XmlUtil
-
 import de.dfki.mary.voicebuilding.tasks.*
-
-import marytts.LocalMaryInterface
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
