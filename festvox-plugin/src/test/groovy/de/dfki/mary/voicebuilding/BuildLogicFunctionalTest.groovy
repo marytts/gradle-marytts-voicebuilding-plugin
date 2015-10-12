@@ -32,6 +32,11 @@ class BuildLogicFunctionalTest {
         plugins {
             id 'de.dfki.mary.voicebuilding-festvox'
         }
+
+        task testPlugins(group: 'Verification') << {
+            assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
+            assert plugins.findPlugin('de.dfki.mary.voicebuilding-festvox')
+        }
         """
     }
 
@@ -40,5 +45,12 @@ class BuildLogicFunctionalTest {
         def result = gradle.build()
         println result.standardOutput
         assert result.task(':help').outcome == SUCCESS
+    }
+
+    @Test
+    void testPlugins() {
+        def result = gradle.withArguments('testPlugins').build()
+        println result.standardOutput
+        assert result.task(':testPlugins').outcome == SUCCESS
     }
 }

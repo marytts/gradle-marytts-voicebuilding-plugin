@@ -9,5 +9,6 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+        project.plugins.apply VoicebuildingDataPlugin
     }
 }
