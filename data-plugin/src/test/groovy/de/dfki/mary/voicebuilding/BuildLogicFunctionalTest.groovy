@@ -67,6 +67,8 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        generateAllophones.dependsOn text
+
         task testWav {
             group 'Verification'
             dependsOn wav
@@ -213,7 +215,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':testText').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testText'], enabled = false)
+    @Test(dependsOnMethods = ['testText'])
     void testGenerateAllophones() {
         def result = gradle.withArguments('generateAllophones').build()
         println result.standardOutput

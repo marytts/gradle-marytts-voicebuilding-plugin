@@ -45,6 +45,32 @@ class BuildLogicFunctionalTest {
         task testDataDependencies(group: 'Verification') << {
             assert configurations.data.dependencies.find { it.name == 'cmu_time_awb' }
         }
+
+        task testProcessDataResources {
+            group 'Verification'
+            dependsOn processDataResources
+            doLast {
+                assert fileTree(sourceSets.data.output.resourcesDir).include('*.wav').files
+                assert fileTree(sourceSets.data.output.resourcesDir).include('*.lab').files
+                assert fileTree(sourceSets.data.output.resourcesDir).include('*.data').files
+            }
+        }
+
+        task testWav {
+            group 'Verification'
+            dependsOn wav
+            doLast {
+                assert fileTree(buildDir).include('wav/*.wav').files
+            }
+        }
+
+        task testText {
+            group 'Verification'
+            dependsOn text
+            doLast {
+                assert fileTree(buildDir).include('text/*.txt').files
+            }
+        }
         """
     }
 
@@ -67,5 +93,43 @@ class BuildLogicFunctionalTest {
         def result = gradle.withArguments('testDataDependencies').build()
         println result.standardOutput
         assert result.task(':testDataDependencies').outcome == SUCCESS
+    }
+
+    @Test
+    void testProcessDataResources() {
+        def result = gradle.withArguments('testProcessDataResources').build()
+        println result.standardOutput
+        // hackery above means this is always up to date, but also always executes:
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':testProcessDataResources').outcome == SUCCESS
+        result = gradle.withArguments('testProcessDataResources').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+    }
+
+    @Test(dependsOnMethods = ['testProcessDataResources'])
+    void testWav() {
+        def result = gradle.withArguments('wav').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == SUCCESS
+        result = gradle.withArguments('testWav').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':testWav').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testProcessDataResources'])
+    void testText() {
+        def result = gradle.withArguments('text').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == SUCCESS
+        result = gradle.withArguments('testText').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':testText').outcome == SUCCESS
     }
 }
