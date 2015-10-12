@@ -17,7 +17,6 @@ class BuildLogicFunctionalTest {
     void setup() {
         def projectDir = new File(System.properties.testProjectDir)
         projectDir.mkdirs()
-        gradle = GradleRunner.create().withProjectDir(projectDir)
         buildFile = new File(projectDir, 'build.gradle')
 
         def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
@@ -27,18 +26,15 @@ class BuildLogicFunctionalTest {
 
         def pluginClasspath = pluginClasspathResource.readLines()
                 .collect { it.replace('\\', '\\\\') } // escape backslashes in Windows paths
-                .collect { "'$it'" }
-                .join(", ")
+                .collect { new File(it) }
+
+        gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath(pluginClasspath)
 
         // Add the logic under test to the test build
         buildFile << """
-        buildscript {
-            dependencies {
-                classpath files($pluginClasspath)
-            }
+        plugins {
+            id 'de.dfki.mary.voicebuilding'
         }
-
-        apply plugin: 'de.dfki.mary.voicebuilding'
 
         voice {
             name = "$voiceName"
