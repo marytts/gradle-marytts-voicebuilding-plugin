@@ -146,36 +146,11 @@ class BuildLogicFunctionalTest {
     }
 
     @Test
-    void testProcessDataResources() {
-        def result = gradle.withArguments('testProcessDataResources').build()
-        println result.standardOutput
-        // hackery above means this is always up to date, but also always executes:
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':testProcessDataResources').outcome == SUCCESS
-        result = gradle.withArguments('testProcessDataResources').build()
-        println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-    }
-
-    @Test(dependsOnMethods = ['testProcessDataResources'])
-    void testWav() {
-        def result = gradle.withArguments('wav').build()
-        println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == SUCCESS
-        result = gradle.withArguments('testWav').build()
-        println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':testWav').outcome == SUCCESS
-    }
-
-    @Test(dependsOnMethods = ['testWav'])
     void testPraatPitchmarker() {
         def result = gradle.withArguments('praatPitchmarker').build()
         println result.standardOutput
         assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == SUCCESS
         assert result.task(':praatPitchmarker').outcome == SUCCESS
         result = gradle.withArguments('testPraatPitchmarker').build()
         println result.standardOutput
@@ -202,25 +177,12 @@ class BuildLogicFunctionalTest {
         assert result.task(':testMcepMaker').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testProcessDataResources'])
-    void testText() {
-        def result = gradle.withArguments('text').build()
-        println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == SUCCESS
-        result = gradle.withArguments('testText').build()
-        println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':testText').outcome == SUCCESS
-    }
-
-    @Test(dependsOnMethods = ['testText'])
+    @Test
     void testGenerateAllophones() {
         def result = gradle.withArguments('generateAllophones').build()
         println result.standardOutput
         assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == SUCCESS
         assert result.task(':generateAllophones').outcome == SUCCESS
         result = gradle.withArguments('testGenerateAllophones').build()
         println result.standardOutput
