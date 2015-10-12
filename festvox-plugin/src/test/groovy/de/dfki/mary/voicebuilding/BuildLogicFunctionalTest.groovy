@@ -37,6 +37,14 @@ class BuildLogicFunctionalTest {
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-festvox')
         }
+
+        dependencies {
+            data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom'
+        }
+
+        task testDataDependencies(group: 'Verification') << {
+            assert configurations.data.dependencies.find { it.name == 'cmu_time_awb' }
+        }
         """
     }
 
@@ -52,5 +60,12 @@ class BuildLogicFunctionalTest {
         def result = gradle.withArguments('testPlugins').build()
         println result.standardOutput
         assert result.task(':testPlugins').outcome == SUCCESS
+    }
+
+    @Test
+    void testDependencies() {
+        def result = gradle.withArguments('testDataDependencies').build()
+        println result.standardOutput
+        assert result.task(':testDataDependencies').outcome == SUCCESS
     }
 }
