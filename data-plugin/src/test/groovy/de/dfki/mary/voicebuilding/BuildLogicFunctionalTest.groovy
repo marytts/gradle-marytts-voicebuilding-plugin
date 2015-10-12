@@ -33,7 +33,7 @@ class BuildLogicFunctionalTest {
         // Add the logic under test to the test build
         buildFile << """
         plugins {
-            id 'de.dfki.mary.voicebuilding-data'
+            id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
         }
 
         repositories {

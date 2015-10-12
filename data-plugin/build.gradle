@@ -12,6 +12,7 @@ repositories {
 dependencies {
     compile gradleApi()
     runtime group: 'de.dfki.mary', name: 'marytts-lang-en', version: maryttsVersion
+    testRuntime project(':festvox-plugin')
     testRuntime project(':marytts-voicebuilding')
     testRuntime group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
 }
