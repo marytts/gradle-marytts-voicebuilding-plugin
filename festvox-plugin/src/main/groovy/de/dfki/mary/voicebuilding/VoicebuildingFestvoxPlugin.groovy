@@ -35,5 +35,12 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
                 tarFileDetails.exclude()
             }
         }
+
+        project.task('text', type: FestvoxTextTask) {
+            dependsOn project.processDataResources
+            // TODO: must configure data file name:
+            srcFile = project.file("$project.sourceSets.data.output.resourcesDir/time.data")
+            destDir = project.file("$project.buildDir/text")
+        }
     }
 }
