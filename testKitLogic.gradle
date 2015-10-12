@@ -10,13 +10,14 @@ test {
 // Write the plugin's classpath to a file to share with the tests
 task createClasspathManifest {
     def outputDir = file("$buildDir/$name")
+    ext.outputFile = file("$outputDir/plugin-classpath.txt")
 
     inputs.files sourceSets.main.runtimeClasspath
     outputs.dir outputDir
 
     doLast {
         outputDir.mkdirs()
-        file("$outputDir/plugin-classpath.txt").text = sourceSets.main.runtimeClasspath.join("\n")
+        outputFile.text = sourceSets.main.runtimeClasspath.join("\n")
     }
 }
 
