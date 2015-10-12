@@ -64,22 +64,6 @@ class BuildLogicFunctionalTest {
             assert configurations.data.dependencies.find { it.name == "$dataDependencyName" }
         }
 
-        processDataResources {
-            from configurations.data
-            filesMatching '*.tar.bz2', { tarFileDetails ->
-                copy {
-                    from tarTree(tarFileDetails.file)
-                    into destinationDir
-                    include '**/wav/*.wav', '**/lab/*.lab', '**/etc/*.data'
-                    eachFile {
-                        it.path = it.name
-                    }
-                    includeEmptyDirs = false
-                }
-                tarFileDetails.exclude()
-            }
-        }
-
         task testProcessDataResources {
             group 'Verification'
             dependsOn processDataResources

@@ -19,5 +19,21 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
         }
 
         project.plugins.apply VoicebuildingDataPlugin
+
+        project.processDataResources {
+            from project.configurations.data
+            filesMatching '*.tar.bz2', { tarFileDetails ->
+                project.copy {
+                    from project.tarTree(tarFileDetails.file)
+                    into destinationDir
+                    include '**/wav/*.wav', '**/lab/*.lab', '**/etc/*.data'
+                    eachFile {
+                        it.path = it.name
+                    }
+                    includeEmptyDirs = false
+                }
+                tarFileDetails.exclude()
+            }
+        }
     }
 }
