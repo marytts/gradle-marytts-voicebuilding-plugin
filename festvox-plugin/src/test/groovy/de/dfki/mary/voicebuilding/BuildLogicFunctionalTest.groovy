@@ -64,6 +64,8 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        text.srcFileName = 'time.data'
+
         task testText {
             group 'Verification'
             dependsOn text

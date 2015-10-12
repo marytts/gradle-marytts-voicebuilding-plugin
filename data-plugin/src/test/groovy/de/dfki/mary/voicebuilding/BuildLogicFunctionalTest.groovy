@@ -67,6 +67,8 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        text.srcFileName = 'time.data'
+
         generateAllophones.dependsOn text
 
         task testWav {
