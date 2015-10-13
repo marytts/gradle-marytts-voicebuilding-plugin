@@ -34,6 +34,14 @@ class BuildLogicFunctionalTest {
             id 'de.dfki.mary.voicebuilding-festvox'
         }
 
+        dependencies {
+            data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom'
+        }
+
+        text.srcFileName = 'time.data'
+
+        legacyInit.dependsOn wav, text, lab
+
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
@@ -87,10 +95,17 @@ class BuildLogicFunctionalTest {
     void testLegacyInit() {
         def result = gradle.withArguments('legacyInit').build()
         println result.standardOutput
-        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == SUCCESS
+        assert result.task(':text').outcome == SUCCESS
+        assert result.task(':lab').outcome == SUCCESS
         assert result.task(':legacyInit').outcome == SUCCESS
         result = gradle.withArguments('testLegacyInit').build()
         println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':legacyInit').outcome == UP_TO_DATE
         assert result.task(':testLegacyInit').outcome == SUCCESS
     }
