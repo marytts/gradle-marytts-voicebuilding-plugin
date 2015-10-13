@@ -93,14 +93,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
 
-        project.task('legacyMCEPMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyInit, project.configureSpeechTools
-            inputs.files project.legacyPraatPitchmarker
-            outputs.files inputs.files.collect {
-                new File("$project.buildDir/mcep", it.name.replace('.pm', '.mcep'))
-            }
-        }
-
         project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
             inputs.files project.fileTree("$project.buildDir/lab").include('*.lab')
             outputs.files inputs.files.collect {

@@ -46,6 +46,12 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destDir = project.file("$project.buildDir/pm")
         }
 
+        project.task('legacyMCEPMaker', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyPraatPitchmarker
+            srcDir = project.file("$project.buildDir/pm")
+            destDir = project.file("$project.buildDir/mcep")
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"

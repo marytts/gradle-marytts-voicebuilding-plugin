@@ -44,6 +44,8 @@ class BuildLogicFunctionalTest {
 
         legacyPraatPitchmarker.dependsOn legacyInit
 
+        legacyMCEPMaker.dependsOn legacyInit
+
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
@@ -71,6 +73,13 @@ class BuildLogicFunctionalTest {
             doLast {
                 assert fileTree(buildDir).include('pm/*.PointProcess').files
                 assert fileTree(buildDir).include('pm/*.pm').files
+            }
+        }
+
+        task testLegacyMCEPMaker(group: 'Verification') {
+            dependsOn legacyMCEPMaker
+            doLast {
+                assert fileTree(buildDir).include('mcep/*.mcep').files
             }
         }
         """
@@ -133,5 +142,22 @@ class BuildLogicFunctionalTest {
         assert result.task(':wav').outcome == UP_TO_DATE
         assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':testLegacyPraatPitchmarker').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
+    void testLegacyMCEPMaker() {
+        def result = gradle.withArguments('legacyMCEPMaker').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyMCEPMaker').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyMCEPMaker').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
+        assert result.task(':testLegacyMCEPMaker').outcome == SUCCESS
     }
 }
