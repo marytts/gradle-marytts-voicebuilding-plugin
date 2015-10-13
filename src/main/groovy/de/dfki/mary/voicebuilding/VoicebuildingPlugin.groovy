@@ -93,52 +93,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
 
-        project.task('generatePhoneUnitFeatures') {
-            dependsOn project.legacyInit, project.generateFeatureList
-            inputs.files project.legacyTranscriptionAligner
-            outputs.files inputs.files.collect {
-                new File("$project.buildDir/phonefeatures", it.name.replace('.xml', '.pfeats'))
-            }
-            def mary
-            doFirst {
-                mary = new LocalMaryInterface()
-                mary.locale = new Locale(project.voice.maryLocale)
-                mary.inputType = 'ALLOPHONES'
-                mary.outputType = 'TARGETFEATURES'
-                def features = project.generateFeatureList.featureFile.readLines().minus(['phone', 'halfphone_lr', 'halfphone_unitname']).plus(0, ['phone'])
-                mary.outputTypeParams = features.join(' ')
-            }
-            doLast {
-                [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
-                    def doc = DomUtils.parseDocument inFile
-                    outFile.text = mary.generateText doc
-                }
-            }
-        }
-
-        project.task('generateHalfPhoneUnitFeatures') {
-            dependsOn project.legacyInit, project.generateFeatureList
-            inputs.files project.legacyTranscriptionAligner
-            outputs.files inputs.files.collect {
-                new File("$project.buildDir/halfphonefeatures", it.name.replace('.xml', '.hpfeats'))
-            }
-            def mary
-            doFirst {
-                mary = new LocalMaryInterface()
-                mary.locale = new Locale(project.voice.maryLocale)
-                mary.inputType = 'ALLOPHONES'
-                mary.outputType = 'HALFPHONE_TARGETFEATURES'
-                def features = project.generateFeatureList.featureFile.readLines().minus(['halfphone_unitname']).plus(0, ['halfphone_unitname'])
-                mary.outputTypeParams = features.join(' ')
-            }
-            doLast {
-                [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
-                    def doc = DomUtils.parseDocument inFile
-                    outFile.text = mary.generateText doc
-                }
-            }
-        }
-
         project.task('legacyWaveTimelineMaker', type: LegacyVoiceImportTask) {
             inputs.files project.legacyPraatPitchmarker
             ext.timelineFile = new File(project.legacyBuildDir, 'timeline_waveforms.mry')
