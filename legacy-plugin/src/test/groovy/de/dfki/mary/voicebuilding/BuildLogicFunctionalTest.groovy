@@ -186,8 +186,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyPraatPitchmarker').outcome == SUCCESS
         result = gradle.withArguments('testLegacyPraatPitchmarker').build()
         println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
         assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':testLegacyPraatPitchmarker').outcome == SUCCESS
     }
@@ -202,9 +200,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyMCEPMaker').outcome == SUCCESS
         result = gradle.withArguments('testLegacyMCEPMaker').build()
         println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
         assert result.task(':testLegacyMCEPMaker').outcome == SUCCESS
     }
@@ -218,8 +213,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyPhoneUnitLabelComputer').outcome == SUCCESS
         result = gradle.withArguments('testLegacyPhoneUnitLabelComputer').build()
         println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
         assert result.task(':testLegacyPhoneUnitLabelComputer').outcome == SUCCESS
     }
@@ -233,8 +226,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == SUCCESS
         result = gradle.withArguments('testLegacyHalfPhoneUnitLabelComputer').build()
         println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
         assert result.task(':testLegacyHalfPhoneUnitLabelComputer').outcome == SUCCESS
     }
@@ -249,8 +240,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyTranscriptionAligner').outcome == SUCCESS
         result = gradle.withArguments('testLegacyTranscriptionAligner').build()
         println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':generateAllophones').outcome == UP_TO_DATE
         assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
         assert result.task(':testLegacyTranscriptionAligner').outcome == SUCCESS
@@ -283,15 +272,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyPhoneUnitFeatureGenerator').outcome == SUCCESS
         result = gradle.withArguments('testLegacyPhoneUnitFeatureGenerator').build()
         println result.standardOutput
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
         assert result.task(':legacyPhoneUnitFeatureGenerator').outcome == UP_TO_DATE
         assert result.task(':testLegacyPhoneUnitFeatureGenerator').outcome == SUCCESS
     }
@@ -312,15 +292,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyHalfPhoneUnitFeatureGenerator').outcome == SUCCESS
         result = gradle.withArguments('testLegacyHalfPhoneUnitFeatureGenerator').build()
         println result.standardOutput
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
         assert result.task(':legacyHalfPhoneUnitFeatureGenerator').outcome == UP_TO_DATE
         assert result.task(':testLegacyHalfPhoneUnitFeatureGenerator').outcome == SUCCESS
     }

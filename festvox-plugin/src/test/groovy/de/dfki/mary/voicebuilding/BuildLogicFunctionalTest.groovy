@@ -127,7 +127,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':wav').outcome == SUCCESS
         result = gradle.withArguments('testWav').build()
         println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':wav').outcome == UP_TO_DATE
         assert result.task(':testWav').outcome == SUCCESS
     }
@@ -140,7 +139,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':text').outcome == SUCCESS
         result = gradle.withArguments('testText').build()
         println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':text').outcome == UP_TO_DATE
         assert result.task(':testText').outcome == SUCCESS
     }
@@ -153,7 +151,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':lab').outcome == SUCCESS
         result = gradle.withArguments('testLab').build()
         println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':testLab').outcome == SUCCESS
     }

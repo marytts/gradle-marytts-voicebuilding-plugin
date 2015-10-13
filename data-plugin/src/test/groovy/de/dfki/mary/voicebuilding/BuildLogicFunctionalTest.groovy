@@ -162,8 +162,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':praatPitchmarker').outcome == SUCCESS
         result = gradle.withArguments('testPraatPitchmarker').build()
         println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
         assert result.task(':praatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':testPraatPitchmarker').outcome == SUCCESS
     }
@@ -178,9 +176,6 @@ class BuildLogicFunctionalTest {
         assert result.task(':mcepMaker').outcome == SUCCESS
         result = gradle.withArguments('testMcepMaker').build()
         println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':praatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':mcepMaker').outcome == UP_TO_DATE
         assert result.task(':testMcepMaker').outcome == SUCCESS
     }
