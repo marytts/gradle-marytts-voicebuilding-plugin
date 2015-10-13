@@ -42,6 +42,8 @@ class BuildLogicFunctionalTest {
 
         legacyInit.dependsOn wav, text, lab
 
+        legacyPraatPitchmarker.dependsOn legacyInit
+
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
@@ -61,6 +63,14 @@ class BuildLogicFunctionalTest {
             dependsOn legacyInit
             doLast {
                 assert file("\$buildDir/database.config")
+            }
+        }
+
+        task testLegacyPraatPitchmarker(group: 'Verification') {
+            dependsOn legacyPraatPitchmarker
+            doLast {
+                assert fileTree(buildDir).include('pm/*.PointProcess').files
+                assert fileTree(buildDir).include('pm/*.pm').files
             }
         }
         """
@@ -108,5 +118,20 @@ class BuildLogicFunctionalTest {
         assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':legacyInit').outcome == UP_TO_DATE
         assert result.task(':testLegacyInit').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyInit'])
+    void testLegacyPraatPitchmarker() {
+        def result = gradle.withArguments('legacyPraatPitchmarker').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyPraatPitchmarker').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':testLegacyPraatPitchmarker').outcome == SUCCESS
     }
 }

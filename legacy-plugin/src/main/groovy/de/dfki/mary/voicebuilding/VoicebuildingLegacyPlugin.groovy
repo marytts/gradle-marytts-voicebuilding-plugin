@@ -41,6 +41,11 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             dependsOn project.templates
         }
 
+        project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
+            srcDir = project.file("$project.buildDir/wav")
+            destDir = project.file("$project.buildDir/pm")
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
