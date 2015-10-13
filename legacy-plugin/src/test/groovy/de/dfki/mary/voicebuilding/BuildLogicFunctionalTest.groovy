@@ -46,6 +46,10 @@ class BuildLogicFunctionalTest {
 
         legacyMCEPMaker.dependsOn legacyInit
 
+        legacyPhoneUnitLabelComputer.dependsOn lab
+
+        legacyHalfPhoneUnitLabelComputer.dependsOn lab
+
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
@@ -80,6 +84,20 @@ class BuildLogicFunctionalTest {
             dependsOn legacyMCEPMaker
             doLast {
                 assert fileTree(buildDir).include('mcep/*.mcep').files
+            }
+        }
+
+        task testLegacyPhoneUnitLabelComputer(group: 'Verification') {
+            dependsOn legacyPhoneUnitLabelComputer
+            doLast {
+                assert fileTree(buildDir).include('phonelab/*.lab').files
+            }
+        }
+
+        task testLegacyHalfPhoneUnitLabelComputer(group: 'Verification') {
+            dependsOn legacyHalfPhoneUnitLabelComputer
+            doLast {
+                assert fileTree(buildDir).include('halfphonelab/*.hplab').files
             }
         }
         """
@@ -159,5 +177,35 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
         assert result.task(':testLegacyMCEPMaker').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyInit'])
+    void testLegacyPhoneUnitLabelComputer() {
+        def result = gradle.withArguments('legacyPhoneUnitLabelComputer').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitLabelComputer').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyPhoneUnitLabelComputer').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':testLegacyPhoneUnitLabelComputer').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyInit'])
+    void testLegacyHalfPhoneUnitLabelComputer() {
+        def result = gradle.withArguments('legacyHalfPhoneUnitLabelComputer').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyHalfPhoneUnitLabelComputer').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':testLegacyHalfPhoneUnitLabelComputer').outcome == SUCCESS
     }
 }
