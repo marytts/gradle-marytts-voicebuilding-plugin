@@ -76,26 +76,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     'Built-With': "gradle-${project.gradle.gradleVersion}, groovy-${GroovySystem.version}")
         }
 
-        project.task('templates') {
-            outputs.files([
-                    'Config.java',
-                    'ConfigTest.java',
-                    'database.config',
-                    'LoadVoiceIT.java',
-                    'voice.config',
-                    'voice-hsmm.config'
-            ].collect {
-                project.file "$temporaryDir/$it"
-            })
-            doLast {
-                outputs.files.each { outputFile ->
-                    outputFile.withOutputStream { stream ->
-                        stream << getClass().getResourceAsStream("/de/dfki/mary/voicebuilding/templates/$outputFile.name")
-                    }
-                }
-            }
-        }
-
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"

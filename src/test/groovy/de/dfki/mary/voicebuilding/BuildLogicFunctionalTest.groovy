@@ -35,7 +35,7 @@ class BuildLogicFunctionalTest {
         """
     }
 
-    @Test
+    @Test(enabled = false)
     void testBuild() {
         def result = gradle.build()
         assert result.task(':help').outcome == SUCCESS
