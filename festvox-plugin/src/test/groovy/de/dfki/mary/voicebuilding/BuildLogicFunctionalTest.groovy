@@ -73,6 +73,14 @@ class BuildLogicFunctionalTest {
                 assert fileTree(buildDir).include('text/*.txt').files
             }
         }
+
+        task testLab {
+            group 'Verification'
+            dependsOn lab
+            doLast {
+                assert fileTree(buildDir).include('lab/*.lab').files
+            }
+        }
         """
     }
 
@@ -133,5 +141,18 @@ class BuildLogicFunctionalTest {
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':text').outcome == UP_TO_DATE
         assert result.task(':testText').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testProcessDataResources'])
+    void testLab() {
+        def result = gradle.withArguments('lab').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == SUCCESS
+        result = gradle.withArguments('testLab').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':testLab').outcome == SUCCESS
     }
 }
