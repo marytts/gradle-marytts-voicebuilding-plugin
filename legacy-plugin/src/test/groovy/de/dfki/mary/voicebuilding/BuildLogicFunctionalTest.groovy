@@ -102,6 +102,13 @@ class BuildLogicFunctionalTest {
                 assert fileTree(buildDir).include('halfphonelab/*.hplab').files
             }
         }
+
+        task testLegacyTranscriptionAligner(group: 'Verification') {
+            dependsOn legacyTranscriptionAligner
+            doLast {
+                assert fileTree(buildDir).include('allophones/*.xml').files
+            }
+        }
         """
     }
 
@@ -209,5 +216,22 @@ class BuildLogicFunctionalTest {
         assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
         assert result.task(':testLegacyHalfPhoneUnitLabelComputer').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyInit'])
+    void testLegacyTranscriptionAligner() {
+        def result = gradle.withArguments('legacyTranscriptionAligner').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == SUCCESS
+        assert result.task(':legacyTranscriptionAligner').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyTranscriptionAligner').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
+        assert result.task(':testLegacyTranscriptionAligner').outcome == SUCCESS
     }
 }

@@ -93,13 +93,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
 
-        project.task('legacyTranscriptionAligner', type: LegacyVoiceImportTask) {
-            inputs.files project.generateAllophones, project.fileTree("$project.buildDir/lab").include('*.lab')
-            outputs.files project.generateAllophones.outputs.files.collect {
-                new File("$project.buildDir/allophones", it.name)
-            }
-        }
-
         project.task('generateFeatureList') {
             dependsOn project.legacyInit
             ext.featureFile = project.file("$project.legacyBuildDir/features.txt")

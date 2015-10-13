@@ -65,6 +65,12 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destDir = project.file("$project.buildDir/halfphonelab")
         }
 
+        project.task('legacyTranscriptionAligner', type: LegacyVoiceImportTask) {
+            dependsOn project.generateAllophones
+            srcDir = project.file("$project.buildDir/lab")
+            destDir = project.file("$project.buildDir/allophones")
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
