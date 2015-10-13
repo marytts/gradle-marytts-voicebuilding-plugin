@@ -34,6 +34,7 @@ class BuildLogicFunctionalTest {
         }
 
         task testPlugins(group: 'Verification') << {
+            assert plugins.findPlugin('java')
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
         }
         """

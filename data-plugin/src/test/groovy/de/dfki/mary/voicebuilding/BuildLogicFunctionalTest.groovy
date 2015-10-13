@@ -45,6 +45,12 @@ class BuildLogicFunctionalTest {
             runtime group: 'de.dfki.mary', name: 'marytts-common', version: '5.1.1'
         }
 
+        task testPlugins(group: 'Verification') << {
+            assert plugins.findPlugin('java')
+            assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
+            assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
+        }
+
         task testConfigurations(group: 'Verification') << {
             assert configurations.data
         }
