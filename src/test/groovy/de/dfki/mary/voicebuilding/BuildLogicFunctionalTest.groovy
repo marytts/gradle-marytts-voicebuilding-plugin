@@ -40,11 +40,4 @@ class BuildLogicFunctionalTest {
         def result = gradle.build()
         assert result.task(':help').outcome == SUCCESS
     }
-
-    @Test
-    void testModel() {
-        def result = gradle.withArguments('model').build()
-        println result.standardOutput
-        assert result.task(':model').outcome == SUCCESS
-    }
 }
