@@ -9,6 +9,9 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+
+        project.plugins.apply VoicebuildingDataPlugin
+
         project.repositories {
             jcenter()
             maven {

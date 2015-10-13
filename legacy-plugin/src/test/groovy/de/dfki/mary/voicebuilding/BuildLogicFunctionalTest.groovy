@@ -50,6 +50,8 @@ class BuildLogicFunctionalTest {
 
         legacyHalfPhoneUnitLabelComputer.dependsOn lab
 
+        generateAllophones.dependsOn legacyInit
+
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
