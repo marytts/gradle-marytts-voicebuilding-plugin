@@ -36,6 +36,14 @@ class BuildLogicFunctionalTest {
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
         }
+
+        task testTemplates(group: 'Verification') {
+            dependsOn templates
+            doLast {
+                assert fileTree(buildDir).include('templates/*.java').files
+                assert fileTree(buildDir).include('templates/*.config').files
+            }
+        }
         """
     }
 
@@ -51,5 +59,16 @@ class BuildLogicFunctionalTest {
         def result = gradle.withArguments('testPlugins').build()
         println result.standardOutput
         assert result.task(':testPlugins').outcome == SUCCESS
+    }
+
+    @Test
+    void testTemplates() {
+        def result = gradle.withArguments('templates').build()
+        println result.standardOutput
+        assert result.task(':templates').outcome == SUCCESS
+        result = gradle.withArguments('testTemplates').build()
+        println result.standardOutput
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':testTemplates').outcome == SUCCESS
     }
 }
