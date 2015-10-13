@@ -13,6 +13,10 @@ class LegacyVoiceImportTask extends DefaultTask {
     File srcDir2
 
     @Optional
+    @InputFile
+    File srcFile
+
+    @Optional
     @OutputDirectory
     File destDir
 

@@ -157,6 +157,20 @@ class BuildLogicFunctionalTest {
                 assert file("\$buildDir/mary/timeline_mcep.mry")
             }
         }
+
+        task testLegacyPhoneUnitfileWriter(group: 'Verification') {
+            dependsOn legacyPhoneUnitfileWriter
+            doLast {
+                assert file("\$buildDir/mary/phoneUnits.mry")
+            }
+        }
+
+        task testLegacyHalfPhoneUnitfileWriter(group: 'Verification') {
+            dependsOn legacyHalfPhoneUnitfileWriter
+            doLast {
+                assert file("\$buildDir/mary/halfphoneUnits.mry")
+            }
+        }
         """
     }
 
@@ -375,5 +389,43 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
         assert result.task(':testLegacyMCepTimelineMaker').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyPhoneUnitLabelComputer'])
+    void testLegacyPhoneUnitfileWriter() {
+        def result = gradle.withArguments('legacyPhoneUnitfileWriter').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitfileWriter').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyPhoneUnitfileWriter').build()
+        println result.standardOutput
+        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':testLegacyPhoneUnitfileWriter').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyHalfPhoneUnitLabelComputer'])
+    void testLegacyHalfPhoneUnitfileWriter() {
+        def result = gradle.withArguments('legacyHalfPhoneUnitfileWriter').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyHalfPhoneUnitfileWriter').build()
+        println result.standardOutput
+        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':testLegacyHalfPhoneUnitfileWriter').outcome == SUCCESS
     }
 }
