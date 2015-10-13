@@ -9,6 +9,15 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+        project.repositories {
+            jcenter()
+            maven {
+                url 'https://oss.jfrog.org/artifactory/repo'
+            }
+        }
+
+        project.configurations.create 'legacy'
+
         project.ext {
             maryttsVersion = '5.1.1'
             legacyBuildDir = "$project.buildDir/mary"
@@ -30,6 +39,17 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.task('legacyInit', type: LegacyInitTask) {
             dependsOn project.templates
+        }
+
+        project.afterEvaluate {
+            project.dependencies {
+                compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
+                legacy("de.dfki.mary:marytts-builder:$project.maryttsVersion") {
+                    exclude module: 'mwdumper'
+                    exclude module: 'sgt'
+                }
+                testCompile "junit:junit:4.11"
+            }
         }
     }
 }

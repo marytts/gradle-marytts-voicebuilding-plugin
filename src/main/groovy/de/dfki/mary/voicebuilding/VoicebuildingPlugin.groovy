@@ -44,15 +44,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.status = project.version.endsWith('SNAPSHOT') ? 'integration' : 'release'
 
-        project.repositories {
-            jcenter()
-            maven {
-                url 'http://oss.jfrog.org/artifactory/repo'
-            }
-        }
-
-        project.configurations.create 'legacy'
-
         project.sourceSets {
             main {
                 java {
@@ -75,14 +66,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
         }
 
         project.afterEvaluate {
-            project.dependencies {
-                compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
-                legacy("de.dfki.mary:marytts-builder:$project.maryttsVersion") {
-                    exclude module: 'mwdumper'
-                    exclude module: 'sgt'
-                }
-                testCompile "junit:junit:4.11"
-            }
 
             addTasks(project)
 
