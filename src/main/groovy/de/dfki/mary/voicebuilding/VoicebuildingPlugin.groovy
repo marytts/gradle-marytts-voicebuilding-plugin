@@ -124,17 +124,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
             project.ext.speechToolsDir = new File(proc.in.text)?.parentFile?.parent
         }
 
-        project.task('legacyInit', type: Copy) {
-            description "Initialize DatabaseLayout for legacy VoiceImportTools"
-            from project.templates
-            into project.buildDir
-            include 'database.config'
-            expand project.properties
-            doLast {
-                project.file(project.legacyBuildDir).mkdirs()
-            }
-        }
-
         project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
             dependsOn project.legacyInit, project.configurePraat
             inputs.files project.fileTree("$project.buildDir/wav").include('*.wav')

@@ -44,6 +44,13 @@ class BuildLogicFunctionalTest {
                 assert fileTree(buildDir).include('templates/*.config').files
             }
         }
+
+        task testLegacyInit(group: 'Verification') {
+            dependsOn legacyInit
+            doLast {
+                assert file("\$buildDir/database.config")
+            }
+        }
         """
     }
 
@@ -70,5 +77,17 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':templates').outcome == UP_TO_DATE
         assert result.task(':testTemplates').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testTemplates'])
+    void testLegacyInit() {
+        def result = gradle.withArguments('legacyInit').build()
+        println result.standardOutput
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyInit').build()
+        println result.standardOutput
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':testLegacyInit').outcome == SUCCESS
     }
 }
