@@ -37,8 +37,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.sourceCompatibility = JavaVersion.VERSION_1_7
 
-        project.extensions.add 'voice', VoiceExtension
-
         project.ext {
             maryttsVersion = '5.1.2'
             generatedSrcDir = "$project.buildDir/generated-src"

@@ -10,6 +10,9 @@ class BuildLogicFunctionalTest {
     def gradle
     def buildFile
 
+    def voiceName = 'cmu-slt'
+    def voiceLocale = Locale.US
+
     @BeforeSuite
     void setup() {
         def projectDir = new File(System.properties.testProjectDir)
@@ -30,21 +33,44 @@ class BuildLogicFunctionalTest {
         // Add the logic under test to the test build
         buildFile << """
         plugins {
-            id 'de.dfki.mary.voicebuilding'
+            id 'de.dfki.mary.voicebuilding-base'
+        }
+
+        voice {
+            name = "$voiceName"
+        }
+
+        task testPlugins(group: 'Verification') << {
+            assert plugins.findPlugin('java')
+            assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
+        }
+
+        task testVoiceProps(group: 'Verification') << {
+            assert voice.name == "$voiceName"
+            assert voice.language == "$voiceLocale.language"
+            assert voice.region == "$voiceLocale.country"
         }
         """
     }
 
     @Test
-    void testBuild() {
+    void testHelp() {
         def result = gradle.build()
+        println result.standardOutput
         assert result.task(':help').outcome == SUCCESS
     }
 
     @Test
-    void testModel() {
-        def result = gradle.withArguments('model').build()
+    void testPlugins() {
+        def result = gradle.withArguments('testPlugins').build()
         println result.standardOutput
-        assert result.task(':model').outcome == SUCCESS
+        assert result.task(':testPlugins').outcome == SUCCESS
+    }
+
+    @Test
+    void testVoiceProps() {
+        def result = gradle.withArguments('testVoiceProps').build()
+        println result.standardOutput
+        assert result.task(':testVoiceProps').outcome == SUCCESS
     }
 }
