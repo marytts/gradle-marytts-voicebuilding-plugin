@@ -33,7 +33,7 @@ class BuildLogicFunctionalTest {
         // Add the logic under test to the test build
         buildFile << """
         plugins {
-            id 'de.dfki.mary.voicebuilding-data'
+            id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
         }
 
         repositories {
@@ -43,13 +43,6 @@ class BuildLogicFunctionalTest {
         dependencies {
             data "$dataDependency"
             runtime group: 'de.dfki.mary', name: 'marytts-common', version: '5.1.1'
-        }
-
-        task('text', type: FestvoxTextTask) {
-            dependsOn processDataResources
-            srcFile = file("\$sourceSets.data.output.resourcesDir/time.data")
-            destDir = file("\$buildDir/text")
-            generateAllophones.dependsOn it
         }
 
         task testConfigurations(group: 'Verification') << {
@@ -64,22 +57,6 @@ class BuildLogicFunctionalTest {
             assert configurations.data.dependencies.find { it.name == "$dataDependencyName" }
         }
 
-        processDataResources {
-            from configurations.data
-            filesMatching '*.tar.bz2', { tarFileDetails ->
-                copy {
-                    from tarTree(tarFileDetails.file)
-                    into destinationDir
-                    include '**/wav/*.wav', '**/lab/*.lab', '**/etc/*.data'
-                    eachFile {
-                        it.path = it.name
-                    }
-                    includeEmptyDirs = false
-                }
-                tarFileDetails.exclude()
-            }
-        }
-
         task testProcessDataResources {
             group 'Verification'
             dependsOn processDataResources
@@ -89,6 +66,10 @@ class BuildLogicFunctionalTest {
                 assert fileTree(sourceSets.data.output.resourcesDir).include('*.data').files
             }
         }
+
+        text.srcFileName = 'time.data'
+
+        generateAllophones.dependsOn text
 
         task testWav {
             group 'Verification'
@@ -135,24 +116,6 @@ class BuildLogicFunctionalTest {
             classpath sourceSets.main.runtimeClasspath
             main 'marytts.util.PrintSystemProperties'
         }
-
-        class FestvoxTextTask extends DefaultTask {
-            @Input
-            File srcFile
-
-            @OutputDirectory
-            File destDir
-
-            @TaskAction
-            void extract() {
-                srcFile.eachLine { line ->
-                    def m = line =~ /\\( (?<utt>.+) "(?<text>.+)" \\)/
-                    if (m.matches()) {
-                        new File("\$destDir/\${m.group('utt')}.txt").text = m.group('text')
-                    }
-                }
-            }
-        }
         """
     }
 
@@ -185,36 +148,11 @@ class BuildLogicFunctionalTest {
     }
 
     @Test
-    void testProcessDataResources() {
-        def result = gradle.withArguments('testProcessDataResources').build()
-        println result.standardOutput
-        // hackery above means this is always up to date, but also always executes:
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':testProcessDataResources').outcome == SUCCESS
-        result = gradle.withArguments('testProcessDataResources').build()
-        println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-    }
-
-    @Test(dependsOnMethods = ['testProcessDataResources'])
-    void testWav() {
-        def result = gradle.withArguments('wav').build()
-        println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == SUCCESS
-        result = gradle.withArguments('testWav').build()
-        println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':testWav').outcome == SUCCESS
-    }
-
-    @Test(dependsOnMethods = ['testWav'])
     void testPraatPitchmarker() {
         def result = gradle.withArguments('praatPitchmarker').build()
         println result.standardOutput
         assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == SUCCESS
         assert result.task(':praatPitchmarker').outcome == SUCCESS
         result = gradle.withArguments('testPraatPitchmarker').build()
         println result.standardOutput
@@ -241,25 +179,12 @@ class BuildLogicFunctionalTest {
         assert result.task(':testMcepMaker').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testProcessDataResources'])
-    void testText() {
-        def result = gradle.withArguments('text').build()
-        println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == SUCCESS
-        result = gradle.withArguments('testText').build()
-        println result.standardOutput
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':testText').outcome == SUCCESS
-    }
-
-    @Test(dependsOnMethods = ['testText'])
+    @Test
     void testGenerateAllophones() {
         def result = gradle.withArguments('generateAllophones').build()
         println result.standardOutput
         assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == SUCCESS
         assert result.task(':generateAllophones').outcome == SUCCESS
         result = gradle.withArguments('testGenerateAllophones').build()
         println result.standardOutput
