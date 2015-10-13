@@ -93,24 +93,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
 
-        project.task('generateFeatureList') {
-            dependsOn project.legacyInit
-            ext.featureFile = project.file("$project.legacyBuildDir/features.txt")
-            outputs.files featureFile
-            doLast {
-                def fpm
-                try {
-                    fpm = Class.forName("marytts.language.${project.voice.language}.features.FeatureProcessorManager").newInstance()
-                } catch (e) {
-                    logger.info "Reflection failed: $e"
-                    logger.info "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
-                    fpm = new FeatureProcessorManager(project.voice.maryLocale)
-                }
-                def featureNames = fpm.listByteValuedFeatureProcessorNames().tokenize() + fpm.listShortValuedFeatureProcessorNames().tokenize()
-                featureFile.text = featureNames.join('\n')
-            }
-        }
-
         project.task('generatePhoneUnitFeatures') {
             dependsOn project.legacyInit, project.generateFeatureList
             inputs.files project.legacyTranscriptionAligner

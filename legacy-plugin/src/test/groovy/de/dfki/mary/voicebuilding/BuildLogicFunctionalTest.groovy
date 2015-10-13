@@ -109,6 +109,13 @@ class BuildLogicFunctionalTest {
                 assert fileTree(buildDir).include('allophones/*.xml').files
             }
         }
+
+        task testLegacyFeatureLister(group: 'Verification') {
+            dependsOn legacyFeatureLister
+            doLast {
+                assert file("\$buildDir/features.txt")
+            }
+        }
         """
     }
 
@@ -233,5 +240,16 @@ class BuildLogicFunctionalTest {
         assert result.task(':generateAllophones').outcome == UP_TO_DATE
         assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
         assert result.task(':testLegacyTranscriptionAligner').outcome == SUCCESS
+    }
+
+    @Test
+    void testLegacyFeatureLister() {
+        def result = gradle.withArguments('legacyFeatureLister').build()
+        println result.standardOutput
+        assert result.task(':legacyFeatureLister').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyFeatureLister').build()
+        println result.standardOutput
+        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
+        assert result.task(':testLegacyFeatureLister').outcome == SUCCESS
     }
 }

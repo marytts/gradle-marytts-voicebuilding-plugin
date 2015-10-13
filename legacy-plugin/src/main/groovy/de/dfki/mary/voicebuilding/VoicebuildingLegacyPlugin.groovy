@@ -2,6 +2,8 @@ package de.dfki.mary.voicebuilding
 
 import de.dfki.mary.voicebuilding.tasks.*
 
+import marytts.features.FeatureProcessorManager
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -69,6 +71,10 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             dependsOn project.generateAllophones
             srcDir = project.file("$project.buildDir/lab")
             destDir = project.file("$project.buildDir/allophones")
+        }
+
+        project.task('legacyFeatureLister', type: LegacyFeatureListerTask) {
+            destFile = project.file("$project.legacyBuildDir/features.txt")
         }
 
         project.afterEvaluate {
