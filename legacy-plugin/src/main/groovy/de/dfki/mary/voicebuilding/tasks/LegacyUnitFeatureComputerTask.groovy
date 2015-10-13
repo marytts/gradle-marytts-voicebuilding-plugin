@@ -8,7 +8,7 @@ import marytts.util.dom.DomUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 
-class LegacyUnitFeatureGeneratorTask extends DefaultTask {
+class LegacyUnitFeatureComputerTask extends DefaultTask {
 
     @InputFile
     File featureFile = project.legacyFeatureLister.destFile

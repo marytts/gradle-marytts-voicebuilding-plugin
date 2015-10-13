@@ -75,7 +75,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.file("$project.legacyBuildDir/features.txt")
         }
 
-        project.task('legacyPhoneUnitFeatureGenerator', type: LegacyUnitFeatureGeneratorTask) {
+        project.task('legacyPhoneUnitFeatureComputer', type: LegacyUnitFeatureComputerTask) {
             dependsOn project.legacyTranscriptionAligner, project.legacyFeatureLister
             rootFeature = 'phone'
             exclude = ['halfphone_lr', 'halfphone_unitname']
@@ -85,7 +85,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             fileExt = 'pfeats'
         }
 
-        project.task('legacyHalfPhoneUnitFeatureGenerator', type: LegacyUnitFeatureGeneratorTask) {
+        project.task('legacyHalfPhoneUnitFeatureComputer', type: LegacyUnitFeatureComputerTask) {
             dependsOn project.legacyTranscriptionAligner, project.legacyFeatureLister
             rootFeature = 'halfphone_unitname'
             exclude = []
