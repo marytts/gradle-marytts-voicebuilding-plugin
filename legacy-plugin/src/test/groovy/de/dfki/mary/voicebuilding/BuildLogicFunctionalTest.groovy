@@ -171,6 +171,22 @@ class BuildLogicFunctionalTest {
                 assert file("\$buildDir/mary/halfphoneUnits.mry")
             }
         }
+
+        task testLegacyPhoneFeatureFileWriter(group: 'Verification') {
+            dependsOn legacyPhoneFeatureFileWriter
+            doLast {
+                assert file("\$buildDir/mary/phoneFeatures.mry")
+                assert file("\$buildDir/mary/phoneUnitFeatureDefinition.txt")
+            }
+        }
+
+        task testLegacyHalfPhoneFeatureFileWriter(group: 'Verification') {
+            dependsOn legacyHalfPhoneFeatureFileWriter
+            doLast {
+                assert file("\$buildDir/mary/halfphoneFeatures.mry")
+                assert file("\$buildDir/mary/halfphoneUnitFeatureDefinition.txt")
+            }
+        }
         """
     }
 
@@ -427,5 +443,53 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
         assert result.task(':testLegacyHalfPhoneUnitfileWriter').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyPhoneUnitfileWriter', 'testLegacyPhoneUnitFeatureComputer'])
+    void testLegacyPhoneFeatureFileWriter() {
+        def result = gradle.withArguments('legacyPhoneFeatureFileWriter').buildAndFail()
+        println result.standardOutput
+        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
+//        assert result.task(':legacyPhoneFeatureFileWriter').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyPhoneFeatureFileWriter').buildAndFail()
+        println result.standardOutput
+//        assert result.task(':legacyPhoneFeatureFileWriter').outcome == UP_TO_DATE
+//        assert result.task(':testLegacyPhoneFeatureFileWriter').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitfileWriter', 'testLegacyHalfPhoneUnitFeatureComputer'])
+    void testLegacyHalfPhoneFeatureFileWriter() {
+        def result = gradle.withArguments('legacyHalfPhoneFeatureFileWriter').buildAndFail()
+        println result.standardOutput
+        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
+//        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyHalfPhoneFeatureFileWriter').buildAndFail()
+        println result.standardOutput
+//        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
+//        assert result.task(':testLegacyHalfPhoneFeatureFileWriter').outcome == SUCCESS
     }
 }

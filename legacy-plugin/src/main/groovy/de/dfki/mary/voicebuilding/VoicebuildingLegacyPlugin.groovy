@@ -128,6 +128,22 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
         }
 
+        project.task('legacyPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyPhoneUnitfileWriter, project.legacyPhoneUnitFeatureComputer
+            srcFile = project.file("$project.legacyBuildDir/phoneUnits.mry")
+            srcDir = project.file("$project.buildDir/phonefeatures")
+            destFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
+            destFile2 = project.file("$project.legacyBuildDir/phoneUnitFeatureDefinition.txt")
+        }
+
+        project.task('legacyHalfPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyHalfPhoneUnitfileWriter, project.legacyHalfPhoneUnitFeatureComputer
+            srcFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
+            srcDir = project.file("$project.buildDir/halfphonefeatures")
+            destFile = project.file("$project.legacyBuildDir/halfphoneFeatures.mry")
+            destFile2 = project.file("$project.legacyBuildDir/halfphoneUnitFeatureDefinition.txt")
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
