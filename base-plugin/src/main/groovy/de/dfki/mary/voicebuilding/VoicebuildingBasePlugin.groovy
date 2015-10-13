@@ -9,5 +9,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.plugins.apply JavaPlugin
+
+        project.extensions.add 'voice', VoiceExtension
     }
 }
