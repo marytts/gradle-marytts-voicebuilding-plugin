@@ -95,6 +95,27 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             fileExt = 'hpfeats'
         }
 
+        project.task('legacyWaveTimelineMaker', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyPraatPitchmarker
+            srcDir = project.file("$project.buildDir/wav")
+            srcDir2 = project.file("$project.buildDir/pm")
+            destFile = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
+        }
+
+        project.task('legacyBasenameTimelineMaker', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyPraatPitchmarker
+            srcDir = project.file("$project.buildDir/wav")
+            srcDir2 = project.file("$project.buildDir/pm")
+            destFile = project.file("$project.legacyBuildDir/timeline_basenames.mry")
+        }
+
+        project.task('legacyMCepTimelineMaker', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyMCEPMaker
+            srcDir = project.file("$project.buildDir/wav")
+            srcDir2 = project.file("$project.buildDir/mcep")
+            destFile = project.file("$project.legacyBuildDir/timeline_mcep.mry")
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"

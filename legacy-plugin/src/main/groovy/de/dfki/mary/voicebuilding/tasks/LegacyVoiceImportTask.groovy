@@ -8,8 +8,17 @@ class LegacyVoiceImportTask extends DefaultTask {
     @InputDirectory
     File srcDir
 
+    @Optional
+    @InputDirectory
+    File srcDir2
+
+    @Optional
     @OutputDirectory
     File destDir
+
+    @Optional
+    @OutputFile
+    File destFile
 
     @TaskAction
     void run() {

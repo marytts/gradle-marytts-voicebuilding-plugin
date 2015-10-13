@@ -52,6 +52,12 @@ class BuildLogicFunctionalTest {
 
         generateAllophones.dependsOn legacyInit
 
+        legacyWaveTimelineMaker.dependsOn legacyInit
+
+        legacyBasenameTimelineMaker.dependsOn legacyInit
+
+        legacyMCepTimelineMaker.dependsOn legacyInit
+
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
@@ -128,6 +134,27 @@ class BuildLogicFunctionalTest {
             dependsOn legacyHalfPhoneUnitFeatureComputer
             doLast {
                 assert fileTree(buildDir).include('halfphonefeatures/*.hpfeats').files
+            }
+        }
+
+        task testLegacyWaveTimelineMaker(group: 'Verification') {
+            dependsOn legacyWaveTimelineMaker
+            doLast {
+                assert file("\$buildDir/mary/timeline_waveforms.mry")
+            }
+        }
+
+        task testLegacyBasenameTimelineMaker(group: 'Verification') {
+            dependsOn legacyBasenameTimelineMaker
+            doLast {
+                assert file("\$buildDir/mary/timeline_basenames.mry")
+            }
+        }
+
+        task testLegacyMCepTimelineMaker(group: 'Verification') {
+            dependsOn legacyMCepTimelineMaker
+            doLast {
+                assert file("\$buildDir/mary/timeline_mcep.mry")
             }
         }
         """
@@ -294,5 +321,59 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
         assert result.task(':testLegacyHalfPhoneUnitFeatureComputer').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
+    void testLegacyWaveTimelineMaker() {
+        def result = gradle.withArguments('legacyWaveTimelineMaker').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyWaveTimelineMaker').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyWaveTimelineMaker').build()
+        println result.standardOutput
+        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':testLegacyWaveTimelineMaker').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
+    void testLegacyBasenameTimelineMaker() {
+        def result = gradle.withArguments('legacyBasenameTimelineMaker').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyBasenameTimelineMaker').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyBasenameTimelineMaker').build()
+        println result.standardOutput
+        assert result.task(':legacyBasenameTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':testLegacyBasenameTimelineMaker').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
+    void testLegacyMCepTimelineMaker() {
+        def result = gradle.withArguments('legacyMCepTimelineMaker').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyMCepTimelineMaker').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyMCepTimelineMaker').build()
+        println result.standardOutput
+        assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':testLegacyMCepTimelineMaker').outcome == SUCCESS
     }
 }

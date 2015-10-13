@@ -93,23 +93,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
 
-        project.task('legacyWaveTimelineMaker', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyPraatPitchmarker
-            ext.timelineFile = new File(project.legacyBuildDir, 'timeline_waveforms.mry')
-            outputs.files timelineFile
-        }
-
-        project.task('legacyBasenameTimelineMaker', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyPraatPitchmarker
-            outputs.files new File("$project.legacyBuildDir", 'timeline_basenames.mry')
-        }
-
-        project.task('legacyMCepTimelineMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyInit
-            inputs.files project.legacyPraatPitchmarker, project.legacyMCEPMaker
-            outputs.files new File("$project.legacyBuildDir", 'timeline_mcep.mry')
-        }
-
         project.task('legacyPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
             inputs.files project.legacyPraatPitchmarker, project.legacyPhoneUnitLabelComputer
             ext.unitFile = new File(project.legacyBuildDir, 'phoneUnits.mry')
