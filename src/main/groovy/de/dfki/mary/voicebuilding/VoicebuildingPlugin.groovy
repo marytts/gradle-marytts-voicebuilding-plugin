@@ -38,10 +38,8 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.sourceCompatibility = JavaVersion.VERSION_1_7
 
         project.ext {
-            maryttsVersion = '5.1.2'
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
-            legacyBuildDir = "$project.buildDir/mary"
         }
 
         project.status = project.version.endsWith('SNAPSHOT') ? 'integration' : 'release'
@@ -111,18 +109,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
     }
 
     private void addTasks(Project project) {
-
-        project.task('configurePraat') {
-            def proc = 'which praat'.execute()
-            proc.waitFor()
-            project.ext.praat = proc.in.text
-        }
-
-        project.task('configureSpeechTools') {
-            def proc = 'which ch_track'.execute()
-            proc.waitFor()
-            project.ext.speechToolsDir = new File(proc.in.text)?.parentFile?.parent
-        }
 
         project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
             dependsOn project.legacyInit, project.configurePraat

@@ -9,6 +9,21 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+        project.ext {
+            maryttsVersion = '5.1.1'
+            legacyBuildDir = "$project.buildDir/mary"
+
+            // configure speech-tools
+            def proc = 'which ch_track'.execute()
+            proc.waitFor()
+            speechToolsDir = new File(proc.in.text)?.parentFile?.parent
+
+            // configure praat
+            proc = 'which praat'.execute()
+            proc.waitFor()
+            praat = proc.in.text
+        }
+
         project.task('templates', type: LegacyTemplateTask) {
             destDir = project.file("$project.buildDir/templates")
         }

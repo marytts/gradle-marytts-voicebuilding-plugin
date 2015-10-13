@@ -14,7 +14,7 @@ class LegacyInitTask extends DefaultTask {
             from project.templates
             into project.buildDir
             include configFile.name
-            // TODO: expand project.properties
+            expand project.properties
         }
     }
 }
