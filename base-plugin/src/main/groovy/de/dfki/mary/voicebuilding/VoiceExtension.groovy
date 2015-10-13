@@ -24,12 +24,12 @@ class VoiceExtension {
         name?.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
     }
 
-    String getLocale() {
-        [language, region].join('_')
+    Locale getLocale() {
+        new Locale(language, region)
     }
 
     String getLocaleXml() {
-        [language, region].join('-')
+        locale.toLanguageTag()
     }
 
     String getMaryLocale() {
