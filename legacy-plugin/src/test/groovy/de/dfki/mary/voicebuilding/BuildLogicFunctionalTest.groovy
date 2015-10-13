@@ -31,10 +31,14 @@ class BuildLogicFunctionalTest {
         buildFile << """
         plugins {
             id 'de.dfki.mary.voicebuilding-legacy'
+            id 'de.dfki.mary.voicebuilding-festvox'
         }
 
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
+            assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
+            assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
+            assert plugins.findPlugin('de.dfki.mary.voicebuilding-festvox')
         }
 
         task testTemplates(group: 'Verification') {

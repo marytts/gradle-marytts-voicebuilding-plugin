@@ -2,4 +2,5 @@ apply from: "$rootDir/testKitLogic.gradle"
 
 dependencies {
     compile gradleApi()
+    runtime project(':festvox-plugin')
 }
