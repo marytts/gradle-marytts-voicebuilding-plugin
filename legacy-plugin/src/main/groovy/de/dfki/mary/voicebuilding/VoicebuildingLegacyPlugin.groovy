@@ -116,14 +116,26 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.file("$project.legacyBuildDir/timeline_mcep.mry")
         }
 
+        project.task('legacyPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyPhoneUnitLabelComputer, project.legacyPhoneUnitFeatureComputer
+            srcDir = project.file("$project.buildDir/phonelab")
+        }
+
+        project.task('legacyHalfPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyHalfPhoneUnitLabelComputer, project.legacyHalfPhoneUnitFeatureComputer
+            srcDir = project.file("$project.buildDir/halfphonelab")
+        }
+
         project.task('legacyPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
             dependsOn project.legacyPraatPitchmarker, project.legacyPhoneUnitLabelComputer
+            dependsOn project.legacyPhoneLabelFeatureAligner
             srcDir = project.file("$project.buildDir/pm")
             destFile = project.file("$project.legacyBuildDir/phoneUnits.mry")
         }
 
         project.task('legacyHalfPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
             dependsOn project.legacyPraatPitchmarker, project.legacyHalfPhoneUnitLabelComputer
+            dependsOn project.legacyHalfPhoneLabelFeatureAligner
             srcDir = project.file("$project.buildDir/pm")
             destFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
         }
