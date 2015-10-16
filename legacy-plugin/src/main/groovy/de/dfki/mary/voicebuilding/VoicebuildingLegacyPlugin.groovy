@@ -189,6 +189,12 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile2 = project.file("$project.legacyBuildDir/joinCostWeights.txt")
         }
 
+        project.task('legacyCARTBuilder', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyAcousticFeatureFileWriter
+            srcFile = project.file("$project.legacyBuildDir/halfphoneFeatures_ac.mry")
+            destFile = project.file("$project.legacyBuildDir/cart.mry")
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"

@@ -93,11 +93,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
 
-        project.task('legacyCARTBuilder', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyAcousticFeatureFileWriter
-            outputs.files project.file("$project.legacyBuildDir/cart.mry")
-        }
-
         project.task('extractDurationFeatures') {
             inputs.files project.legacyPhoneFeatureFileWriter, project.legacyPhoneUnitfileWriter
             ext.featsFile = project.file("$temporaryDir/dur.feats")

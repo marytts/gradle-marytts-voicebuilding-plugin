@@ -210,6 +210,13 @@ class BuildLogicFunctionalTest {
                 assert file("\$buildDir/mary/joinCostWeights.txt")
             }
         }
+
+        task testLegacyCARTBuilder(group: 'Verification') {
+            dependsOn legacyCARTBuilder
+            doLast {
+                assert file("\$buildDir/mary/cart.mry")
+            }
+        }
         """
     }
 
@@ -600,5 +607,34 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
         assert result.task(':testLegacyJoinCostFileMaker').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyAcousticFeatureFileWriter'])
+    void testLegacyCARTBuilder() {
+        def result = gradle.withArguments('legacyCARTBuilder').build()
+        println result.standardOutput
+        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyCARTBuilder').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyCARTBuilder').build()
+        println result.standardOutput
+        assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
+        assert result.task(':testLegacyCARTBuilder').outcome == SUCCESS
     }
 }
