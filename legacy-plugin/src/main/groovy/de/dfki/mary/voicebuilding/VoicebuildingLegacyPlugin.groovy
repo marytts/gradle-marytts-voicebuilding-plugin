@@ -178,6 +178,17 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile2 = project.file("$project.legacyBuildDir/halfphoneUnitFeatureDefinition_ac.txt")
         }
 
+        project.task('legacyJoinCostFileMaker', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyMCepTimelineMaker
+            dependsOn project.legacyHalfPhoneUnitfileWriter
+            dependsOn project.legacyAcousticFeatureFileWriter
+            srcFile = project.file("$project.legacyBuildDir/timeline_mcep.mry")
+            srcFile2 = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
+            srcFile3 = project.file("$project.legacyBuildDir/halfphoneFeatures_ac.mry")
+            destFile = project.file("$project.legacyBuildDir/joinCostFeatures.mry")
+            destFile2 = project.file("$project.legacyBuildDir/joinCostWeights.txt")
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
