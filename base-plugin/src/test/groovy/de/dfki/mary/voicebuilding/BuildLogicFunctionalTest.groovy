@@ -49,6 +49,9 @@ class BuildLogicFunctionalTest {
             assert voice.name == "$voiceName"
             assert voice.language == "$voiceLocale.language"
             assert voice.region == "$voiceLocale.country"
+            assert voice.nameCamelCase == 'CmuSlt'
+            assert voice.locale == new Locale("$voiceLocale.language", "$voiceLocale.country")
+            assert voice.localeXml == "${voiceLocale.toLanguageTag()}"
         }
         """
     }

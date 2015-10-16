@@ -14,8 +14,6 @@ import groovy.xml.*
 
 import org.apache.commons.codec.digest.DigestUtils
 
-import de.dfki.mary.voicebuilding.tasks.legacy.LegacyVoiceImportTask
-
 import marytts.LocalMaryInterface
 import marytts.cart.CART
 import marytts.cart.LeafNode
@@ -38,22 +36,11 @@ class VoicebuildingPlugin implements Plugin<Project> {
         project.sourceCompatibility = JavaVersion.VERSION_1_7
 
         project.ext {
-            maryttsVersion = '5.1.2'
             generatedSrcDir = "$project.buildDir/generated-src"
             generatedTestSrcDir = "$project.buildDir/generated-test-src"
-            legacyBuildDir = "$project.buildDir/mary"
         }
 
         project.status = project.version.endsWith('SNAPSHOT') ? 'integration' : 'release'
-
-        project.repositories {
-            jcenter()
-            maven {
-                url 'http://oss.jfrog.org/artifactory/repo'
-            }
-        }
-
-        project.configurations.create 'legacy'
 
         project.sourceSets {
             main {
@@ -76,35 +63,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
                     'Built-With': "gradle-${project.gradle.gradleVersion}, groovy-${GroovySystem.version}")
         }
 
-        project.task('templates') {
-            outputs.files([
-                    'Config.java',
-                    'ConfigTest.java',
-                    'database.config',
-                    'LoadVoiceIT.java',
-                    'voice.config',
-                    'voice-hsmm.config'
-            ].collect {
-                project.file "$temporaryDir/$it"
-            })
-            doLast {
-                outputs.files.each { outputFile ->
-                    outputFile.withOutputStream { stream ->
-                        stream << getClass().getResourceAsStream("/de/dfki/mary/voicebuilding/templates/$outputFile.name")
-                    }
-                }
-            }
-        }
-
         project.afterEvaluate {
-            project.dependencies {
-                compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
-                legacy("de.dfki.mary:marytts-builder:$project.maryttsVersion") {
-                    exclude module: 'mwdumper'
-                    exclude module: 'sgt'
-                }
-                testCompile "junit:junit:4.11"
-            }
 
             addTasks(project)
 
@@ -131,189 +90,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
     }
 
     private void addTasks(Project project) {
-
-        project.task('configurePraat') {
-            def proc = 'which praat'.execute()
-            proc.waitFor()
-            project.ext.praat = proc.in.text
-        }
-
-        project.task('configureSpeechTools') {
-            def proc = 'which ch_track'.execute()
-            proc.waitFor()
-            project.ext.speechToolsDir = new File(proc.in.text)?.parentFile?.parent
-        }
-
-        project.task('legacyInit', type: Copy) {
-            description "Initialize DatabaseLayout for legacy VoiceImportTools"
-            from project.templates
-            into project.buildDir
-            include 'database.config'
-            expand project.properties
-            doLast {
-                project.file(project.legacyBuildDir).mkdirs()
-            }
-        }
-
-        project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyInit, project.configurePraat
-            inputs.files project.fileTree("$project.buildDir/wav").include('*.wav')
-            outputs.files inputs.files.collect {
-                new File("$project.buildDir/pm", it.name.replace('.wav', '.pm'))
-            }
-        }
-
-        project.task('legacyMCEPMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyInit, project.configureSpeechTools
-            inputs.files project.legacyPraatPitchmarker
-            outputs.files inputs.files.collect {
-                new File("$project.buildDir/mcep", it.name.replace('.pm', '.mcep'))
-            }
-        }
-
-        project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
-            inputs.files project.fileTree("$project.buildDir/lab").include('*.lab')
-            outputs.files inputs.files.collect {
-                new File("$project.buildDir/phonelab", it.name)
-            }
-        }
-
-        project.task('legacyHalfPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
-            inputs.files project.fileTree("$project.buildDir/lab").include('*.lab')
-            outputs.files inputs.files.collect {
-                new File("$project.buildDir/halfphonelab", it.name.replace('.lab', '.hplab'))
-            }
-        }
-
-        project.task('legacyTranscriptionAligner', type: LegacyVoiceImportTask) {
-            inputs.files project.generateAllophones, project.fileTree("$project.buildDir/lab").include('*.lab')
-            outputs.files project.generateAllophones.outputs.files.collect {
-                new File("$project.buildDir/allophones", it.name)
-            }
-        }
-
-        project.task('generateFeatureList') {
-            dependsOn project.legacyInit
-            ext.featureFile = project.file("$project.legacyBuildDir/features.txt")
-            outputs.files featureFile
-            doLast {
-                def fpm
-                try {
-                    fpm = Class.forName("marytts.language.${project.voice.language}.features.FeatureProcessorManager").newInstance()
-                } catch (e) {
-                    logger.info "Reflection failed: $e"
-                    logger.info "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
-                    fpm = new FeatureProcessorManager(project.voice.maryLocale)
-                }
-                def featureNames = fpm.listByteValuedFeatureProcessorNames().tokenize() + fpm.listShortValuedFeatureProcessorNames().tokenize()
-                featureFile.text = featureNames.join('\n')
-            }
-        }
-
-        project.task('generatePhoneUnitFeatures') {
-            dependsOn project.legacyInit, project.generateFeatureList
-            inputs.files project.legacyTranscriptionAligner
-            outputs.files inputs.files.collect {
-                new File("$project.buildDir/phonefeatures", it.name.replace('.xml', '.pfeats'))
-            }
-            def mary
-            doFirst {
-                mary = new LocalMaryInterface()
-                mary.locale = new Locale(project.voice.maryLocale)
-                mary.inputType = 'ALLOPHONES'
-                mary.outputType = 'TARGETFEATURES'
-                def features = project.generateFeatureList.featureFile.readLines().minus(['phone', 'halfphone_lr', 'halfphone_unitname']).plus(0, ['phone'])
-                mary.outputTypeParams = features.join(' ')
-            }
-            doLast {
-                [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
-                    def doc = DomUtils.parseDocument inFile
-                    outFile.text = mary.generateText doc
-                }
-            }
-        }
-
-        project.task('generateHalfPhoneUnitFeatures') {
-            dependsOn project.legacyInit, project.generateFeatureList
-            inputs.files project.legacyTranscriptionAligner
-            outputs.files inputs.files.collect {
-                new File("$project.buildDir/halfphonefeatures", it.name.replace('.xml', '.hpfeats'))
-            }
-            def mary
-            doFirst {
-                mary = new LocalMaryInterface()
-                mary.locale = new Locale(project.voice.maryLocale)
-                mary.inputType = 'ALLOPHONES'
-                mary.outputType = 'HALFPHONE_TARGETFEATURES'
-                def features = project.generateFeatureList.featureFile.readLines().minus(['halfphone_unitname']).plus(0, ['halfphone_unitname'])
-                mary.outputTypeParams = features.join(' ')
-            }
-            doLast {
-                [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
-                    def doc = DomUtils.parseDocument inFile
-                    outFile.text = mary.generateText doc
-                }
-            }
-        }
-
-        project.task('legacyWaveTimelineMaker', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyPraatPitchmarker
-            ext.timelineFile = new File(project.legacyBuildDir, 'timeline_waveforms.mry')
-            outputs.files timelineFile
-        }
-
-        project.task('legacyBasenameTimelineMaker', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyPraatPitchmarker
-            outputs.files new File("$project.legacyBuildDir", 'timeline_basenames.mry')
-        }
-
-        project.task('legacyMCepTimelineMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyInit
-            inputs.files project.legacyPraatPitchmarker, project.legacyMCEPMaker
-            outputs.files new File("$project.legacyBuildDir", 'timeline_mcep.mry')
-        }
-
-        project.task('legacyPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyPraatPitchmarker, project.legacyPhoneUnitLabelComputer
-            ext.unitFile = new File(project.legacyBuildDir, 'phoneUnits.mry')
-            outputs.files unitFile
-        }
-
-        project.task('legacyHalfPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyPraatPitchmarker, project.legacyHalfPhoneUnitLabelComputer
-            outputs.files new File("$project.legacyBuildDir", 'halfphoneUnits.mry')
-        }
-
-        project.task('legacyPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyPhoneUnitfileWriter, project.generatePhoneUnitFeatures
-            ext.featureFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
-            outputs.files featureFile, project.file("$project.legacyBuildDir/phoneUnitFeatureDefinition.txt")
-        }
-
-        project.task('legacyHalfPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyHalfPhoneUnitfileWriter, project.generateHalfPhoneUnitFeatures
-            outputs.files project.files("$project.legacyBuildDir/halfphoneFeatures.mry", "$project.legacyBuildDir/halfphoneUnitFeatureDefinition.txt")
-        }
-
-        project.task('legacyF0PolynomialFeatureFileWriter', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyHalfPhoneUnitfileWriter, project.legacyWaveTimelineMaker, project.legacyHalfPhoneFeatureFileWriter
-            outputs.files project.file("$project.legacyBuildDir/syllableF0Polynomials.mry")
-        }
-
-        project.task('legacyAcousticFeatureFileWriter', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyHalfPhoneUnitfileWriter, project.legacyF0PolynomialFeatureFileWriter, project.legacyHalfPhoneFeatureFileWriter
-            outputs.files project.files("$project.legacyBuildDir/halfphoneFeatures_ac.mry", "$project.legacyBuildDir/halfphoneUnitFeatureDefinition_ac.txt")
-        }
-
-        project.task('legacyJoinCostFileMaker', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyMCEPMaker, project.legacyMCepTimelineMaker, project.legacyHalfPhoneUnitfileWriter, project.legacyAcousticFeatureFileWriter
-            outputs.files project.file("$project.legacyBuildDir/joinCostFeatures.mry")
-        }
-
-        project.task('legacyCARTBuilder', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyAcousticFeatureFileWriter
-            outputs.files project.file("$project.legacyBuildDir/cart.mry")
-        }
 
         project.task('extractDurationFeatures') {
             inputs.files project.legacyPhoneFeatureFileWriter, project.legacyPhoneUnitfileWriter

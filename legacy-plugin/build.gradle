@@ -1,0 +1,7 @@
+apply from: "$rootDir/testKitLogic.gradle"
+
+dependencies {
+    compile gradleApi()
+    compile project(':data-plugin')
+    runtime project(':festvox-plugin')
+}

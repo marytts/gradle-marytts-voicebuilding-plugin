@@ -1,31 +1,42 @@
 package de.dfki.mary.voicebuilding
 
 class VoiceExtension {
-    String name = 'my_voice'
-    String gender = 'female'
-    String domain = 'general'
-    String language = 'en'
-    String region = 'US'
-    String type = 'unit selection'
-    int samplingRate = 16000
 
-    def nameCamelCase = {
+    String name
+    String gender
+    String domain
+    String language
+    String region
+    String type
+    int samplingRate
+
+    VoiceExtension() {
+        name = 'my_voice'
+        gender = 'female'
+        domain = 'general'
+        language = 'en'
+        region = 'US'
+        type = 'unit selection'
+        samplingRate = 16000
+    }
+
+    String getNameCamelCase() {
         name?.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
     }
 
-    def locale = {
-        locale ?: [language, region].join('_')
+    Locale getLocale() {
+        new Locale(language, region)
     }
 
-    def localeXml = {
-        [language, region].join('-')
+    String getLocaleXml() {
+        locale.toLanguageTag()
     }
 
-    def maryLocale = {
+    String getMaryLocale() {
         language?.equalsIgnoreCase(region) ? language : locale
     }
 
-    def maryLocaleXml = {
+    String getMaryLocaleXml() {
         language?.equalsIgnoreCase(region) ? language : localeXml
     }
 }
