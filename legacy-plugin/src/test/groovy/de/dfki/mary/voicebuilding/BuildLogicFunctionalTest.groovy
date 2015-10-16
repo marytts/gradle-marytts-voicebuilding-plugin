@@ -194,6 +194,14 @@ class BuildLogicFunctionalTest {
                 assert file("\$buildDir/mary/syllableF0Polynomials.mry")
             }
         }
+
+        task testLegacyAcousticFeatureFileWriter(group: 'Verification') {
+            dependsOn legacyAcousticFeatureFileWriter
+            doLast {
+                assert file("\$buildDir/mary/halfphoneFeatures_ac.mry")
+                assert file("\$buildDir/mary/halfphoneUnitFeatureDefinition_ac.txt")
+            }
+        }
         """
     }
 
@@ -525,5 +533,33 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
         assert result.task(':testLegacyF0PolynomialFeatureFileWriter').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitfileWriter', 'testLegacyF0PolynomialFeatureFileWriter', 'testLegacyHalfPhoneFeatureFileWriter'])
+    void testLegacyAcousticFeatureFileWriter() {
+        def result = gradle.withArguments('legacyAcousticFeatureFileWriter').build()
+        println result.standardOutput
+        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyAcousticFeatureFileWriter').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyAcousticFeatureFileWriter').build()
+        println result.standardOutput
+        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':testLegacyAcousticFeatureFileWriter').outcome == SUCCESS
     }
 }

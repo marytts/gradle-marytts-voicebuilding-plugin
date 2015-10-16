@@ -93,11 +93,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
 
-        project.task('legacyAcousticFeatureFileWriter', type: LegacyVoiceImportTask) {
-            inputs.files project.legacyHalfPhoneUnitfileWriter, project.legacyF0PolynomialFeatureFileWriter, project.legacyHalfPhoneFeatureFileWriter
-            outputs.files project.files("$project.legacyBuildDir/halfphoneFeatures_ac.mry", "$project.legacyBuildDir/halfphoneUnitFeatureDefinition_ac.txt")
-        }
-
         project.task('legacyJoinCostFileMaker', type: LegacyVoiceImportTask) {
             inputs.files project.legacyMCEPMaker, project.legacyMCepTimelineMaker, project.legacyHalfPhoneUnitfileWriter, project.legacyAcousticFeatureFileWriter
             outputs.files project.file("$project.legacyBuildDir/joinCostFeatures.mry")
