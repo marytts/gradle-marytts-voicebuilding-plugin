@@ -149,7 +149,8 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyHalfPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyHalfPhoneUnitfileWriter, project.legacyHalfPhoneUnitFeatureComputer
+            dependsOn project.legacyHalfPhoneUnitfileWriter
+            dependsOn project.legacyHalfPhoneUnitFeatureComputer
             srcFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
             srcDir = project.file("$project.buildDir/halfphonefeatures")
             destFile = project.file("$project.legacyBuildDir/halfphoneFeatures.mry")
@@ -157,7 +158,9 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyF0PolynomialFeatureFileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyHalfPhoneUnitfileWriter, project.legacyWaveTimelineMaker, project.legacyHalfPhoneFeatureFileWriter
+            dependsOn project.legacyHalfPhoneUnitfileWriter
+            dependsOn project.legacyWaveTimelineMaker
+            dependsOn project.legacyHalfPhoneFeatureFileWriter
             srcFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
             srcFile2 = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
             srcFile3 = project.file("$project.legacyBuildDir/halfphoneFeatures.mry")
@@ -165,7 +168,9 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyAcousticFeatureFileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyHalfPhoneUnitfileWriter, project.legacyF0PolynomialFeatureFileWriter, project.legacyHalfPhoneFeatureFileWriter
+            dependsOn project.legacyHalfPhoneUnitfileWriter
+            dependsOn project.legacyF0PolynomialFeatureFileWriter
+            dependsOn project.legacyHalfPhoneFeatureFileWriter
             srcFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
             srcFile2 = project.file("$project.legacyBuildDir/syllableF0Polynomials.mry")
             srcFile3 = project.file("$project.legacyBuildDir/halfphoneFeatures.mry")
