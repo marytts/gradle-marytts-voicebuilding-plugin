@@ -5,6 +5,7 @@ import org.gradle.api.tasks.*
 
 class LegacyVoiceImportTask extends DefaultTask {
 
+    @Optional
     @InputDirectory
     File srcDir
 
@@ -15,6 +16,14 @@ class LegacyVoiceImportTask extends DefaultTask {
     @Optional
     @InputFile
     File srcFile
+
+    @Optional
+    @InputFile
+    File srcFile2
+
+    @Optional
+    @InputFile
+    File srcFile3
 
     @Optional
     @OutputDirectory

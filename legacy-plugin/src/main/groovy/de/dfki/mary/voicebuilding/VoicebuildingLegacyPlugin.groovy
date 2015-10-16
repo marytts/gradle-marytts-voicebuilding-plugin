@@ -156,6 +156,14 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile2 = project.file("$project.legacyBuildDir/halfphoneUnitFeatureDefinition.txt")
         }
 
+        project.task('legacyF0PolynomialFeatureFileWriter', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyHalfPhoneUnitfileWriter, project.legacyWaveTimelineMaker, project.legacyHalfPhoneFeatureFileWriter
+            srcFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
+            srcFile2 = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
+            srcFile3 = project.file("$project.legacyBuildDir/halfphoneFeatures.mry")
+            destFile project.file("$project.legacyBuildDir/syllableF0Polynomials.mry")
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
