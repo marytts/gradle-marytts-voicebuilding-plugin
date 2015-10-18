@@ -195,6 +195,28 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.file("$project.legacyBuildDir/cart.mry")
         }
 
+        project.task('legacyDurationCARTTrainer', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyPhoneFeatureFileWriter
+            dependsOn project.legacyPhoneUnitfileWriter
+            dependsOn project.legacyWaveTimelineMaker
+            srcFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
+            srcFile2 = project.file("$project.legacyBuildDir/phoneUnits.mry")
+            srcFile3 = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
+            destFile = project.file("$project.legacyBuildDir/dur.tree")
+        }
+
+        project.task('legacyF0CARTTrainer', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyPhoneFeatureFileWriter
+            dependsOn project.legacyPhoneUnitfileWriter
+            dependsOn project.legacyWaveTimelineMaker
+            srcFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
+            srcFile2 = project.file("$project.legacyBuildDir/phoneUnits.mry")
+            srcFile3 = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
+            destFile = project.file("$project.legacyBuildDir/f0.left.tree")
+            destFile2 = project.file("$project.legacyBuildDir/f0.mid.tree")
+            destFile3 = project.file("$project.legacyBuildDir/f0.right.tree")
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
