@@ -14,6 +14,10 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.extensions.add 'voice', VoiceExtension
 
+        project.ext {
+            maryttsVersion = '5.1.1'
+        }
+
         project.task('generateSource', type: GenerateSource) {
             destDir = project.file("$project.buildDir/generatedSrc")
             project.compileJava.dependsOn it

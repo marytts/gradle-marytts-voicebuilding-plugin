@@ -22,7 +22,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         project.configurations.create 'legacy'
 
         project.ext {
-            maryttsVersion = '5.1.1'
             legacyBuildDir = "$project.buildDir/mary"
 
             // configure speech-tools
