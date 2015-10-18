@@ -58,7 +58,7 @@ class BuildLogicFunctionalTest {
 
     @Test
     void testHelp() {
-        def result = gradle.build()
+        def result = gradle.withArguments().build()
         println result.standardOutput
         assert result.task(':help').outcome == SUCCESS
     }
