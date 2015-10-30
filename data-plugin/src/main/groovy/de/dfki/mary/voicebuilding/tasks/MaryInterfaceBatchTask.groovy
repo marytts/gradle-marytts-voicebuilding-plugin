@@ -9,7 +9,7 @@ import marytts.datatypes.MaryDataType
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 
-class AllophonesExtractorTask extends DefaultTask {
+class MaryInterfaceBatchTask extends DefaultTask {
 
     @InputDirectory
     File srcDir

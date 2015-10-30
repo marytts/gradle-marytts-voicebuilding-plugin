@@ -21,7 +21,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.file("$project.buildDir/wav")
         }
 
-        project.task('generateAllophones', type: AllophonesExtractorTask) {
+        project.task('generateAllophones', type: MaryInterfaceBatchTask) {
             srcDir = project.file("$project.buildDir/text")
             destDir = project.file("$project.buildDir/prompt_allophones")
         }
