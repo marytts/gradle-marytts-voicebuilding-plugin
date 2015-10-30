@@ -21,9 +21,33 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.file("$project.buildDir/wav")
         }
 
-        project.task('generateAllophones', type: AllophonesExtractorTask) {
+        project.task('generateAllophones', type: MaryInterfaceBatchTask) {
             srcDir = project.file("$project.buildDir/text")
             destDir = project.file("$project.buildDir/prompt_allophones")
+            inputType = 'TEXT'
+            inputExt = 'txt'
+            outputType = 'ALLOPHONES'
+            outputExt = 'xml'
+        }
+
+        project.task('generatePhoneFeatures', type: MaryInterfaceBatchTask) {
+            dependsOn project.generateAllophones
+            srcDir = project.file("$project.buildDir/prompt_allophones")
+            destDir = project.file("$project.buildDir/phonefeatures")
+            inputType = 'ALLOPHONES'
+            inputExt = 'xml'
+            outputType = 'TARGETFEATURES'
+            outputExt = 'pfeats'
+        }
+
+        project.task('generateHalfPhoneFeatures', type: MaryInterfaceBatchTask) {
+            dependsOn project.generateAllophones
+            srcDir = project.file("$project.buildDir/prompt_allophones")
+            destDir = project.file("$project.buildDir/halfphonefeatures")
+            inputType = 'ALLOPHONES'
+            inputExt = 'xml'
+            outputType = 'HALFPHONE_TARGETFEATURES'
+            outputExt = 'hpfeats'
         }
 
         project.task('praatPitchmarker', type: PraatPitchmarkerTask) {
