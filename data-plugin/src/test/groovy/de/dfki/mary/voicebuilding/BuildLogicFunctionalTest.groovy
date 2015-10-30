@@ -118,6 +118,14 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        task testGeneratePhoneFeatures {
+            group 'Verification'
+            dependsOn generatePhoneFeatures
+            doLast {
+                assert fileTree("\$buildDir/phonefeatures").include('*.pfeats').files
+            }
+        }
+
         task testMaryJavaExec(type: JavaExec) {
             classpath sourceSets.main.runtimeClasspath
             main 'marytts.util.PrintSystemProperties'
@@ -191,6 +199,19 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':generateAllophones').outcome == UP_TO_DATE
         assert result.task(':testGenerateAllophones').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testGenerateAllophones'])
+    void testGeneratePhoneFeatures() {
+        def result = gradle.withArguments('generatePhoneFeatures').build()
+        println result.standardOutput
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':generatePhoneFeatures').outcome == SUCCESS
+        result = gradle.withArguments('testGeneratePhoneFeatures').build()
+        println result.standardOutput
+        assert result.task(':generatePhoneFeatures').outcome == UP_TO_DATE
+        assert result.task(':testGeneratePhoneFeatures').outcome == SUCCESS
     }
 
     @Test
