@@ -1,29 +1,19 @@
 package de.dfki.mary.voicebuilding
 
 import groovy.json.JsonBuilder
+import groovy.xml.*
+
+import marytts.features.FeatureProcessorManager
+
+import org.apache.commons.codec.digest.DigestUtils
+
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.Exec
 import org.gradle.api.tasks.bundling.Zip
-
-import groovy.xml.*
-
-import org.apache.commons.codec.digest.DigestUtils
-
-import marytts.LocalMaryInterface
-import marytts.cart.CART
-import marytts.cart.LeafNode
-import marytts.cart.io.MaryCARTWriter
-import marytts.cart.io.WagonCARTReader
-import marytts.features.FeatureProcessorManager
-import marytts.unitselection.data.FeatureFileReader
-import marytts.unitselection.data.TimelineReader
-import marytts.unitselection.data.UnitFileReader
-import marytts.util.dom.DomUtils
 
 class VoicebuildingPlugin implements Plugin<Project> {
 
@@ -90,224 +80,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
     }
 
     private void addTasks(Project project) {
-
-        project.task('extractDurationFeatures') {
-            inputs.files project.legacyPhoneFeatureFileWriter, project.legacyPhoneUnitfileWriter
-            ext.featsFile = project.file("$temporaryDir/dur.feats")
-            outputs.files featsFile
-            doLast {
-                def featureFile = FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
-                def featureDefinition = featureFile.featureDefinition
-                def unitFile = new UnitFileReader(project.legacyPhoneUnitfileWriter.unitFile.path)
-                featsFile.withWriter { feats ->
-                    (0..unitFile.numberOfUnits - 1).each { u ->
-                        def unit = unitFile.getUnit u
-                        def samples = unit.duration
-                        def duration = samples / unitFile.sampleRate
-                        if (duration > 0.01) {
-                            def features = featureFile.getFeatureVector u
-                            feats.println "$duration ${featureDefinition.toFeatureString features}"
-                        }
-                    }
-                }
-            }
-        }
-
-        project.task('generateDurationFeaturesDescription') {
-            inputs.files project.legacyPhoneFeatureFileWriter
-            ext.descFile = project.file("$temporaryDir/dur.desc")
-            outputs.files descFile
-            doLast {
-                def featureFile = FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
-                def featureDefinition = featureFile.featureDefinition
-                descFile.withWriter { desc ->
-                    desc.println '('
-                    desc.println '( segment_duration float )'
-                    featureDefinition.featureNameArray.eachWithIndex { feature, f ->
-                        def values = featureDefinition.getPossibleValues f
-                        desc.print "( $feature "
-                        if (featureDefinition.isContinuousFeature(f) || values.length == 20 && values.last() == '19') {
-                            desc.print 'float'
-                        } else {
-                            desc.print values.collect { "\"${it.replace '"', '\\\"'}\"" }.join(' ')
-                        }
-                        desc.println " )"
-                    }
-                    desc.println " )"
-                }
-            }
-        }
-
-        project.task('trainDurationCart', type: Exec) {
-            inputs.files project.extractDurationFeatures, project.generateDurationFeaturesDescription
-            def treeFile = project.file("$temporaryDir/dur.tree")
-            outputs.files treeFile
-            dependsOn project.legacyInit, project.configureSpeechTools
-            executable "$project.speechToolsDir/bin/wagon"
-            args = [
-                    '-data', project.extractDurationFeatures.featsFile,
-                    '-desc', project.generateDurationFeaturesDescription.descFile,
-                    '-stop', 10,
-                    '-output', treeFile
-            ]
-        }
-
-        project.task('extractF0Features') {
-            inputs.files project.legacyPhoneFeatureFileWriter, project.legacyPhoneUnitfileWriter, project.legacyWaveTimelineMaker
-            ext.leftFeatsFile = project.file("$temporaryDir/f0.left.feats")
-            ext.midFeatsFile = project.file("$temporaryDir/f0.mid.feats")
-            ext.rightFeatsFile = project.file("$temporaryDir/f0.right.feats")
-            outputs.files leftFeatsFile, midFeatsFile, rightFeatsFile
-            doLast {
-                // open destination files for writing
-                def leftFeats = new FileWriter(leftFeatsFile)
-                def midFeats = new FileWriter(midFeatsFile)
-                def rightFeats = new FileWriter(rightFeatsFile)
-                // MaryTTS files needed to extract F0 baked into unit datagram durations
-                def featureFile = FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
-                def featureDefinition = featureFile.featureDefinition
-                def unitFile = new UnitFileReader(project.legacyPhoneUnitfileWriter.unitFile.path)
-                def waveTimeline = new TimelineReader(project.legacyWaveTimelineMaker.timelineFile.path)
-                // in the absence of high-level feature value accessors, need feature indices
-                def numSegsFromSylStartFeatureIndex = featureDefinition.getFeatureIndex 'segs_from_syl_start'
-                def numSegsFromEndStartFeatureIndex = featureDefinition.getFeatureIndex 'segs_from_syl_end'
-                def phoneFeatureIndex = featureDefinition.getFeatureIndex 'phone'
-                def isVowelFeatureIndex = featureDefinition.getFeatureIndex 'ph_vc'
-                def isVoicedConsonantFeatureIndex = featureDefinition.getFeatureIndex 'ph_cvox'
-                // iterate over all units
-                for (def u = 0; u < unitFile.numberOfUnits; u++) {
-                    def sylSegs = []
-                    // in absence of syllable structure, use segment counter features
-                    def featureVector = featureFile.getFeatureVector(u)
-                    def firstSegInSyl = u + featureVector.getFeatureAsInt(numSegsFromSylStartFeatureIndex)
-                    def lastSegInSyl = u + featureVector.getFeatureAsInt(numSegsFromEndStartFeatureIndex)
-                    // reconstruct relevant features per segment in syllable
-                    (firstSegInSyl..lastSegInSyl).each {
-                        featureVector = featureFile.getFeatureVector it
-                        def phone = featureVector.getFeatureAsString(phoneFeatureIndex, featureDefinition)
-                        def isVowel = featureVector.getFeatureAsString(isVowelFeatureIndex, featureDefinition) == '+'
-                        def isVoicedConsonant = featureVector.getFeatureAsString(isVoicedConsonantFeatureIndex, featureDefinition) == '+'
-                        sylSegs << [
-                                'unitIndex': it,
-                                'phone'    : phone,
-                                'isVoiced' : isVowel || isVoicedConsonant,
-                                'isVowel'  : isVowel,
-                                'features' : featureVector
-                        ]
-                    }
-                    // proceed to reconstruct F0 values from voiced segments, if any
-                    def voicedSegs = sylSegs.grep { it['isVowel'] }
-                    if (voicedSegs) {
-                        // left F0
-                        def firstVoicedSeg = voicedSegs.first()
-                        def firstVoicedDatagrams = waveTimeline.getDatagrams(unitFile.getUnit(firstVoicedSeg['unitIndex']), unitFile.sampleRate)
-                        def leftF0 = waveTimeline.sampleRate / firstVoicedDatagrams.first().duration
-                        leftFeats.println "$leftF0 ${featureDefinition.toFeatureString firstVoicedSeg['features']}"
-                        // mid F0
-                        def firstVowel = voicedSegs.grep { it['isVowel'] }.first()
-                        def vowelDatagrams = waveTimeline.getDatagrams(unitFile.getUnit(firstVowel['unitIndex']), unitFile.sampleRate)
-                        def midF0 = waveTimeline.sampleRate / vowelDatagrams[vowelDatagrams.length / 2 as int].duration
-                        midFeats.println "$midF0 ${featureDefinition.toFeatureString firstVowel['features']}"
-                        // right F0
-                        def lastVoicedSeg = voicedSegs.last()
-                        def lastVoicedDatagrams = waveTimeline.getDatagrams(unitFile.getUnit(lastVoicedSeg['unitIndex']), unitFile.sampleRate)
-                        def rightF0 = waveTimeline.sampleRate / lastVoicedDatagrams.last().duration
-                        rightFeats.println "$rightF0 ${featureDefinition.toFeatureString lastVoicedSeg['features']}"
-                    }
-                    // increment to end of syllable
-                    u = lastSegInSyl
-                }
-                leftFeats.close()
-                midFeats.close()
-                rightFeats.close()
-            }
-        }
-
-        project.task('generateF0FeaturesDescription') {
-            inputs.files project.legacyPhoneFeatureFileWriter
-            ext.descFile = project.file("$temporaryDir/f0.desc")
-            outputs.files descFile
-            doLast {
-                def featureFile = FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
-                def featureDefinition = featureFile.featureDefinition
-                descFile.withWriter { desc ->
-                    desc.println '('
-                    desc.println '( f0 float )'
-                    featureDefinition.featureNameArray.eachWithIndex { feature, f ->
-                        def values = featureDefinition.getPossibleValues f
-                        desc.print "( $feature "
-                        if (featureDefinition.isContinuousFeature(f) || values.length == 20 && values.last() == '19') {
-                            desc.print 'float'
-                        } else {
-                            desc.print values.collect { "\"${it.replace '"', '\\\"'}\"" }.join(' ')
-                        }
-                        desc.println " )"
-                    }
-                    desc.println " )"
-                }
-            }
-        }
-
-        project.task('trainLeftF0Cart', type: Exec) {
-            inputs.files project.extractF0Features.leftFeatsFile, project.generateF0FeaturesDescription
-            def treeFile = project.file("$temporaryDir/f0.left.tree")
-            outputs.files treeFile
-            dependsOn project.legacyInit, project.configureSpeechTools, project.extractF0Features
-            executable "$project.speechToolsDir/bin/wagon"
-            args = [
-                    '-data', project.extractF0Features.leftFeatsFile,
-                    '-desc', project.generateF0FeaturesDescription.descFile,
-                    '-stop', 10,
-                    '-output', treeFile
-            ]
-        }
-
-        project.task('trainMidF0Cart', type: Exec) {
-            inputs.files project.extractF0Features.midFeatsFile, project.generateF0FeaturesDescription
-            def treeFile = project.file("$temporaryDir/f0.mid.tree")
-            outputs.files treeFile
-            dependsOn project.legacyInit, project.configureSpeechTools, project.extractF0Features
-            executable "$project.speechToolsDir/bin/wagon"
-            args = [
-                    '-data', project.extractF0Features.midFeatsFile,
-                    '-desc', project.generateF0FeaturesDescription.descFile,
-                    '-stop', 10,
-                    '-output', treeFile
-            ]
-        }
-
-        project.task('trainRightF0Cart', type: Exec) {
-            inputs.files project.extractF0Features.rightFeatsFile, project.generateF0FeaturesDescription
-            def treeFile = project.file("$temporaryDir/f0.right.tree")
-            outputs.files treeFile
-            dependsOn project.legacyInit, project.configureSpeechTools, project.extractF0Features
-            executable "$project.speechToolsDir/bin/wagon"
-            args = [
-                    '-data', project.extractF0Features.rightFeatsFile,
-                    '-desc', project.generateF0FeaturesDescription.descFile,
-                    '-stop', 10,
-                    '-output', treeFile
-            ]
-        }
-
-        project.task('processCarts') {
-            inputs.files project.trainDurationCart, project.trainLeftF0Cart, project.trainMidF0Cart, project.trainRightF0Cart
-            outputs.files inputs.files.collect {
-                new File(project.legacyBuildDir, it.name)
-            }
-            dependsOn project.legacyPhoneFeatureFileWriter
-            doLast {
-                def featureFile = FeatureFileReader.getFeatureFileReader project.legacyPhoneFeatureFileWriter.featureFile.path
-                def featureDefinition = featureFile.featureDefinition
-                [inputs.files as List, outputs.files as List].transpose().each { inFile, outFile ->
-                    def wagonCartReader = new WagonCARTReader(LeafNode.LeafType.FloatLeafNode)
-                    def rootNode = wagonCartReader.load(new BufferedReader(new FileReader(inFile)), featureDefinition)
-                    def cart = new CART(rootNode, featureDefinition)
-                    def maryCartWriter = new MaryCARTWriter()
-                    maryCartWriter.dumpMaryCART(cart, outFile.path);
-                }
-            }
-        }
 
         project.task('generateSource', type: Copy) {
             from project.templates

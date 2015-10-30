@@ -22,7 +22,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         project.configurations.create 'legacy'
 
         project.ext {
-            maryttsVersion = '5.1.1'
             legacyBuildDir = "$project.buildDir/mary"
 
             // configure speech-tools
@@ -193,6 +192,28 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             dependsOn project.legacyAcousticFeatureFileWriter
             srcFile = project.file("$project.legacyBuildDir/halfphoneFeatures_ac.mry")
             destFile = project.file("$project.legacyBuildDir/cart.mry")
+        }
+
+        project.task('legacyDurationCARTTrainer', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyPhoneFeatureFileWriter
+            dependsOn project.legacyPhoneUnitfileWriter
+            dependsOn project.legacyWaveTimelineMaker
+            srcFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
+            srcFile2 = project.file("$project.legacyBuildDir/phoneUnits.mry")
+            srcFile3 = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
+            destFile = project.file("$project.legacyBuildDir/dur.tree")
+        }
+
+        project.task('legacyF0CARTTrainer', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyPhoneFeatureFileWriter
+            dependsOn project.legacyPhoneUnitfileWriter
+            dependsOn project.legacyWaveTimelineMaker
+            srcFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
+            srcFile2 = project.file("$project.legacyBuildDir/phoneUnits.mry")
+            srcFile3 = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
+            destFile = project.file("$project.legacyBuildDir/f0.left.tree")
+            destFile2 = project.file("$project.legacyBuildDir/f0.mid.tree")
+            destFile3 = project.file("$project.legacyBuildDir/f0.right.tree")
         }
 
         project.afterEvaluate {

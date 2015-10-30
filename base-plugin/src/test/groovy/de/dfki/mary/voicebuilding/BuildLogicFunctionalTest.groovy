@@ -53,12 +53,19 @@ class BuildLogicFunctionalTest {
             assert voice.locale == new Locale("$voiceLocale.language", "$voiceLocale.country")
             assert voice.localeXml == "${voiceLocale.toLanguageTag()}"
         }
+
+        task testGenerateSource(group: 'Verification') {
+            dependsOn generateSource
+            doLast {
+                assert file("\$buildDir/generatedSrc/main/java/marytts/voice/\$voice.nameCamelCase/Config.java")
+            }
+        }
         """
     }
 
     @Test
     void testHelp() {
-        def result = gradle.build()
+        def result = gradle.withArguments().build()
         println result.standardOutput
         assert result.task(':help').outcome == SUCCESS
     }
@@ -75,5 +82,16 @@ class BuildLogicFunctionalTest {
         def result = gradle.withArguments('testVoiceProps').build()
         println result.standardOutput
         assert result.task(':testVoiceProps').outcome == SUCCESS
+    }
+
+    @Test
+    void testGenerateSource() {
+        def result = gradle.withArguments('generateSource').build()
+        println result.standardOutput
+        assert result.task(':generateSource').outcome == SUCCESS
+        result = gradle.withArguments('testGenerateSource').build()
+        println result.standardOutput
+        assert result.task(':generateSource').outcome == UP_TO_DATE
+        assert result.task(':testGenerateSource').outcome == SUCCESS
     }
 }

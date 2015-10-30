@@ -217,12 +217,28 @@ class BuildLogicFunctionalTest {
                 assert file("\$buildDir/mary/cart.mry")
             }
         }
+
+        task testLegacyDurationCARTTrainer(group: 'Verification') {
+            dependsOn legacyDurationCARTTrainer
+            doLast {
+                assert file("\$buildDir/mary/dur.tree")
+            }
+        }
+
+        task testLegacyF0CARTTrainer(group: 'Verification') {
+            dependsOn legacyF0CARTTrainer
+            doLast {
+                assert file("\$buildDir/mary/f0.left.tree")
+                assert file("\$buildDir/mary/f0.mid.tree")
+                assert file("\$buildDir/mary/f0.right.tree")
+            }
+        }
         """
     }
 
     @Test
     void testHelp() {
-        def result = gradle.build()
+        def result = gradle.withArguments().build()
         println result.standardOutput
         assert result.task(':help').outcome == SUCCESS
     }
@@ -636,5 +652,59 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
         assert result.task(':testLegacyCARTBuilder').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyPhoneFeatureFileWriter', 'testLegacyPhoneUnitfileWriter', 'testLegacyWaveTimelineMaker'])
+    void testLegacyDurationCARTTrainer() {
+        def result = gradle.withArguments('legacyDurationCARTTrainer').build()
+        println result.standardOutput
+        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneLabelFeatureAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyDurationCARTTrainer').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyDurationCARTTrainer').build()
+        println result.standardOutput
+        assert result.task(':legacyDurationCARTTrainer').outcome == UP_TO_DATE
+        assert result.task(':testLegacyDurationCARTTrainer').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyPhoneFeatureFileWriter', 'testLegacyPhoneUnitfileWriter', 'testLegacyWaveTimelineMaker'])
+    void testLegacyF0CARTTrainer() {
+        def result = gradle.withArguments('legacyF0CARTTrainer').build()
+        println result.standardOutput
+        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneLabelFeatureAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyF0CARTTrainer').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyF0CARTTrainer').build()
+        println result.standardOutput
+        assert result.task(':legacyF0CARTTrainer').outcome == UP_TO_DATE
+        assert result.task(':testLegacyF0CARTTrainer').outcome == SUCCESS
     }
 }

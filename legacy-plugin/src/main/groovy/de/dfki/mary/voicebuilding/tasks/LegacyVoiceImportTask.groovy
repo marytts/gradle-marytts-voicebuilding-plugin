@@ -37,6 +37,10 @@ class LegacyVoiceImportTask extends DefaultTask {
     @OutputFile
     File destFile2
 
+    @Optional
+    @OutputFile
+    File destFile3
+
     @TaskAction
     void run() {
         project.javaexec {
