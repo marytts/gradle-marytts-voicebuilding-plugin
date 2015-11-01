@@ -18,8 +18,21 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             maryttsVersion = '5.1.1'
         }
 
+        project.repositories {
+            jcenter()
+        }
+
+        project.dependencies {
+            compile(group: 'de.dfki.mary', name: 'marytts-runtime', version: project.maryttsVersion) {
+                exclude module: 'freetts'
+                exclude module: 'freetts-en_us'
+                exclude module: 'freetts-de'
+            }
+        }
+
         project.task('generateSource', type: GenerateSource) {
             destDir = project.file("$project.buildDir/generatedSrc")
+            project.sourceSets.main.java.srcDirs += "$destDir/main/java"
             project.compileJava.dependsOn it
             project.compileTestJava.dependsOn it
         }

@@ -60,6 +60,13 @@ class BuildLogicFunctionalTest {
                 assert file("\$buildDir/generatedSrc/main/java/marytts/voice/\$voice.nameCamelCase/Config.java")
             }
         }
+
+        task testCompileJava(group: 'Verification') {
+            dependsOn compileJava
+            doLast {
+                assert file("\$buildDir/classes/main/marytts/voice/\$voice.nameCamelCase/Config.class").exists()
+            }
+        }
         """
     }
 
@@ -93,5 +100,17 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':generateSource').outcome == UP_TO_DATE
         assert result.task(':testGenerateSource').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testGenerateSource'])
+    void testCompileJava() {
+        def result = gradle.withArguments('compileJava').build()
+        println result.standardOutput
+        assert result.task(':generateSource').outcome == UP_TO_DATE
+        assert result.task(':compileJava').outcome == SUCCESS
+        result = gradle.withArguments('testCompileJava').build()
+        println result.standardOutput
+        assert result.task(':compileJava').outcome == UP_TO_DATE
+        assert result.task(':testCompileJava').outcome == SUCCESS
     }
 }
