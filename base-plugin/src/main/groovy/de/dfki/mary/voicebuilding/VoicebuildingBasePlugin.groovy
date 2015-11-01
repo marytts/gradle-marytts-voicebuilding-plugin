@@ -28,11 +28,13 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
                 exclude module: 'freetts-en_us'
                 exclude module: 'freetts-de'
             }
+            testCompile group: 'junit', name: 'junit', version: '4.12'
         }
 
         project.task('generateSource', type: GenerateSource) {
             destDir = project.file("$project.buildDir/generatedSrc")
             project.sourceSets.main.java.srcDirs += "$destDir/main/java"
+            project.sourceSets.test.java.srcDirs += "$destDir/test/java"
             project.compileJava.dependsOn it
             project.compileTestJava.dependsOn it
         }
