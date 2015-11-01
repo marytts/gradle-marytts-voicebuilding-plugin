@@ -57,7 +57,7 @@ class BuildLogicFunctionalTest {
         task testGenerateSource(group: 'Verification') {
             dependsOn generateSource
             doLast {
-                assert file("\$buildDir/generatedSrc/main/java/marytts/voice/\$voice.nameCamelCase/Config.java")
+                assert file("\$buildDir/generatedSrc/main/java/marytts/voice/\$voice.nameCamelCase/Config.java").exists()
             }
         }
         """
