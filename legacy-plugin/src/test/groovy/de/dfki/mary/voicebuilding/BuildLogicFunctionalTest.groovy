@@ -76,7 +76,7 @@ class BuildLogicFunctionalTest {
         task testLegacyInit(group: 'Verification') {
             dependsOn legacyInit
             doLast {
-                assert file("\$buildDir/database.config")
+                assert file("\$buildDir/database.config").exists()
             }
         }
 
@@ -119,7 +119,7 @@ class BuildLogicFunctionalTest {
         task testLegacyFeatureLister(group: 'Verification') {
             dependsOn legacyFeatureLister
             doLast {
-                assert file("\$buildDir/features.txt")
+                assert file("\$buildDir/mary/features.txt").exists()
             }
         }
 
@@ -140,97 +140,97 @@ class BuildLogicFunctionalTest {
         task testLegacyWaveTimelineMaker(group: 'Verification') {
             dependsOn legacyWaveTimelineMaker
             doLast {
-                assert file("\$buildDir/mary/timeline_waveforms.mry")
+                assert file("\$buildDir/mary/timeline_waveforms.mry").exists()
             }
         }
 
         task testLegacyBasenameTimelineMaker(group: 'Verification') {
             dependsOn legacyBasenameTimelineMaker
             doLast {
-                assert file("\$buildDir/mary/timeline_basenames.mry")
+                assert file("\$buildDir/mary/timeline_basenames.mry").exists()
             }
         }
 
         task testLegacyMCepTimelineMaker(group: 'Verification') {
             dependsOn legacyMCepTimelineMaker
             doLast {
-                assert file("\$buildDir/mary/timeline_mcep.mry")
+                assert file("\$buildDir/mary/timeline_mcep.mry").exists()
             }
         }
 
         task testLegacyPhoneUnitfileWriter(group: 'Verification') {
             dependsOn legacyPhoneUnitfileWriter
             doLast {
-                assert file("\$buildDir/mary/phoneUnits.mry")
+                assert file("\$buildDir/mary/phoneUnits.mry").exists()
             }
         }
 
         task testLegacyHalfPhoneUnitfileWriter(group: 'Verification') {
             dependsOn legacyHalfPhoneUnitfileWriter
             doLast {
-                assert file("\$buildDir/mary/halfphoneUnits.mry")
+                assert file("\$buildDir/mary/halfphoneUnits.mry").exists()
             }
         }
 
         task testLegacyPhoneFeatureFileWriter(group: 'Verification') {
             dependsOn legacyPhoneFeatureFileWriter
             doLast {
-                assert file("\$buildDir/mary/phoneFeatures.mry")
-                assert file("\$buildDir/mary/phoneUnitFeatureDefinition.txt")
+                assert file("\$buildDir/mary/phoneFeatures.mry").exists()
+                assert file("\$buildDir/mary/phoneUnitFeatureDefinition.txt").exists()
             }
         }
 
         task testLegacyHalfPhoneFeatureFileWriter(group: 'Verification') {
             dependsOn legacyHalfPhoneFeatureFileWriter
             doLast {
-                assert file("\$buildDir/mary/halfphoneFeatures.mry")
-                assert file("\$buildDir/mary/halfphoneUnitFeatureDefinition.txt")
+                assert file("\$buildDir/mary/halfphoneFeatures.mry").exists()
+                assert file("\$buildDir/mary/halfphoneUnitFeatureDefinition.txt").exists()
             }
         }
 
         task testLegacyF0PolynomialFeatureFileWriter(group: 'Verification') {
             dependsOn legacyF0PolynomialFeatureFileWriter
             doLast {
-                assert file("\$buildDir/mary/syllableF0Polynomials.mry")
+                assert file("\$buildDir/mary/syllableF0Polynomials.mry").exists()
             }
         }
 
         task testLegacyAcousticFeatureFileWriter(group: 'Verification') {
             dependsOn legacyAcousticFeatureFileWriter
             doLast {
-                assert file("\$buildDir/mary/halfphoneFeatures_ac.mry")
-                assert file("\$buildDir/mary/halfphoneUnitFeatureDefinition_ac.txt")
+                assert file("\$buildDir/mary/halfphoneFeatures_ac.mry").exists()
+                assert file("\$buildDir/mary/halfphoneUnitFeatureDefinition_ac.txt").exists()
             }
         }
 
         task testLegacyJoinCostFileMaker(group: 'Verification') {
             dependsOn legacyJoinCostFileMaker
             doLast {
-                assert file("\$buildDir/mary/joinCostFeatures.mry")
-                assert file("\$buildDir/mary/joinCostWeights.txt")
+                assert file("\$buildDir/mary/joinCostFeatures.mry").exists()
+                assert file("\$buildDir/mary/joinCostWeights.txt").exists()
             }
         }
 
         task testLegacyCARTBuilder(group: 'Verification') {
             dependsOn legacyCARTBuilder
             doLast {
-                assert file("\$buildDir/mary/cart.mry")
+                assert file("\$buildDir/mary/cart.mry").exists()
             }
         }
 
         task testLegacyDurationCARTTrainer(group: 'Verification') {
             dependsOn legacyDurationCARTTrainer
             doLast {
-                assert file("\$buildDir/mary/dur.tree")
+                assert file("\$buildDir/mary/dur.tree").exists()
             }
         }
 
         task testLegacyF0CARTTrainer(group: 'Verification') {
             dependsOn legacyF0CARTTrainer
             doLast {
-                assert file("\$buildDir/mary/f0.left.tree")
-                assert file("\$buildDir/mary/f0.mid.tree")
-                assert file("\$buildDir/mary/f0.right.tree")
+                assert file("\$buildDir/mary/f0.left.tree").exists()
+                assert file("\$buildDir/mary/f0.mid.tree").exists()
+                assert file("\$buildDir/mary/f0.right.tree").exists()
             }
         }
         """
