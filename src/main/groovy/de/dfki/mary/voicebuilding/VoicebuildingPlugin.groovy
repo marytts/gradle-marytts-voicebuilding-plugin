@@ -81,30 +81,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
 
-        project.task('generateSource', type: Copy) {
-            from project.templates
-            into project.generatedSrcDir
-            include 'Config.java'
-            rename {
-                "marytts/voice/$project.voice.nameCamelCase/$it"
-            }
-            expand project.properties
-        }
-
-        project.compileJava.dependsOn project.generateSource
-
-        project.task('generateTestSource', type: Copy) {
-            from project.templates
-            into project.generatedTestSrcDir
-            include 'ConfigTest.java', 'LoadVoiceIT.java'
-            rename {
-                "marytts/voice/$project.voice.nameCamelCase/$it"
-            }
-            expand project.properties
-        }
-
-        project.compileTestJava.dependsOn project.generateTestSource
-
         project.task('generateServiceLoader') {
             def serviceLoaderFile = project.file("$project.sourceSets.main.output.resourcesDir/META-INF/services/marytts.config.MaryConfig")
             outputs.files serviceLoaderFile
