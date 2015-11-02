@@ -83,6 +83,15 @@ class BuildLogicFunctionalTest {
                 assert configFile.withReader { it.readLine().contains(voice.name) }
             }
         }
+
+        task testGenerateServiceLoader(group: 'Verification') {
+            dependsOn generateServiceLoader
+            doLast {
+                def serviceLoaderFile = file("\$buildDir/resources/main/META-INF/services/marytts.config.MaryConfig")
+                assert serviceLoaderFile.exists()
+                assert serviceLoaderFile.text == "marytts.voice.\${voice.nameCamelCase}.Config"
+            }
+        }
         """
     }
 
@@ -154,5 +163,16 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
         assert result.task(':testGenerateVoiceConfig').outcome == SUCCESS
+    }
+
+    @Test
+    void testGenerateServiceLoader() {
+        def result = gradle.withArguments('generateServiceLoader').build()
+        println result.standardOutput
+        assert result.task(':generateServiceLoader').outcome == SUCCESS
+        result = gradle.withArguments('testGenerateServiceLoader').build()
+        println result.standardOutput
+        assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
+        assert result.task(':testGenerateServiceLoader').outcome == SUCCESS
     }
 }

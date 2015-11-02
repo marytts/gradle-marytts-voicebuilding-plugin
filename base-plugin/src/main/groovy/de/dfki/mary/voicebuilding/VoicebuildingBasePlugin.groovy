@@ -45,5 +45,10 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             }
             project.processResources.dependsOn it
         }
+
+        project.task('generateServiceLoader', type: GenerateServiceLoader) {
+            destFile = project.file("$project.sourceSets.main.output.resourcesDir/META-INF/services/marytts.config.MaryConfig")
+            project.processResources.dependsOn it
+        }
     }
 }
