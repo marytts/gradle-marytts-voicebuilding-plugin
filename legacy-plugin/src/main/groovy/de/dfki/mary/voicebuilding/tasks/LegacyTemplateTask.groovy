@@ -9,8 +9,6 @@ class LegacyTemplateTask extends DefaultTask {
     File destDir
 
     def resources = [
-            'Config.java',
-            'ConfigTest.java',
             'database.config',
             'LoadVoiceIT.java',
             'voice.config',
