@@ -175,4 +175,11 @@ class BuildLogicFunctionalTest {
         assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
         assert result.task(':testGenerateServiceLoader').outcome == SUCCESS
     }
+
+    @Test(dependsOnMethods = ['testCompileTestJava'])
+    void testTest() {
+        def result = gradle.withArguments('test').build()
+        println result.standardOutput
+        assert result.task(':test').outcome == SUCCESS
+    }
 }
