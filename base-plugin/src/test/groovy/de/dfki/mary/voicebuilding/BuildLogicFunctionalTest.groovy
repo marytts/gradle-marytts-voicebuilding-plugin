@@ -74,6 +74,15 @@ class BuildLogicFunctionalTest {
                 assert file("\$buildDir/classes/test/marytts/voice/\$voice.nameCamelCase/ConfigTest.class").exists()
             }
         }
+
+        task testGenerateVoiceConfig(group: 'Verification') {
+            dependsOn generateVoiceConfig
+            doLast {
+                def configFile = file("\$buildDir/resources/main/marytts/voice/\$voice.nameCamelCase/voice.config")
+                assert configFile.exists()
+                assert configFile.withReader { it.readLine().contains(voice.name) }
+            }
+        }
         """
     }
 
@@ -134,5 +143,16 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':compileTestJava').outcome == UP_TO_DATE
         assert result.task(':testCompileTestJava').outcome == SUCCESS
+    }
+
+    @Test
+    void testGenerateVoiceConfig() {
+        def result = gradle.withArguments('generateVoiceConfig').build()
+        println result.standardOutput
+        assert result.task(':generateVoiceConfig').outcome == SUCCESS
+        result = gradle.withArguments('testGenerateVoiceConfig').build()
+        println result.standardOutput
+        assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
+        assert result.task(':testGenerateVoiceConfig').outcome == SUCCESS
     }
 }

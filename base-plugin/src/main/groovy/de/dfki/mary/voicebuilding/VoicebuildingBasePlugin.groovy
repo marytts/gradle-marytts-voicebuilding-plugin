@@ -1,6 +1,6 @@
 package de.dfki.mary.voicebuilding
 
-import de.dfki.mary.voicebuilding.tasks.GenerateSource
+import de.dfki.mary.voicebuilding.tasks.*
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -37,6 +37,13 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             project.sourceSets.test.java.srcDirs += "$destDir/test/java"
             project.compileJava.dependsOn it
             project.compileTestJava.dependsOn it
+        }
+
+        project.task('generateVoiceConfig', type: GenerateVoiceConfig) {
+            project.afterEvaluate {
+                destFile = project.file("$project.sourceSets.main.output.resourcesDir/marytts/voice/$project.voice.nameCamelCase/voice.config")
+            }
+            project.processResources.dependsOn it
         }
     }
 }
