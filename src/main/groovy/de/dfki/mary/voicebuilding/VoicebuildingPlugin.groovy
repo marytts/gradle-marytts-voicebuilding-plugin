@@ -81,27 +81,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
     private void addTasks(Project project) {
 
-        project.task('generateServiceLoader') {
-            def serviceLoaderFile = project.file("$project.sourceSets.main.output.resourcesDir/META-INF/services/marytts.config.MaryConfig")
-            outputs.files serviceLoaderFile
-            doFirst {
-                serviceLoaderFile.parentFile.mkdirs()
-            }
-            doLast {
-                serviceLoaderFile.text = "marytts.voice.${project.voice.nameCamelCase}.Config"
-            }
-        }
-
-        project.task('generateVoiceConfig', type: Copy) {
-            from project.templates
-            into project.sourceSets.main.output.resourcesDir
-            include project.voice.type == 'hsmm' ? 'voice-hsmm.config' : 'voice.config'
-            rename {
-                "marytts/voice/$project.voice.nameCamelCase/voice.config"
-            }
-            expand project.properties
-        }
-
         project.task('generateFeatureFiles') {
             def destDir = project.file("$project.sourceSets.main.output.resourcesDir/marytts/voice/$project.voice.nameCamelCase")
             def featureFile = new File(destDir, 'halfphoneUnitFeatureDefinition_ac.txt')
@@ -160,7 +139,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
             rename {
                 "marytts/voice/$project.voice.nameCamelCase/$it"
             }
-            dependsOn project.generateServiceLoader, project.generateVoiceConfig
             if (project.voice.type == 'unit selection') {
                 dependsOn project.generateFeatureFiles
             }
