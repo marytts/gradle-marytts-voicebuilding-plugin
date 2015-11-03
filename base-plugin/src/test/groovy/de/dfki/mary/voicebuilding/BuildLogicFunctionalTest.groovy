@@ -60,6 +60,38 @@ class BuildLogicFunctionalTest {
                 assert file("\$buildDir/generatedSrc/main/java/marytts/voice/\$voice.nameCamelCase/Config.java").exists()
             }
         }
+
+        task testCompileJava(group: 'Verification') {
+            dependsOn compileJava
+            doLast {
+                assert file("\$buildDir/classes/main/marytts/voice/\$voice.nameCamelCase/Config.class").exists()
+            }
+        }
+
+        task testCompileTestJava(group: 'Verification') {
+            dependsOn compileTestJava
+            doLast {
+                assert file("\$buildDir/classes/test/marytts/voice/\$voice.nameCamelCase/ConfigTest.class").exists()
+            }
+        }
+
+        task testGenerateVoiceConfig(group: 'Verification') {
+            dependsOn generateVoiceConfig
+            doLast {
+                def configFile = file("\$buildDir/resources/main/marytts/voice/\$voice.nameCamelCase/voice.config")
+                assert configFile.exists()
+                assert configFile.withReader { it.readLine().contains(voice.name) }
+            }
+        }
+
+        task testGenerateServiceLoader(group: 'Verification') {
+            dependsOn generateServiceLoader
+            doLast {
+                def serviceLoaderFile = file("\$buildDir/resources/main/META-INF/services/marytts.config.MaryConfig")
+                assert serviceLoaderFile.exists()
+                assert serviceLoaderFile.text == "marytts.voice.\${voice.nameCamelCase}.Config"
+            }
+        }
         """
     }
 
@@ -93,5 +125,61 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':generateSource').outcome == UP_TO_DATE
         assert result.task(':testGenerateSource').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testGenerateSource'])
+    void testCompileJava() {
+        def result = gradle.withArguments('compileJava').build()
+        println result.standardOutput
+        assert result.task(':generateSource').outcome == UP_TO_DATE
+        assert result.task(':compileJava').outcome == SUCCESS
+        result = gradle.withArguments('testCompileJava').build()
+        println result.standardOutput
+        assert result.task(':compileJava').outcome == UP_TO_DATE
+        assert result.task(':testCompileJava').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testCompileJava'])
+    void testCompileTestJava() {
+        def result = gradle.withArguments('compileTestJava').build()
+        println result.standardOutput
+        assert result.task(':generateSource').outcome == UP_TO_DATE
+        assert result.task(':compileJava').outcome == UP_TO_DATE
+        assert result.task(':processResources').outcome == UP_TO_DATE
+        assert result.task(':classes').outcome == UP_TO_DATE
+        assert result.task(':compileTestJava').outcome == SUCCESS
+        result = gradle.withArguments('testCompileTestJava').build()
+        println result.standardOutput
+        assert result.task(':compileTestJava').outcome == UP_TO_DATE
+        assert result.task(':testCompileTestJava').outcome == SUCCESS
+    }
+
+    @Test
+    void testGenerateVoiceConfig() {
+        def result = gradle.withArguments('generateVoiceConfig').build()
+        println result.standardOutput
+        assert result.task(':generateVoiceConfig').outcome == SUCCESS
+        result = gradle.withArguments('testGenerateVoiceConfig').build()
+        println result.standardOutput
+        assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
+        assert result.task(':testGenerateVoiceConfig').outcome == SUCCESS
+    }
+
+    @Test
+    void testGenerateServiceLoader() {
+        def result = gradle.withArguments('generateServiceLoader').build()
+        println result.standardOutput
+        assert result.task(':generateServiceLoader').outcome == SUCCESS
+        result = gradle.withArguments('testGenerateServiceLoader').build()
+        println result.standardOutput
+        assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
+        assert result.task(':testGenerateServiceLoader').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testCompileTestJava'])
+    void testTest() {
+        def result = gradle.withArguments('test').build()
+        println result.standardOutput
+        assert result.task(':test').outcome == SUCCESS
     }
 }
