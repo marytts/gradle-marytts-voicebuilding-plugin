@@ -6,7 +6,7 @@ class VoiceExtensionTest {
 
     def voice
 
-    @BeforeTest
+    @BeforeMethod
     void setup() {
         voice = new VoiceExtension()
     }
@@ -41,5 +41,12 @@ class VoiceExtensionTest {
     @Test
     void testDescription() {
         assert voice.description == "A female English unit selection voice"
+        voice.gender = 'male'
+        voice.type = 'HMM'
+        voice.language = 'de'
+        voice.region = 'de'
+        assert voice.description == "A male German HMM voice"
+        voice.description = 'fnord'
+        assert voice.description == 'fnord'
     }
 }
