@@ -37,4 +37,9 @@ class VoiceExtensionTest {
         assert voice.maryLocale == 'de'
         assert voice.maryLocaleXml == 'de'
     }
+
+    @Test(expectedExceptions = MissingPropertyException.class)
+    void testDescription() {
+        assert voice.description == "A female English unit selection voice"
+    }
 }
