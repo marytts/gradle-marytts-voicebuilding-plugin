@@ -142,40 +142,40 @@ class BuildLogicFunctionalTest {
     @Test
     void testHelp() {
         def result = gradle.withArguments().build()
-        println result.standardOutput
+        println result.output
         assert result.task(':help').outcome == SUCCESS
     }
 
     @Test
     void testConfigurations() {
         def result = gradle.withArguments('testConfigurations').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':testConfigurations').outcome == SUCCESS
     }
 
     @Test
     void testSourceSets() {
         def result = gradle.withArguments('testSourceSets').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':testSourceSets').outcome == SUCCESS
     }
 
     @Test
     void testDependencies() {
         def result = gradle.withArguments('testDependencies').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':testDependencies').outcome == SUCCESS
     }
 
     @Test
     void testPraatPitchmarker() {
         def result = gradle.withArguments('praatPitchmarker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':wav').outcome == SUCCESS
         assert result.task(':praatPitchmarker').outcome == SUCCESS
         result = gradle.withArguments('testPraatPitchmarker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':praatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':testPraatPitchmarker').outcome == SUCCESS
     }
@@ -183,13 +183,13 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testPraatPitchmarker'])
     void testMcepMaker() {
         def result = gradle.withArguments('mcepMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':wav').outcome == UP_TO_DATE
         assert result.task(':praatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':mcepMaker').outcome == SUCCESS
         result = gradle.withArguments('testMcepMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':mcepMaker').outcome == UP_TO_DATE
         assert result.task(':testMcepMaker').outcome == SUCCESS
     }
@@ -197,12 +197,12 @@ class BuildLogicFunctionalTest {
     @Test
     void testGenerateAllophones() {
         def result = gradle.withArguments('generateAllophones').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':text').outcome == SUCCESS
         assert result.task(':generateAllophones').outcome == SUCCESS
         result = gradle.withArguments('testGenerateAllophones').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateAllophones').outcome == UP_TO_DATE
         assert result.task(':testGenerateAllophones').outcome == SUCCESS
     }
@@ -210,12 +210,12 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testGenerateAllophones'])
     void testGeneratePhoneFeatures() {
         def result = gradle.withArguments('generatePhoneFeatures').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':generateAllophones').outcome == UP_TO_DATE
         assert result.task(':generatePhoneFeatures').outcome == SUCCESS
         result = gradle.withArguments('testGeneratePhoneFeatures').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generatePhoneFeatures').outcome == UP_TO_DATE
         assert result.task(':testGeneratePhoneFeatures').outcome == SUCCESS
     }
@@ -223,12 +223,12 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testGenerateAllophones'])
     void testGenerateHalfPhoneFeatures() {
         def result = gradle.withArguments('generateHalfPhoneFeatures').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':generateAllophones').outcome == UP_TO_DATE
         assert result.task(':generateHalfPhoneFeatures').outcome == SUCCESS
         result = gradle.withArguments('testGenerateHalfPhoneFeatures').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateHalfPhoneFeatures').outcome == UP_TO_DATE
         assert result.task(':testGenerateHalfPhoneFeatures').outcome == SUCCESS
     }
@@ -236,7 +236,7 @@ class BuildLogicFunctionalTest {
     @Test
     void testMaryJavaExec() {
         def result = gradle.withArguments('testMaryJavaExec').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':testMaryJavaExec').outcome == SUCCESS
     }
 }
