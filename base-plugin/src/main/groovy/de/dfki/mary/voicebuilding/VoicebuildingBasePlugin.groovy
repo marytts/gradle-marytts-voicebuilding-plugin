@@ -12,7 +12,8 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply JavaPlugin
 
-        project.extensions.add 'voice', VoiceExtension
+        project.extensions.create 'voice', VoiceExtension
+        project.voice.extensions.create 'license', VoiceLicenseExtension
 
         project.ext {
             maryttsVersion = '5.1.1'

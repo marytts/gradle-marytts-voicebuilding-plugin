@@ -12,6 +12,7 @@ class BuildLogicFunctionalTest {
 
     def voiceName = 'cmu-slt'
     def voiceLocale = Locale.US
+    def voiceLicenseName = 'public domain'
 
     @BeforeSuite
     void setup() {
@@ -40,6 +41,9 @@ class BuildLogicFunctionalTest {
 
         voice {
             name = "$voiceName"
+            license {
+                name = "$voiceLicenseName"
+            }
         }
 
         task testPlugins(group: 'Verification') << {
@@ -54,6 +58,8 @@ class BuildLogicFunctionalTest {
             assert voice.nameCamelCase == 'CmuSlt'
             assert voice.locale == new Locale("$voiceLocale.language", "$voiceLocale.country")
             assert voice.localeXml == "${voiceLocale.toLanguageTag()}"
+            assert voice.description == "A \$voice.gender \$voice.locale.displayLanguage \$voice.type voice"
+            assert voice.license?.name == "$voiceLicenseName"
         }
 
         task testGenerateSource(group: 'Verification') {
