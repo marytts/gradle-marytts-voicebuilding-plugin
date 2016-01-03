@@ -8,6 +8,7 @@ class VoiceExtension {
     String language
     String region
     String type
+    String description
     int samplingRate
 
     VoiceExtension() {
@@ -38,5 +39,9 @@ class VoiceExtension {
 
     String getMaryLocaleXml() {
         language?.equalsIgnoreCase(region) ? language : localeXml
+    }
+
+    String getDescription() {
+        description ?: "A $gender $locale.displayLanguage $type voice"
     }
 }
