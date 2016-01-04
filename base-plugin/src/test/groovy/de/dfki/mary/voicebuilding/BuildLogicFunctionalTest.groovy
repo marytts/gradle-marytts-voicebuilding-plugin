@@ -12,7 +12,9 @@ class BuildLogicFunctionalTest {
 
     def voiceName = 'cmu-slt'
     def voiceLocale = Locale.US
-    def voiceLicenseName = 'public domain'
+    def voiceDescription = "A female $voiceLocale.displayLanguage unit selection voice"
+    def voiceLicenseName = 'Arctic'
+    def voiceLicenseUrl = 'http://festvox.org/cmu_arctic/cmu_arctic/cmu_us_slt_arctic/COPYING'
 
     @BeforeSuite
     void setup() {
@@ -35,6 +37,15 @@ class BuildLogicFunctionalTest {
 
         // Add the logic under test to the test build
         buildFile << """
+        buildscript {
+            repositories {
+                jcenter()
+            }
+            dependencies {
+                classpath group: 'xmlunit', name: 'xmlunit', version: '1.6'
+            }
+        }
+
         plugins {
             id 'de.dfki.mary.voicebuilding-base'
         }
@@ -43,6 +54,7 @@ class BuildLogicFunctionalTest {
             name = "$voiceName"
             license {
                 name = "$voiceLicenseName"
+                url = "$voiceLicenseUrl"
             }
         }
 
@@ -58,7 +70,7 @@ class BuildLogicFunctionalTest {
             assert voice.nameCamelCase == 'CmuSlt'
             assert voice.locale == new Locale("$voiceLocale.language", "$voiceLocale.country")
             assert voice.localeXml == "${voiceLocale.toLanguageTag()}"
-            assert voice.description == "A \$voice.gender \$voice.locale.displayLanguage \$voice.type voice"
+            assert voice.description == "$voiceDescription"
             assert voice.license?.name == "$voiceLicenseName"
         }
 
@@ -98,6 +110,49 @@ class BuildLogicFunctionalTest {
                 def serviceLoaderFile = file("\$buildDir/resources/main/META-INF/services/marytts.config.MaryConfig")
                 assert serviceLoaderFile.exists()
                 assert serviceLoaderFile.text == "marytts.voice.\${voice.nameCamelCase}.Config"
+            }
+        }
+
+        import org.custommonkey.xmlunit.XMLUnit
+
+        task testGeneratePom(group: 'Verification') {
+            dependsOn generatePom
+            doLast {
+                def pomFile = file("\$buildDir/resources/main/META-INF/maven/$projectDir.name/pom.xml")
+                assert pomFile.exists()
+                def pomXml = '''<?xml version="1.0"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId/>
+                      <artifactId>$projectDir.name</artifactId>
+                      <version>unspecified</version>
+                      <description>$voiceDescription</description>
+                      <licenses>
+                        <license>
+                          <name>$voiceLicenseName</name>
+                          <url>$voiceLicenseUrl</url>
+                        </license>
+                      </licenses>
+                      <dependencies>
+                        <dependency>
+                          <groupId>junit</groupId>
+                          <artifactId>junit</artifactId>
+                          <version>4.12</version>
+                          <scope>test</scope>
+                        </dependency>
+                        <dependency>
+                          <groupId>de.dfki.mary</groupId>
+                          <artifactId>marytts-runtime</artifactId>
+                          <version>5.1.1</version>
+                          <scope>compile</scope>
+                        </dependency>
+                      </dependencies>
+                    </project>'''
+                XMLUnit.ignoreWhitespace = true
+                assert XMLUnit.compareXML(pomFile.text, pomXml).similar()
+                def pomPropertiesFile = file("\$buildDir/resources/main/META-INF/maven/$projectDir.name/pom.properties")
+                assert pomPropertiesFile.exists()
+                assert pomPropertiesFile.readLines() == ['version=unspecified', 'groupId=', 'artifactId=$projectDir.name']
             }
         }
         """
@@ -182,6 +237,17 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
         assert result.task(':testGenerateServiceLoader').outcome == SUCCESS
+    }
+
+    @Test
+    void testGeneratePom() {
+        def result = gradle.withArguments('generatePom').build()
+        println result.standardOutput
+        assert result.task(':generatePom').outcome == SUCCESS
+        result = gradle.withArguments('testGeneratePom').build()
+        println result.standardOutput
+        assert result.task(':generatePom').outcome == UP_TO_DATE
+        assert result.task(':testGeneratePom').outcome == SUCCESS
     }
 
     @Test(dependsOnMethods = ['testCompileTestJava'])
