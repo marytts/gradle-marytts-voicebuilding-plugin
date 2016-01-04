@@ -57,8 +57,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         project.task('generatePom') {
             def pomDir = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/$project.name")
             def pomFile = project.file("$pomDir/pom.xml")
-            def propFile = project.file("$pomDir/pom.properties")
-            outputs.files project.files(pomFile, propFile)
+            outputs.files project.file(pomFile)
             doFirst {
                 pomDir.mkdirs()
             }
@@ -74,6 +73,18 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
                         }
                     }
                 }.writeTo(pomFile)
+            }
+            project.jar.dependsOn it
+        }
+
+        project.task('generatePomProperties') {
+            def pomDir = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/$project.name")
+            def propFile = project.file("$pomDir/pom.properties")
+            outputs.files project.file(propFile)
+            doFirst {
+                pomDir.mkdirs()
+            }
+            doLast {
                 propFile.withWriter { dest ->
                     dest.println "version=$project.version"
                     dest.println "groupId=$project.group"

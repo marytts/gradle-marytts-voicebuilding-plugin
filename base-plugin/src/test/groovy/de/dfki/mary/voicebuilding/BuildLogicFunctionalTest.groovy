@@ -150,6 +150,12 @@ class BuildLogicFunctionalTest {
                     </project>'''
                 XMLUnit.ignoreWhitespace = true
                 assert XMLUnit.compareXML(pomFile.text, pomXml).similar()
+            }
+        }
+
+        task testGeneratePomProperties(group: 'Verification') {
+            dependsOn generatePomProperties
+            doLast {
                 def pomPropertiesFile = file("\$buildDir/resources/main/META-INF/maven/$projectDir.name/pom.properties")
                 assert pomPropertiesFile.exists()
                 assert pomPropertiesFile.readLines() == ['version=unspecified', 'groupId=', 'artifactId=$projectDir.name']
@@ -248,6 +254,17 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':generatePom').outcome == UP_TO_DATE
         assert result.task(':testGeneratePom').outcome == SUCCESS
+    }
+
+    @Test
+    void testGeneratePomProperties() {
+        def result = gradle.withArguments('generatePomProperties').build()
+        println result.standardOutput
+        assert result.task(':generatePomProperties').outcome == SUCCESS
+        result = gradle.withArguments('testGeneratePomProperties').build()
+        println result.standardOutput
+        assert result.task(':generatePomProperties').outcome == UP_TO_DATE
+        assert result.task(':testGeneratePomProperties').outcome == SUCCESS
     }
 
     @Test(dependsOnMethods = ['testCompileTestJava'])
