@@ -54,43 +54,13 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             project.processResources.dependsOn it
         }
 
-        project.task('generatePom') {
-            def pomDir = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/$project.name")
-            def pomFile = project.file("$pomDir/pom.xml")
-            outputs.files project.file(pomFile)
-            doFirst {
-                pomDir.mkdirs()
-            }
-            doLast {
-                project.pom { pom ->
-                    pom.project {
-                        description project.voice.description
-                        licenses {
-                            license {
-                                name project.voice.license.name
-                                url project.voice.license.url
-                            }
-                        }
-                    }
-                }.writeTo(pomFile)
-            }
+        project.task('generatePom', type: GeneratePom) {
+            destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/$project.name/pom.xml")
             project.jar.dependsOn it
         }
 
-        project.task('generatePomProperties') {
-            def pomDir = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/$project.name")
-            def propFile = project.file("$pomDir/pom.properties")
-            outputs.files project.file(propFile)
-            doFirst {
-                pomDir.mkdirs()
-            }
-            doLast {
-                propFile.withWriter { dest ->
-                    dest.println "version=$project.version"
-                    dest.println "groupId=$project.group"
-                    dest.println "artifactId=$project.name"
-                }
-            }
+        project.task('generatePomProperties', type: GeneratePomProperties) {
+            destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/$project.name/pom.properties")
             project.jar.dependsOn it
         }
     }
