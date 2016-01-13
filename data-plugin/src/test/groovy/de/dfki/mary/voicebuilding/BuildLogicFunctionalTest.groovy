@@ -38,10 +38,6 @@ class BuildLogicFunctionalTest {
             id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
         }
 
-        repositories {
-            flatDir dirs: "$projectDir.parent/testKitGradleHome"
-        }
-
         dependencies {
             data "$dataDependency"
             runtime group: 'de.dfki.mary', name: 'marytts-common', version: '5.1.1'
