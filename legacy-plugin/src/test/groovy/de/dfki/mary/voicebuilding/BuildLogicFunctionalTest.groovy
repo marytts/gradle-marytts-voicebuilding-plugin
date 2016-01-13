@@ -12,6 +12,8 @@ class BuildLogicFunctionalTest {
 
     @BeforeSuite
     void setup() {
+        def testKitDir = new File(System.properties.testKitDir)
+
         def projectDir = new File(System.properties.testProjectDir)
         projectDir.mkdirs()
         buildFile = new File(projectDir, 'build.gradle')
@@ -25,7 +27,7 @@ class BuildLogicFunctionalTest {
                 .collect { it.replace('\\', '\\\\') } // escape backslashes in Windows paths
                 .collect { new File(it) }
 
-        gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath(pluginClasspath)
+        gradle = GradleRunner.create().withTestKitDir(testKitDir).withProjectDir(projectDir).withPluginClasspath(pluginClasspath)
 
         // Add the logic under test to the test build
         buildFile << """
@@ -35,7 +37,7 @@ class BuildLogicFunctionalTest {
         }
 
         dependencies {
-            data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom'
+            data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
         }
 
         text.srcFileName = 'time.data'

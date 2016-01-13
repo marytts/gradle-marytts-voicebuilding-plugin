@@ -15,6 +15,8 @@ class BuildLogicFunctionalTest {
 
     @BeforeSuite
     void setup() {
+        def testKitDir = new File(System.properties.testKitDir)
+
         def projectDir = new File(System.properties.testProjectDir)
         projectDir.mkdirs()
         buildFile = new File(projectDir, 'build.gradle')
@@ -28,16 +30,12 @@ class BuildLogicFunctionalTest {
                 .collect { it.replace('\\', '\\\\') } // escape backslashes in Windows paths
                 .collect { new File(it) }
 
-        gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath(pluginClasspath)
+        gradle = GradleRunner.create().withTestKitDir(testKitDir).withProjectDir(projectDir).withPluginClasspath(pluginClasspath)
 
         // Add the logic under test to the test build
         buildFile << """
         plugins {
             id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
-        }
-
-        repositories {
-            flatDir dirs: "$projectDir.parent/testKitGradleHome"
         }
 
         dependencies {

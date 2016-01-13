@@ -1,21 +1,11 @@
 apply from: "$rootDir/testKitLogic.gradle"
 
-repositories {
-    ivy {
-        url 'http://festvox.org/examples'
-        layout 'pattern', {
-            artifact '[module]_[classifier]/packed/[artifact].[ext]'
-        }
-    }
-}
-
 dependencies {
     compile gradleApi()
     compile project(':base-plugin')
     runtime group: 'de.dfki.mary', name: 'marytts-lang-en', version: maryttsVersion
     testRuntime project(':festvox-plugin')
     testRuntime project(':marytts-voicebuilding')
-    testRuntime group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
 }
 
 createClasspathManifest << {

@@ -5,6 +5,8 @@ test {
     doFirst {
         delete testProjectDir
     }
+    // path to shared testkit gradle home
+    systemProperty 'testKitDir', file("$rootProject.buildDir/.gradle")
 }
 
 // Write the plugin's classpath to a file to share with the tests
@@ -25,10 +27,4 @@ task createClasspathManifest {
 dependencies {
     testCompile gradleTestKit()
     testRuntime files(createClasspathManifest)
-}
-
-task copyTestRuntimeDependencies(type: Copy) {
-    from configurations.testRuntime
-    into "$buildDir/testKitGradleHome"
-    test.dependsOn it
 }
