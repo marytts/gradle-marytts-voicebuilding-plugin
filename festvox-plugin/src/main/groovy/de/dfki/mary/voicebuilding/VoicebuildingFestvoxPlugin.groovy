@@ -13,7 +13,7 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
             ivy {
                 url 'http://festvox.org/examples'
                 layout 'pattern', {
-                    artifact '[module]_[classifier]/packed/[artifact].tar.bz2'
+                    artifact '[module]_[classifier]/packed/[artifact].[ext]'
                 }
             }
         }

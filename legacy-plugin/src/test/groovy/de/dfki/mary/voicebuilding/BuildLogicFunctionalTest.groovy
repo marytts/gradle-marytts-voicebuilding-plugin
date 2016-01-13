@@ -37,7 +37,7 @@ class BuildLogicFunctionalTest {
         }
 
         dependencies {
-            data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom'
+            data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
         }
 
         text.srcFileName = 'time.data'
