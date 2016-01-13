@@ -5,6 +5,8 @@ test {
     doFirst {
         delete testProjectDir
     }
+    // path to shared testkit gradle home
+    systemProperty 'testKitDir', file("$rootProject.buildDir/.gradle")
 }
 
 // Write the plugin's classpath to a file to share with the tests
