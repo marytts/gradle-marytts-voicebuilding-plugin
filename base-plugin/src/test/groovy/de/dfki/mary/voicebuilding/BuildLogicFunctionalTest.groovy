@@ -164,6 +164,24 @@ class BuildLogicFunctionalTest {
                 assert pomPropertiesFile.readLines() == ['version=unspecified', 'groupId=$group', 'artifactId=$projectDir.name']
             }
         }
+
+        import java.util.zip.ZipFile
+
+        task testJar(group: 'Verification') {
+            dependsOn jar
+            doLast {
+                def actual = new ZipFile(jar.archivePath).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
+                def expected = [
+                    'META-INF/MANIFEST.MF',
+                    'META-INF/services/marytts.config.MaryConfig',
+                    "META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.xml",
+                    "META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.properties",
+                    "marytts/voice/\$voice.nameCamelCase/Config.class",
+                    "marytts/voice/\$voice.nameCamelCase/voice.config"
+                ] as Set
+                assert actual == expected
+            }
+        }
         """
     }
 
@@ -268,6 +286,25 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':generatePomProperties').outcome == UP_TO_DATE
         assert result.task(':testGeneratePomProperties').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testCompileJava', 'testGeneratePom', 'testGeneratePomProperties'])
+    void testJar() {
+        def result = gradle.withArguments('jar').build()
+        println result.standardOutput
+        assert result.task(':generateSource').outcome == UP_TO_DATE
+        assert result.task(':compileJava').outcome == UP_TO_DATE
+        assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
+        assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
+        assert result.task(':processResources').outcome == UP_TO_DATE
+        assert result.task(':classes').outcome == UP_TO_DATE
+        assert result.task(':generatePom').outcome == UP_TO_DATE
+        assert result.task(':generatePomProperties').outcome == UP_TO_DATE
+        assert result.task(':jar').outcome == SUCCESS
+        result = gradle.withArguments('testJar').build()
+        println result.standardOutput
+        assert result.task(':jar').outcome == UP_TO_DATE
+        assert result.task(':testJar').outcome == SUCCESS
     }
 
     @Test(dependsOnMethods = ['testCompileTestJava'])
