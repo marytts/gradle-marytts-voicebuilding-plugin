@@ -275,6 +275,27 @@ class BuildLogicFunctionalTest {
                 assert actual == expected
             }
         }
+
+        task testLegacyZip(group: 'Verification') {
+            dependsOn legacyZip
+            doLast {
+                def actual = new ZipFile(legacyZip.archivePath).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
+                def expected = [
+                    "lib/voices/$voiceName/dur.tree",
+                    "lib/voices/$voiceName/f0.left.tree",
+                    "lib/voices/$voiceName/f0.mid.tree",
+                    "lib/voices/$voiceName/f0.right.tree",
+                    "lib/voices/$voiceName/halfphoneFeatures_ac.mry",
+                    "lib/voices/$voiceName/halfphoneUnits.mry",
+                    "lib/voices/$voiceName/joinCostFeatures.mry",
+                    "lib/voices/$voiceName/phoneUnitFeatureDefinition.txt",
+                    "lib/voices/$voiceName/timeline_basenames.mry",
+                    "lib/voices/$voiceName/timeline_waveforms.mry",
+                    "lib/\$jar.archiveName"
+                ] as Set
+                assert actual == expected
+            }
+        }
         """
     }
 
@@ -823,5 +844,56 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':jar').outcome == UP_TO_DATE
         assert result.task(':testJar').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testJar'])
+    void testLegacyZip() {
+        def result = gradle.withArguments('legacyZip').build()
+        println result.standardOutput
+        assert result.task(':generateSource').outcome == UP_TO_DATE
+        assert result.task(':compileJava').outcome == UP_TO_DATE
+        assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
+        assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
+        assert result.task(':processResources').outcome == UP_TO_DATE
+        assert result.task(':classes').outcome == UP_TO_DATE
+        assert result.task(':generatePom').outcome == UP_TO_DATE
+        assert result.task(':generatePomProperties').outcome == UP_TO_DATE
+        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
+        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
+        assert result.task(':processLegacyResources').outcome == UP_TO_DATE
+        assert result.task(':jar').outcome == UP_TO_DATE
+        assert result.task(':legacyBasenameTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneLabelFeatureAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyDurationCARTTrainer').outcome == UP_TO_DATE
+        assert result.task(':legacyF0CARTTrainer').outcome == UP_TO_DATE
+        assert result.task(':legacyZip').outcome == SUCCESS
+        result = gradle.withArguments('testlegacyZip').build()
+        println result.standardOutput
+        assert result.task(':legacyZip').outcome == UP_TO_DATE
+        assert result.task(':testLegacyZip').outcome == SUCCESS
     }
 }
