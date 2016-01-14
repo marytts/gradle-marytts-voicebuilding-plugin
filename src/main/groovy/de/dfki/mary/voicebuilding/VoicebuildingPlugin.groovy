@@ -1,17 +1,13 @@
 package de.dfki.mary.voicebuilding
 
 import groovy.json.JsonBuilder
-import groovy.xml.*
 
 import marytts.features.FeatureProcessorManager
-
-import org.apache.commons.codec.digest.DigestUtils
 
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
 
 class VoicebuildingPlugin implements Plugin<Project> {
@@ -150,31 +146,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
             systemProperty 'mary.base', project.sourceSets.data.output.resourcesDir
             systemProperty 'log4j.logger.marytts', 'DEBUG,stderr'
             maxHeapSize = '1g'
-        }
-
-        project.task('legacyComponentXml') {
-            dependsOn project.legacyComponentZip
-            def zipFile = project.legacyComponentZip.outputs.files.singleFile
-            def xmlFile = project.file("$project.distsDir/$project.name-$project.version-component-descriptor.xml")
-            inputs.files zipFile
-            outputs.files xmlFile
-            doLast {
-                def zipFileHash = DigestUtils.md5Hex(new FileInputStream(zipFile))
-                def builder = new StreamingMarkupBuilder()
-                def xml = builder.bind {
-                    'marytts-install'(xmlns: 'http://mary.dfki.de/installer') {
-                        voice(gender: project.voice.gender, locale: project.voice.maryLocale, name: project.voice.name, type: project.voice.type, version: project.version) {
-                            delegate.description project.voice.description
-                            license(href: project.voice.license.url)
-                            'package'(filename: zipFile.name, md5sum: zipFileHash, size: zipFile.size()) {
-                                location(folder: true, href: "http://mary.dfki.de/download/$project.maryttsVersion/")
-                            }
-                            depends(language: project.voice.maryLocaleXml, version: project.maryttsVersion)
-                        }
-                    }
-                }
-                xmlFile.text = XmlUtil.serialize(xml)
-            }
         }
 
         project.task('generateJsonDescriptor') {

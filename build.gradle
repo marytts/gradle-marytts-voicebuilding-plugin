@@ -50,7 +50,6 @@ repositories {
 dependencies {
     compile gradleApi()
     compile project('data-plugin')
-    compile 'commons-codec:commons-codec:1.9'
 }
 
 task sourceJar(type: Jar) {

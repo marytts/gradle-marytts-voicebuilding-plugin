@@ -2,6 +2,11 @@ package de.dfki.mary.voicebuilding
 
 import de.dfki.mary.voicebuilding.tasks.*
 
+import groovy.xml.StreamingMarkupBuilder
+import groovy.xml.XmlUtil
+
+import org.apache.commons.codec.digest.DigestUtils
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
@@ -240,6 +245,31 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                     project.legacyWaveTimelineMaker
             from project.jar, {
                 rename { "lib/$it" }
+            }
+        }
+
+        project.task('legacyDescriptor') {
+            dependsOn project.legacyZip
+            def zipFile = project.legacyZip.outputs.files.singleFile
+            def xmlFile = project.file("$project.distsDir/$project.name-$project.version-component-descriptor.xml")
+            inputs.files zipFile
+            outputs.files xmlFile
+            doLast {
+                def zipFileHash = DigestUtils.md5Hex(new FileInputStream(zipFile))
+                def builder = new StreamingMarkupBuilder()
+                def xml = builder.bind {
+                    'marytts-install'(xmlns: 'http://mary.dfki.de/installer') {
+                        voice(gender: project.voice.gender, locale: project.voice.maryLocale, name: project.voice.name, type: project.voice.type, version: project.maryttsVersion) {
+                            delegate.description project.voice.description
+                            license(href: project.voice.license.url)
+                            'package'(filename: zipFile.name, md5sum: zipFileHash, size: zipFile.size()) {
+                                location(folder: true, href: "http://mary.dfki.de/download/$project.maryttsVersion/")
+                            }
+                            depends(language: project.voice.maryLocaleXml, version: project.maryttsVersion)
+                        }
+                    }
+                }
+                xmlFile.text = XmlUtil.serialize(xml)
             }
         }
 
