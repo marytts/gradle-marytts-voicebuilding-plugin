@@ -10,6 +10,9 @@ class BuildLogicFunctionalTest {
     def gradle
     def buildFile
 
+    def group = 'de.dfki.mary'
+    def voiceName = 'cmu-slt'
+
     @BeforeSuite
     void setup() {
         def testKitDir = new File(System.properties.testKitDir)
@@ -34,6 +37,12 @@ class BuildLogicFunctionalTest {
         plugins {
             id 'de.dfki.mary.voicebuilding-legacy'
             id 'de.dfki.mary.voicebuilding-festvox'
+        }
+
+        group "$group"
+
+        voice {
+            name = "$voiceName"
         }
 
         dependencies {
