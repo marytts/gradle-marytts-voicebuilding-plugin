@@ -254,6 +254,27 @@ class BuildLogicFunctionalTest {
                 assert file("\$prefix/joinCostWeights.txt").exists()
             }
         }
+
+        import java.util.zip.ZipFile
+
+        task testJar(group: 'Verification') {
+            dependsOn jar
+            doLast {
+                def actual = new ZipFile(jar.archivePath).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
+                def expected = [
+                    'META-INF/MANIFEST.MF',
+                    'META-INF/services/marytts.config.MaryConfig',
+                    "META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.xml",
+                    "META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.properties",
+                    "marytts/voice/\$voice.nameCamelCase/Config.class",
+                    "marytts/voice/\$voice.nameCamelCase/cart.mry",
+                    "marytts/voice/\$voice.nameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
+                    "marytts/voice/\$voice.nameCamelCase/joinCostWeights.txt",
+                    "marytts/voice/\$voice.nameCamelCase/voice.config"
+                ] as Set
+                assert actual == expected
+            }
+        }
         """
     }
 
@@ -760,5 +781,47 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':processLegacyResources').outcome == UP_TO_DATE
         assert result.task(':testProcessLegacyResources').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testProcessLegacyResources'])
+    void testJar() {
+        def result = gradle.withArguments('jar').build()
+        println result.standardOutput
+        assert result.task(':generateSource').outcome == SUCCESS
+        assert result.task(':compileJava').outcome == SUCCESS
+        assert result.task(':generateServiceLoader').outcome == SUCCESS
+        assert result.task(':generateVoiceConfig').outcome == SUCCESS
+        assert result.task(':processResources').outcome == UP_TO_DATE
+        assert result.task(':classes').outcome == SUCCESS
+        assert result.task(':generatePom').outcome == SUCCESS
+        assert result.task(':generatePomProperties').outcome == SUCCESS
+        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
+        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
+        assert result.task(':processLegacyResources').outcome == UP_TO_DATE
+        assert result.task(':jar').outcome == SUCCESS
+        result = gradle.withArguments('testJar').build()
+        println result.standardOutput
+        assert result.task(':jar').outcome == UP_TO_DATE
+        assert result.task(':testJar').outcome == SUCCESS
     }
 }
