@@ -4,6 +4,7 @@ import de.dfki.mary.voicebuilding.tasks.*
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.Copy
 
 class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
@@ -216,6 +217,18 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile3 = project.file("$project.legacyBuildDir/f0.right.tree")
         }
 
+        project.task('processLegacyResources', type: Copy) {
+            from project.legacyAcousticFeatureFileWriter, {
+                include 'halfphoneUnitFeatureDefinition_ac.txt'
+            }
+            from project.legacyJoinCostFileMaker, {
+                include 'joinCostWeights.txt'
+            }
+            from project.legacyCARTBuilder
+            into project.sourceSets.main.output.resourcesDir
+            project.jar.dependsOn it
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
@@ -224,6 +237,10 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                     exclude module: 'sgt'
                 }
                 testCompile "junit:junit:4.11"
+            }
+
+            project.processLegacyResources {
+                rename { "marytts/voice/$project.voice.nameCamelCase/$it" }
             }
         }
     }

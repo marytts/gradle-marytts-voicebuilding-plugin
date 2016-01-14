@@ -244,6 +244,16 @@ class BuildLogicFunctionalTest {
                 assert file("\$buildDir/mary/f0.right.tree").exists()
             }
         }
+
+        task testProcessLegacyResources(group: 'Verification') {
+            dependsOn processLegacyResources
+            doLast {
+                def prefix = "\$sourceSets.main.output.resourcesDir/marytts/voice/\$voice.nameCamelCase"
+                assert file("\$prefix/cart.mry").exists()
+                assert file("\$prefix/halfphoneUnitFeatureDefinition_ac.txt").exists()
+                assert file("\$prefix/joinCostWeights.txt").exists()
+            }
+        }
         """
     }
 
@@ -717,5 +727,38 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':legacyF0CARTTrainer').outcome == UP_TO_DATE
         assert result.task(':testLegacyF0CARTTrainer').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyAcousticFeatureFileWriter', 'testLegacyJoinCostFileMaker', 'testLegacyCARTBuilder'])
+    void testProcessLegacyResources() {
+        def result = gradle.withArguments('processLegacyResources').build()
+        println result.standardOutput
+        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
+        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
+        assert result.task(':processLegacyResources').outcome == SUCCESS
+        result = gradle.withArguments('testProcessLegacyResources').build()
+        println result.standardOutput
+        assert result.task(':processLegacyResources').outcome == UP_TO_DATE
+        assert result.task(':testProcessLegacyResources').outcome == SUCCESS
     }
 }
