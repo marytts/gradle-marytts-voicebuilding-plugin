@@ -117,6 +117,7 @@ class BuildLogicFunctionalTest {
         }
 
         import org.custommonkey.xmlunit.XMLUnit
+        import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier
 
         task testGeneratePom(group: 'Verification') {
             dependsOn generatePom
@@ -152,7 +153,9 @@ class BuildLogicFunctionalTest {
                       </dependencies>
                     </project>'''
                 XMLUnit.ignoreWhitespace = true
-                assert XMLUnit.compareXML(pomFile.text, pomXml).similar()
+                def diff = XMLUnit.compareXML(pomFile.text, pomXml)
+                diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier())
+                assert diff.similar()
             }
         }
 
