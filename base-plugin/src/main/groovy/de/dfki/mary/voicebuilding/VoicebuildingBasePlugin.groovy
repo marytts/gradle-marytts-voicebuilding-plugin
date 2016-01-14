@@ -55,12 +55,16 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.task('generatePom', type: GeneratePom) {
-            destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/$project.name/pom.xml")
+            project.afterEvaluate {
+                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace('.', '/')}/voice-$project.voice.name/pom.xml")
+            }
             project.jar.dependsOn it
         }
 
         project.task('generatePomProperties', type: GeneratePomProperties) {
-            destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/$project.name/pom.properties")
+            project.afterEvaluate {
+                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/voice-$project.voice.name/pom.properties")
+            }
             project.jar.dependsOn it
         }
     }

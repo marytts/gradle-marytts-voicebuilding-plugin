@@ -10,6 +10,7 @@ class BuildLogicFunctionalTest {
     def gradle
     def buildFile
 
+    def group = 'de.dfki.mary'
     def voiceName = 'cmu-slt'
     def voiceLocale = Locale.US
     def voiceDescription = "A female $voiceLocale.displayLanguage unit selection voice"
@@ -49,6 +50,8 @@ class BuildLogicFunctionalTest {
         plugins {
             id 'de.dfki.mary.voicebuilding-base'
         }
+
+        group "$group"
 
         voice {
             name = "$voiceName"
@@ -118,12 +121,12 @@ class BuildLogicFunctionalTest {
         task testGeneratePom(group: 'Verification') {
             dependsOn generatePom
             doLast {
-                def pomFile = file("\$buildDir/resources/main/META-INF/maven/$projectDir.name/pom.xml")
+                def pomFile = file("\$buildDir/resources/main/META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.xml")
                 assert pomFile.exists()
                 def pomXml = '''<?xml version="1.0"?>
                     <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
                       <modelVersion>4.0.0</modelVersion>
-                      <groupId/>
+                      <groupId>$group</groupId>
                       <artifactId>$projectDir.name</artifactId>
                       <version>unspecified</version>
                       <description>$voiceDescription</description>
@@ -156,9 +159,9 @@ class BuildLogicFunctionalTest {
         task testGeneratePomProperties(group: 'Verification') {
             dependsOn generatePomProperties
             doLast {
-                def pomPropertiesFile = file("\$buildDir/resources/main/META-INF/maven/$projectDir.name/pom.properties")
+                def pomPropertiesFile = file("\$buildDir/resources/main/META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.properties")
                 assert pomPropertiesFile.exists()
-                assert pomPropertiesFile.readLines() == ['version=unspecified', 'groupId=', 'artifactId=$projectDir.name']
+                assert pomPropertiesFile.readLines() == ['version=unspecified', 'groupId=$group', 'artifactId=$projectDir.name']
             }
         }
         """
