@@ -34,7 +34,16 @@ class BuildLogicFunctionalTest {
         gradle = GradleRunner.create().withTestKitDir(testKitDir).withProjectDir(projectDir).withPluginClasspath(pluginClasspath)
 
         // Add the logic under test to the test build
-        buildFile << """
+        buildFile.text = """
+        buildscript {
+            repositories {
+                jcenter()
+            }
+            dependencies {
+                classpath group: 'xmlunit', name: 'xmlunit', version: '1.6'
+            }
+        }
+
         plugins {
             id 'de.dfki.mary.voicebuilding-legacy'
             id 'de.dfki.mary.voicebuilding-festvox'
@@ -298,6 +307,33 @@ class BuildLogicFunctionalTest {
                     "lib/\$jar.archiveName"
                 ] as Set
                 assert actual == expected
+            }
+        }
+        """
+
+        def expectedLegacyDescriptor = '''<?xml version="1.0"?>
+            <marytts-install xmlns="http://mary.dfki.de/installer">
+                <voice locale="en_US" name="''' + voiceName + '''" gender="female" type="unit selection" version="5.1.1">
+                    <description>A female English unit selection voice</description>
+                    <license href="''' + voiceLicenseUrl + '''"/>
+                    <package md5sum="$ant.md5Hash" filename="$legacyZip.archiveName" size="${legacyZip.archivePath.size()}">
+                        <location folder="true" href="http://mary.dfki.de/download/5.1.1/"/>
+                    </package>
+                    <depends language="en-US" version="5.1.1"/>
+                </voice>
+            </marytts-install>'''
+
+        buildFile << """
+        import org.custommonkey.xmlunit.XMLUnit
+
+        task testLegacyDescriptor(group: 'Verification') {
+            dependsOn legacyDescriptor
+            doLast {
+                ant.checksum file: legacyZip.archivePath, algorithm: 'MD5',  property: 'md5Hash'
+                def expected = \"\"\"$expectedLegacyDescriptor\"\"\"
+                def actual = file(\"\$project.distsDir/\$project.name-\$project.version-component-descriptor.xml\").text
+                XMLUnit.ignoreWhitespace = true
+                assert XMLUnit.compareXML(expected, actual).similar()
             }
         }
         """
@@ -899,5 +935,57 @@ class BuildLogicFunctionalTest {
         println result.standardOutput
         assert result.task(':legacyZip').outcome == UP_TO_DATE
         assert result.task(':testLegacyZip').outcome == SUCCESS
+    }
+
+    @Test(dependsOnMethods = ['testLegacyZip'])
+    void testLegacyDescriptor() {
+        def result = gradle.withArguments('legacyDescriptor').build()
+        println result.standardOutput
+        assert result.task(':generateSource').outcome == UP_TO_DATE
+        assert result.task(':compileJava').outcome == UP_TO_DATE
+        assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
+        assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
+        assert result.task(':processResources').outcome == UP_TO_DATE
+        assert result.task(':classes').outcome == UP_TO_DATE
+        assert result.task(':generatePom').outcome == UP_TO_DATE
+        assert result.task(':generatePomProperties').outcome == UP_TO_DATE
+        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
+        assert result.task(':processDataResources').outcome == UP_TO_DATE
+        assert result.task(':lab').outcome == UP_TO_DATE
+        assert result.task(':templates').outcome == UP_TO_DATE
+        assert result.task(':text').outcome == UP_TO_DATE
+        assert result.task(':wav').outcome == UP_TO_DATE
+        assert result.task(':legacyInit').outcome == UP_TO_DATE
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
+        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
+        assert result.task(':processLegacyResources').outcome == UP_TO_DATE
+        assert result.task(':jar').outcome == UP_TO_DATE
+        assert result.task(':legacyBasenameTimelineMaker').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneLabelFeatureAligner').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyPhoneFeatureFileWriter').outcome == UP_TO_DATE
+        assert result.task(':legacyDurationCARTTrainer').outcome == UP_TO_DATE
+        assert result.task(':legacyF0CARTTrainer').outcome == UP_TO_DATE
+        assert result.task(':legacyZip').outcome == UP_TO_DATE
+        assert result.task(':legacyDescriptor').outcome == SUCCESS
+        result = gradle.withArguments('testLegacyDescriptor').build()
+        println result.standardOutput
+        assert result.task(':legacyDescriptor').outcome == UP_TO_DATE
+        assert result.task(':testLegacyDescriptor').outcome == SUCCESS
     }
 }
