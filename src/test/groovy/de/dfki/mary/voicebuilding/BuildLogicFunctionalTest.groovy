@@ -37,7 +37,7 @@ class BuildLogicFunctionalTest {
         """
     }
 
-    @Test(enabled = false)
+    @Test
     void testHelp() {
         def result = gradle.withArguments().build()
         println result.standardOutput
