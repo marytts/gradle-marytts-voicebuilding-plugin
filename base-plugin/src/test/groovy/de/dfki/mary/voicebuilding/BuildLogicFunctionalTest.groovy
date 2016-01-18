@@ -196,38 +196,38 @@ class BuildLogicFunctionalTest {
     @Test
     void testHelp() {
         def result = gradle.withArguments().build()
-        println result.standardOutput
+        println result.output
         assert result.task(':help').outcome == SUCCESS
     }
 
     @Test
     void testPlugins() {
         def result = gradle.withArguments('testPlugins').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':testPlugins').outcome == SUCCESS
     }
 
     @Test
     void testVoiceProps() {
         def result = gradle.withArguments('testVoiceProps').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':testVoiceProps').outcome == SUCCESS
     }
 
     @Test
     void testJavaCompatibility() {
         def result = gradle.withArguments('testJavaCompatibility').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':testJavaCompatibility').outcome == SUCCESS
     }
 
     @Test
     void testGenerateSource() {
         def result = gradle.withArguments('generateSource').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateSource').outcome == SUCCESS
         result = gradle.withArguments('testGenerateSource').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateSource').outcome == UP_TO_DATE
         assert result.task(':testGenerateSource').outcome == SUCCESS
     }
@@ -235,11 +235,11 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testGenerateSource'])
     void testCompileJava() {
         def result = gradle.withArguments('compileJava').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateSource').outcome == UP_TO_DATE
         assert result.task(':compileJava').outcome == SUCCESS
         result = gradle.withArguments('testCompileJava').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':compileJava').outcome == UP_TO_DATE
         assert result.task(':testCompileJava').outcome == SUCCESS
     }
@@ -247,14 +247,14 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testCompileJava'])
     void testCompileTestJava() {
         def result = gradle.withArguments('compileTestJava').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateSource').outcome == UP_TO_DATE
         assert result.task(':compileJava').outcome == UP_TO_DATE
         assert result.task(':processResources').outcome == UP_TO_DATE
         assert result.task(':classes').outcome == UP_TO_DATE
         assert result.task(':compileTestJava').outcome == SUCCESS
         result = gradle.withArguments('testCompileTestJava').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':compileTestJava').outcome == UP_TO_DATE
         assert result.task(':testCompileTestJava').outcome == SUCCESS
     }
@@ -262,10 +262,10 @@ class BuildLogicFunctionalTest {
     @Test
     void testGenerateVoiceConfig() {
         def result = gradle.withArguments('generateVoiceConfig').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateVoiceConfig').outcome == SUCCESS
         result = gradle.withArguments('testGenerateVoiceConfig').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
         assert result.task(':testGenerateVoiceConfig').outcome == SUCCESS
     }
@@ -273,10 +273,10 @@ class BuildLogicFunctionalTest {
     @Test
     void testGenerateServiceLoader() {
         def result = gradle.withArguments('generateServiceLoader').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateServiceLoader').outcome == SUCCESS
         result = gradle.withArguments('testGenerateServiceLoader').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
         assert result.task(':testGenerateServiceLoader').outcome == SUCCESS
     }
@@ -284,10 +284,10 @@ class BuildLogicFunctionalTest {
     @Test
     void testGeneratePom() {
         def result = gradle.withArguments('generatePom').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generatePom').outcome == SUCCESS
         result = gradle.withArguments('testGeneratePom').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generatePom').outcome == UP_TO_DATE
         assert result.task(':testGeneratePom').outcome == SUCCESS
     }
@@ -295,10 +295,10 @@ class BuildLogicFunctionalTest {
     @Test
     void testGeneratePomProperties() {
         def result = gradle.withArguments('generatePomProperties').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generatePomProperties').outcome == SUCCESS
         result = gradle.withArguments('testGeneratePomProperties').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generatePomProperties').outcome == UP_TO_DATE
         assert result.task(':testGeneratePomProperties').outcome == SUCCESS
     }
@@ -306,7 +306,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testCompileJava', 'testGeneratePom', 'testGeneratePomProperties'])
     void testJar() {
         def result = gradle.withArguments('jar').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateSource').outcome == UP_TO_DATE
         assert result.task(':compileJava').outcome == UP_TO_DATE
         assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
@@ -317,7 +317,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':generatePomProperties').outcome == UP_TO_DATE
         assert result.task(':jar').outcome == SUCCESS
         result = gradle.withArguments('testJar').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':jar').outcome == UP_TO_DATE
         assert result.task(':testJar').outcome == SUCCESS
     }
@@ -325,7 +325,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testCompileTestJava'])
     void testTest() {
         def result = gradle.withArguments('test').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':test').outcome == SUCCESS
     }
 }

@@ -40,7 +40,7 @@ class BuildLogicFunctionalTest {
     @Test
     void testHelp() {
         def result = gradle.withArguments().build()
-        println result.standardOutput
+        println result.output
         assert result.task(':help').outcome == SUCCESS
     }
 }

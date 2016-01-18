@@ -342,24 +342,24 @@ class BuildLogicFunctionalTest {
     @Test
     void testHelp() {
         def result = gradle.withArguments().build()
-        println result.standardOutput
+        println result.output
         assert result.task(':help').outcome == SUCCESS
     }
 
     @Test
     void testPlugins() {
         def result = gradle.withArguments('testPlugins').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':testPlugins').outcome == SUCCESS
     }
 
     @Test
     void testTemplates() {
         def result = gradle.withArguments('templates').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':templates').outcome == SUCCESS
         result = gradle.withArguments('testTemplates').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':templates').outcome == UP_TO_DATE
         assert result.task(':testTemplates').outcome == SUCCESS
     }
@@ -367,14 +367,14 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testTemplates'])
     void testLegacyInit() {
         def result = gradle.withArguments('legacyInit').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':wav').outcome == SUCCESS
         assert result.task(':text').outcome == SUCCESS
         assert result.task(':lab').outcome == SUCCESS
         assert result.task(':legacyInit').outcome == SUCCESS
         result = gradle.withArguments('testLegacyInit').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':wav').outcome == UP_TO_DATE
         assert result.task(':text').outcome == UP_TO_DATE
@@ -386,12 +386,12 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyInit'])
     void testLegacyPraatPitchmarker() {
         def result = gradle.withArguments('legacyPraatPitchmarker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':wav').outcome == UP_TO_DATE
         assert result.task(':legacyPraatPitchmarker').outcome == SUCCESS
         result = gradle.withArguments('testLegacyPraatPitchmarker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':testLegacyPraatPitchmarker').outcome == SUCCESS
     }
@@ -399,13 +399,13 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
     void testLegacyMCEPMaker() {
         def result = gradle.withArguments('legacyMCEPMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':wav').outcome == UP_TO_DATE
         assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':legacyMCEPMaker').outcome == SUCCESS
         result = gradle.withArguments('testLegacyMCEPMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
         assert result.task(':testLegacyMCEPMaker').outcome == SUCCESS
     }
@@ -413,12 +413,12 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyInit'])
     void testLegacyPhoneUnitLabelComputer() {
         def result = gradle.withArguments('legacyPhoneUnitLabelComputer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':legacyPhoneUnitLabelComputer').outcome == SUCCESS
         result = gradle.withArguments('testLegacyPhoneUnitLabelComputer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
         assert result.task(':testLegacyPhoneUnitLabelComputer').outcome == SUCCESS
     }
@@ -426,12 +426,12 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyInit'])
     void testLegacyHalfPhoneUnitLabelComputer() {
         def result = gradle.withArguments('legacyHalfPhoneUnitLabelComputer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == SUCCESS
         result = gradle.withArguments('testLegacyHalfPhoneUnitLabelComputer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
         assert result.task(':testLegacyHalfPhoneUnitLabelComputer').outcome == SUCCESS
     }
@@ -439,13 +439,13 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyInit'])
     void testLegacyTranscriptionAligner() {
         def result = gradle.withArguments('legacyTranscriptionAligner').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':generateAllophones').outcome == SUCCESS
         assert result.task(':legacyTranscriptionAligner').outcome == SUCCESS
         result = gradle.withArguments('testLegacyTranscriptionAligner').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateAllophones').outcome == UP_TO_DATE
         assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
         assert result.task(':testLegacyTranscriptionAligner').outcome == SUCCESS
@@ -454,10 +454,10 @@ class BuildLogicFunctionalTest {
     @Test
     void testLegacyFeatureLister() {
         def result = gradle.withArguments('legacyFeatureLister').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == SUCCESS
         result = gradle.withArguments('testLegacyFeatureLister').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':testLegacyFeatureLister').outcome == SUCCESS
     }
@@ -465,7 +465,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyTranscriptionAligner'])
     void testLegacyPhoneUnitFeatureComputer() {
         def result = gradle.withArguments('legacyPhoneUnitFeatureComputer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
@@ -477,7 +477,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
         assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
         result = gradle.withArguments('testLegacyPhoneUnitFeatureComputer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
         assert result.task(':testLegacyPhoneUnitFeatureComputer').outcome == SUCCESS
     }
@@ -485,7 +485,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyTranscriptionAligner'])
     void testLegacyHalfPhoneUnitFeatureComputer() {
         def result = gradle.withArguments('legacyHalfPhoneUnitFeatureComputer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
@@ -497,7 +497,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
         assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
         result = gradle.withArguments('testLegacyHalfPhoneUnitFeatureComputer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
         assert result.task(':testLegacyHalfPhoneUnitFeatureComputer').outcome == SUCCESS
     }
@@ -505,7 +505,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
     void testLegacyWaveTimelineMaker() {
         def result = gradle.withArguments('legacyWaveTimelineMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':templates').outcome == UP_TO_DATE
@@ -515,7 +515,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':legacyWaveTimelineMaker').outcome == SUCCESS
         result = gradle.withArguments('testLegacyWaveTimelineMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
         assert result.task(':testLegacyWaveTimelineMaker').outcome == SUCCESS
     }
@@ -523,7 +523,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
     void testLegacyBasenameTimelineMaker() {
         def result = gradle.withArguments('legacyBasenameTimelineMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':templates').outcome == UP_TO_DATE
@@ -533,7 +533,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':legacyBasenameTimelineMaker').outcome == SUCCESS
         result = gradle.withArguments('testLegacyBasenameTimelineMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyBasenameTimelineMaker').outcome == UP_TO_DATE
         assert result.task(':testLegacyBasenameTimelineMaker').outcome == SUCCESS
     }
@@ -541,7 +541,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
     void testLegacyMCepTimelineMaker() {
         def result = gradle.withArguments('legacyMCepTimelineMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':templates').outcome == UP_TO_DATE
@@ -551,7 +551,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
         assert result.task(':legacyMCepTimelineMaker').outcome == SUCCESS
         result = gradle.withArguments('testLegacyMCepTimelineMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
         assert result.task(':testLegacyMCepTimelineMaker').outcome == SUCCESS
     }
@@ -559,7 +559,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyPhoneUnitLabelComputer'])
     void testLegacyPhoneUnitfileWriter() {
         def result = gradle.withArguments('legacyPhoneUnitfileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
@@ -570,7 +570,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':legacyPhoneUnitfileWriter').outcome == SUCCESS
         result = gradle.withArguments('testLegacyPhoneUnitfileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
         assert result.task(':testLegacyPhoneUnitfileWriter').outcome == SUCCESS
     }
@@ -578,7 +578,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyHalfPhoneUnitLabelComputer'])
     void testLegacyHalfPhoneUnitfileWriter() {
         def result = gradle.withArguments('legacyHalfPhoneUnitfileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
         assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
@@ -589,7 +589,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
         assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == SUCCESS
         result = gradle.withArguments('testLegacyHalfPhoneUnitfileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
         assert result.task(':testLegacyHalfPhoneUnitfileWriter').outcome == SUCCESS
     }
@@ -597,7 +597,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyPhoneUnitfileWriter', 'testLegacyPhoneUnitFeatureComputer'])
     void testLegacyPhoneFeatureFileWriter() {
         def result = gradle.withArguments('legacyPhoneFeatureFileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
@@ -613,7 +613,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
         assert result.task(':legacyPhoneFeatureFileWriter').outcome == SUCCESS
         result = gradle.withArguments('testLegacyPhoneFeatureFileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyPhoneFeatureFileWriter').outcome == UP_TO_DATE
         assert result.task(':testLegacyPhoneFeatureFileWriter').outcome == SUCCESS
     }
@@ -621,7 +621,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitfileWriter', 'testLegacyHalfPhoneUnitFeatureComputer'])
     void testLegacyHalfPhoneFeatureFileWriter() {
         def result = gradle.withArguments('legacyHalfPhoneFeatureFileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
@@ -637,7 +637,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
         assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == SUCCESS
         result = gradle.withArguments('testLegacyHalfPhoneFeatureFileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
         assert result.task(':testLegacyHalfPhoneFeatureFileWriter').outcome == SUCCESS
     }
@@ -645,7 +645,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitfileWriter', 'testLegacyWaveTimelineMaker', 'testLegacyHalfPhoneFeatureFileWriter'])
     void testLegacyF0PolynomialFeatureFileWriter() {
         def result = gradle.withArguments('legacyF0PolynomialFeatureFileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
@@ -664,7 +664,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
         assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == SUCCESS
         result = gradle.withArguments('testLegacyF0PolynomialFeatureFileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
         assert result.task(':testLegacyF0PolynomialFeatureFileWriter').outcome == SUCCESS
     }
@@ -672,7 +672,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitfileWriter', 'testLegacyF0PolynomialFeatureFileWriter', 'testLegacyHalfPhoneFeatureFileWriter'])
     void testLegacyAcousticFeatureFileWriter() {
         def result = gradle.withArguments('legacyAcousticFeatureFileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
@@ -692,7 +692,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
         assert result.task(':legacyAcousticFeatureFileWriter').outcome == SUCCESS
         result = gradle.withArguments('testLegacyAcousticFeatureFileWriter').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
         assert result.task(':testLegacyAcousticFeatureFileWriter').outcome == SUCCESS
     }
@@ -700,7 +700,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyMCepTimelineMaker', 'testLegacyHalfPhoneUnitfileWriter', 'testLegacyAcousticFeatureFileWriter'])
     void testLegacyJoinCostFileMaker() {
         def result = gradle.withArguments('legacyJoinCostFileMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
@@ -723,7 +723,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
         assert result.task(':legacyJoinCostFileMaker').outcome == SUCCESS
         result = gradle.withArguments('testLegacyJoinCostFileMaker').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
         assert result.task(':testLegacyJoinCostFileMaker').outcome == SUCCESS
     }
@@ -731,7 +731,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyAcousticFeatureFileWriter'])
     void testLegacyCARTBuilder() {
         def result = gradle.withArguments('legacyCARTBuilder').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
@@ -752,7 +752,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
         assert result.task(':legacyCARTBuilder').outcome == SUCCESS
         result = gradle.withArguments('testLegacyCARTBuilder').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
         assert result.task(':testLegacyCARTBuilder').outcome == SUCCESS
     }
@@ -760,7 +760,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyPhoneFeatureFileWriter', 'testLegacyPhoneUnitfileWriter', 'testLegacyWaveTimelineMaker'])
     void testLegacyDurationCARTTrainer() {
         def result = gradle.withArguments('legacyDurationCARTTrainer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
@@ -779,7 +779,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
         assert result.task(':legacyDurationCARTTrainer').outcome == SUCCESS
         result = gradle.withArguments('testLegacyDurationCARTTrainer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyDurationCARTTrainer').outcome == UP_TO_DATE
         assert result.task(':testLegacyDurationCARTTrainer').outcome == SUCCESS
     }
@@ -787,7 +787,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyPhoneFeatureFileWriter', 'testLegacyPhoneUnitfileWriter', 'testLegacyWaveTimelineMaker'])
     void testLegacyF0CARTTrainer() {
         def result = gradle.withArguments('legacyF0CARTTrainer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
@@ -806,7 +806,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
         assert result.task(':legacyF0CARTTrainer').outcome == SUCCESS
         result = gradle.withArguments('testLegacyF0CARTTrainer').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyF0CARTTrainer').outcome == UP_TO_DATE
         assert result.task(':testLegacyF0CARTTrainer').outcome == SUCCESS
     }
@@ -814,7 +814,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyAcousticFeatureFileWriter', 'testLegacyJoinCostFileMaker', 'testLegacyCARTBuilder'])
     void testProcessLegacyResources() {
         def result = gradle.withArguments('processLegacyResources').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
         assert result.task(':processDataResources').outcome == UP_TO_DATE
         assert result.task(':lab').outcome == UP_TO_DATE
@@ -839,7 +839,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
         assert result.task(':processLegacyResources').outcome == SUCCESS
         result = gradle.withArguments('testProcessLegacyResources').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':processLegacyResources').outcome == UP_TO_DATE
         assert result.task(':testProcessLegacyResources').outcome == SUCCESS
     }
@@ -847,7 +847,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testProcessLegacyResources'])
     void testJar() {
         def result = gradle.withArguments('jar').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateSource').outcome == SUCCESS
         assert result.task(':compileJava').outcome == SUCCESS
         assert result.task(':generateServiceLoader').outcome == SUCCESS
@@ -881,7 +881,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':processLegacyResources').outcome == UP_TO_DATE
         assert result.task(':jar').outcome == SUCCESS
         result = gradle.withArguments('testJar').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':jar').outcome == UP_TO_DATE
         assert result.task(':testJar').outcome == SUCCESS
     }
@@ -889,7 +889,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testJar'])
     void testLegacyZip() {
         def result = gradle.withArguments('legacyZip').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateSource').outcome == UP_TO_DATE
         assert result.task(':compileJava').outcome == UP_TO_DATE
         assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
@@ -932,7 +932,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyF0CARTTrainer').outcome == UP_TO_DATE
         assert result.task(':legacyZip').outcome == SUCCESS
         result = gradle.withArguments('testlegacyZip').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyZip').outcome == UP_TO_DATE
         assert result.task(':testLegacyZip').outcome == SUCCESS
     }
@@ -940,7 +940,7 @@ class BuildLogicFunctionalTest {
     @Test(dependsOnMethods = ['testLegacyZip'])
     void testLegacyDescriptor() {
         def result = gradle.withArguments('legacyDescriptor').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':generateSource').outcome == UP_TO_DATE
         assert result.task(':compileJava').outcome == UP_TO_DATE
         assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
@@ -984,7 +984,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':legacyZip').outcome == UP_TO_DATE
         assert result.task(':legacyDescriptor').outcome == SUCCESS
         result = gradle.withArguments('testLegacyDescriptor').build()
-        println result.standardOutput
+        println result.output
         assert result.task(':legacyDescriptor').outcome == UP_TO_DATE
         assert result.task(':testLegacyDescriptor').outcome == SUCCESS
     }
