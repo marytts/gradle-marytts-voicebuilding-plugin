@@ -329,9 +329,9 @@ class BuildLogicFunctionalTest {
         task testLegacyDescriptor(group: 'Verification') {
             dependsOn legacyDescriptor
             doLast {
-                ant.checksum file: legacyZip.archivePath, algorithm: 'MD5',  property: 'md5Hash'
+                ant.checksum file: legacyZip.archivePath, algorithm: 'MD5', property: 'md5Hash'
                 def expected = \"\"\"$expectedLegacyDescriptor\"\"\"
-                def actual = file(\"\$project.distsDir/\$project.name-\$project.version-component-descriptor.xml\").text
+                def actual = file(\"\$distsDir/\${legacyZip.archiveName.replace('.zip', '-component-descriptor.xml')}\").text
                 XMLUnit.ignoreWhitespace = true
                 assert XMLUnit.compareXML(expected, actual).similar()
             }

@@ -248,29 +248,10 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('legacyDescriptor') {
+        project.task('legacyDescriptor', type: LegacyDescriptorTask) {
             dependsOn project.legacyZip
-            def zipFile = project.legacyZip.outputs.files.singleFile
-            def xmlFile = project.file("$project.distsDir/$project.name-$project.version-component-descriptor.xml")
-            inputs.files zipFile
-            outputs.files xmlFile
-            doLast {
-                def zipFileHash = DigestUtils.md5Hex(new FileInputStream(zipFile))
-                def builder = new StreamingMarkupBuilder()
-                def xml = builder.bind {
-                    'marytts-install'(xmlns: 'http://mary.dfki.de/installer') {
-                        voice(gender: project.voice.gender, locale: project.voice.maryLocale, name: project.voice.name, type: project.voice.type, version: project.maryttsVersion) {
-                            delegate.description project.voice.description
-                            license(href: project.voice.license.url)
-                            'package'(filename: zipFile.name, md5sum: zipFileHash, size: zipFile.size()) {
-                                location(folder: true, href: "http://mary.dfki.de/download/$project.maryttsVersion/")
-                            }
-                            depends(language: project.voice.maryLocaleXml, version: project.maryttsVersion)
-                        }
-                    }
-                }
-                xmlFile.text = XmlUtil.serialize(xml)
-            }
+            srcFile = project.legacyZip.archivePath
+            destFile = project.file("$project.distsDir/${project.legacyZip.archiveName.replace('.zip', '-component-descriptor.xml')}")
         }
 
         project.afterEvaluate {
