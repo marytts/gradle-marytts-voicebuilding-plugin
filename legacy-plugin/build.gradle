@@ -3,6 +3,5 @@ apply from: "$rootDir/testKitLogic.gradle"
 dependencies {
     compile gradleApi()
     compile project(':data-plugin')
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.9'
     runtime project(':festvox-plugin')
 }
