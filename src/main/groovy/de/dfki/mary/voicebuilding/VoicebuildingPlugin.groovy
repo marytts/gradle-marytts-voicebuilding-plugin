@@ -4,7 +4,6 @@ import groovy.json.JsonBuilder
 
 import marytts.features.FeatureProcessorManager
 
-import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
@@ -16,8 +15,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply JavaPlugin
         project.plugins.apply VoicebuildingDataPlugin
-
-        project.sourceCompatibility = JavaVersion.VERSION_1_7
 
         project.ext {
             generatedSrcDir = "$project.buildDir/generated-src"

@@ -77,6 +77,11 @@ class BuildLogicFunctionalTest {
             assert voice.license?.name == "$voiceLicenseName"
         }
 
+        task testJavaCompatibility(group: 'Verification') << {
+            assert "\$sourceCompatibility" == '1.7'
+            assert "\$targetCompatibility" == '1.7'
+        }
+
         task testGenerateSource(group: 'Verification') {
             dependsOn generateSource
             doLast {
@@ -207,6 +212,13 @@ class BuildLogicFunctionalTest {
         def result = gradle.withArguments('testVoiceProps').build()
         println result.standardOutput
         assert result.task(':testVoiceProps').outcome == SUCCESS
+    }
+
+    @Test
+    void testJavaCompatibility() {
+        def result = gradle.withArguments('testJavaCompatibility').build()
+        println result.standardOutput
+        assert result.task(':testJavaCompatibility').outcome == SUCCESS
     }
 
     @Test

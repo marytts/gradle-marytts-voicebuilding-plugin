@@ -14,6 +14,8 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         project.plugins.apply JavaPlugin
         project.plugins.apply MavenPlugin
 
+        project.sourceCompatibility = '1.7'
+
         project.extensions.create 'voice', VoiceExtension
         project.voice.extensions.create 'license', VoiceLicenseExtension
 
