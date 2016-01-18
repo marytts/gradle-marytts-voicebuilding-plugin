@@ -2,8 +2,15 @@ package de.dfki.mary.voicebuilding
 
 import de.dfki.mary.voicebuilding.tasks.*
 
+import groovy.xml.StreamingMarkupBuilder
+import groovy.xml.XmlUtil
+
+import org.apache.commons.codec.digest.DigestUtils
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.bundling.Zip
 
 class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
@@ -216,6 +223,37 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile3 = project.file("$project.legacyBuildDir/f0.right.tree")
         }
 
+        project.task('processLegacyResources', type: Copy) {
+            from project.legacyAcousticFeatureFileWriter, {
+                include 'halfphoneUnitFeatureDefinition_ac.txt'
+            }
+            from project.legacyJoinCostFileMaker, {
+                include 'joinCostWeights.txt'
+            }
+            from project.legacyCARTBuilder
+            into project.sourceSets.main.output.resourcesDir
+            project.jar.dependsOn it
+        }
+
+        project.task('legacyZip', type: Zip) {
+            dependsOn project.legacyBasenameTimelineMaker,
+                    project.legacyDurationCARTTrainer,
+                    project.legacyF0CARTTrainer,
+                    project.legacyHalfPhoneFeatureFileWriter,
+                    project.legacyJoinCostFileMaker,
+                    project.legacyPhoneFeatureFileWriter,
+                    project.legacyWaveTimelineMaker
+            from project.jar, {
+                rename { "lib/$it" }
+            }
+        }
+
+        project.task('legacyDescriptor', type: LegacyDescriptorTask) {
+            dependsOn project.legacyZip
+            srcFile = project.legacyZip.archivePath
+            destFile = project.file("$project.distsDir/${project.legacyZip.archiveName.replace('.zip', '-component-descriptor.xml')}")
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
@@ -224,6 +262,26 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                     exclude module: 'sgt'
                 }
                 testCompile "junit:junit:4.11"
+            }
+
+            project.processLegacyResources {
+                rename { "marytts/voice/$project.voice.nameCamelCase/$it" }
+            }
+
+            project.legacyZip {
+                from project.legacyBuildDir, {
+                    include 'dur.tree',
+                            'f0.left.tree',
+                            'f0.mid.tree',
+                            'f0.right.tree',
+                            'halfphoneFeatures_ac.mry',
+                            'halfphoneUnits.mry',
+                            'joinCostFeatures.mry',
+                            'phoneUnitFeatureDefinition.txt',
+                            'timeline_basenames.mry',
+                            'timeline_waveforms.mry'
+                    rename { "lib/voices/$project.voice.name/$it" }
+                }
             }
         }
     }
