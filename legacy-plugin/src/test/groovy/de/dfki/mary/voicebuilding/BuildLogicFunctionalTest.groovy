@@ -12,6 +12,7 @@ class BuildLogicFunctionalTest {
 
     def group = 'de.dfki.mary'
     def voiceName = 'cmu-slt'
+    def voiceLicenseUrl = 'http://mary.dfki.de/download/arctic-license.html'
 
     @BeforeSuite
     void setup() {
@@ -43,6 +44,9 @@ class BuildLogicFunctionalTest {
 
         voice {
             name = "$voiceName"
+            license {
+                url = "$voiceLicenseUrl"
+            }
         }
 
         dependencies {
