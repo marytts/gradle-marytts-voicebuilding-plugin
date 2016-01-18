@@ -6,37 +6,15 @@ import marytts.features.FeatureProcessorManager
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.bundling.Zip
 
 class VoicebuildingPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        project.plugins.apply JavaPlugin
         project.plugins.apply VoicebuildingDataPlugin
 
-        project.ext {
-            generatedSrcDir = "$project.buildDir/generated-src"
-            generatedTestSrcDir = "$project.buildDir/generated-test-src"
-        }
-
         project.status = project.version.endsWith('SNAPSHOT') ? 'integration' : 'release'
-
-        project.sourceSets {
-            main {
-                java {
-                    srcDir project.generatedSrcDir
-                }
-            }
-            data
-            test {
-                java {
-                    srcDir project.generatedTestSrcDir
-                }
-                compileClasspath += data.output
-            }
-        }
 
         project.jar.manifest {
             attributes('Created-By': "${System.properties['java.version']} (${System.properties['java.vendor']})",
