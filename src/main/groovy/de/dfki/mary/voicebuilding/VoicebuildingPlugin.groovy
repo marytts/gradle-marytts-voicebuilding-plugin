@@ -58,15 +58,6 @@ class VoicebuildingPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('legacyComponentZip', type: Zip) {
-            from project.processDataResources
-            from(project.jar) {
-                rename {
-                    "lib/$it"
-                }
-            }
-        }
-
         project.task('dataZip', type: Zip) {
             from project.processDataResources
             classifier 'data'
