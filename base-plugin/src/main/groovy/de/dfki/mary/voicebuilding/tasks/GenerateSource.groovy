@@ -104,6 +104,42 @@ class GenerateSource extends DefaultTask {
                     }
                 }
             }
+            integrationTest {
+                groovy {
+                    marytts {
+                        voice {
+                            "${project.voice.nameCamelCase}" {
+                                'LoadVoiceIT.groovy'(
+                                        """|package marytts.voice.${project.voice.nameCamelCase}
+                                           |
+                                           |import marytts.LocalMaryInterface
+                                           |
+                                           |import org.testng.annotations.*
+                                           |
+                                           |public class LoadVoiceIT {
+                                           |
+                                           |    LocalMaryInterface mary
+                                           |
+                                           |    @BeforeMethod
+                                           |    void setup() {
+                                           |        mary = new LocalMaryInterface()
+                                           |    }
+                                           |
+                                           |    @Test
+                                           |    void canSetVoice() {
+                                           |        def voiceName = new Config().name
+                                           |        mary.voice = voiceName
+                                           |        assert voiceName == mary.voice
+                                           |    }
+                                           |
+                                           |}
+                                           |""".stripMargin()
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
