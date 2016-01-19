@@ -23,14 +23,22 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             maryttsVersion = '5.1.1'
         }
 
+        project.repositories {
+            jcenter()
+        }
+
         project.sourceSets {
             integrationTest {
-                compileClasspath += project.sourceSets.main.runtimeClasspath
+                java {
+                    compileClasspath += main.output + test.output
+                    runtimeClasspath += main.output + test.output
+                }
             }
         }
 
-        project.repositories {
-            jcenter()
+        project.configurations {
+            integrationTestCompile.extendsFrom testCompile
+            integrationTestRuntime.extendsFrom testRuntime
         }
 
         project.dependencies {

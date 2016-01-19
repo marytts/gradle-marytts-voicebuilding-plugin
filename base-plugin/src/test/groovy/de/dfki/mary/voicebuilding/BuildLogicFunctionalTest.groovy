@@ -103,6 +103,13 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        task testCompileIntegrationTestGroovy(group: 'Verification') {
+            dependsOn compileIntegrationTestGroovy
+            doLast {
+                assert file("\$buildDir/classes/integrationTest/marytts/voice/\$voice.nameCamelCase/LoadVoiceIT.class").exists()
+            }
+        }
+
         task testGenerateVoiceConfig(group: 'Verification') {
             dependsOn generateVoiceConfig
             doLast {
@@ -249,6 +256,16 @@ class BuildLogicFunctionalTest {
         result = gradle.withArguments('testCompileTestJava').build()
         println result.output
         assert result.taskPaths(SUCCESS) == [':testCompileTestJava']
+    }
+
+    @Test(dependsOnMethods = ['testCompileTestJava'])
+    void testCompileIntegrationTestGroovy() {
+        def result = gradle.withArguments('compileIntegrationTestGroovy').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':compileIntegrationTestGroovy']
+        result = gradle.withArguments('testCompileIntegrationTestGroovy').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':testCompileIntegrationTestGroovy']
     }
 
     @Test
