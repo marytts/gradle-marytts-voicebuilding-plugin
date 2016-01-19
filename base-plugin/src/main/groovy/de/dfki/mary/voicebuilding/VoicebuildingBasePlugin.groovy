@@ -23,6 +23,12 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             maryttsVersion = '5.1.1'
         }
 
+        project.sourceSets {
+            integrationTest {
+                compileClasspath += project.sourceSets.main.runtimeClasspath
+            }
+        }
+
         project.repositories {
             jcenter()
         }
@@ -34,6 +40,8 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
                 exclude module: 'freetts-de'
             }
             testCompile group: 'junit', name: 'junit', version: '4.12'
+            integrationTestCompile localGroovy()
+            integrationTestCompile group: 'org.testng', name: 'testng', version: '6.9.4'
         }
 
         project.task('generateSource', type: GenerateSource) {
