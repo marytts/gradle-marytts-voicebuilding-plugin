@@ -37,7 +37,7 @@ class BuildLogicFunctionalTest {
         gradle = GradleRunner.create().withTestKitDir(testKitDir).withProjectDir(projectDir).withPluginClasspath(pluginClasspath)
 
         // Add the logic under test to the test build
-        buildFile << """
+        buildFile.text = """
         buildscript {
             repositories {
                 jcenter()

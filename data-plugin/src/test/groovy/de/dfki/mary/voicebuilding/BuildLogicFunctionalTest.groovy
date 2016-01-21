@@ -33,7 +33,7 @@ class BuildLogicFunctionalTest {
         gradle = GradleRunner.create().withTestKitDir(testKitDir).withProjectDir(projectDir).withPluginClasspath(pluginClasspath)
 
         // Add the logic under test to the test build
-        buildFile << """
+        buildFile.text = """
         plugins {
             id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
         }
