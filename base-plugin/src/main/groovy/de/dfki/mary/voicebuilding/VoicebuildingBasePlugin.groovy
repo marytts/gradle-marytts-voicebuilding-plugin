@@ -6,6 +6,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.GroovyPlugin
 import org.gradle.api.plugins.MavenPlugin
+import org.gradle.api.tasks.testing.Test
 
 class VoicebuildingBasePlugin implements Plugin<Project> {
 
@@ -59,7 +60,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             project.sourceSets.integrationTest.groovy.srcDirs += "$destDir/integrationTest/groovy"
             project.compileJava.dependsOn it
             project.compileTestJava.dependsOn it
-            project.compileIntegrationTestJava.dependsOn it
+            project.compileIntegrationTestGroovy.dependsOn it
             doFirst {
                 assert destDir.path.startsWith(project.buildDir.path)
                 project.delete destDir
@@ -90,6 +91,15 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
                 destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/voice-$project.voice.name/pom.properties")
             }
             project.jar.dependsOn it
+        }
+
+        project.task('integrationTest', type: Test) {
+            useTestNG()
+            testClassesDir = project.sourceSets.integrationTest.output.classesDir
+            classpath = project.sourceSets.integrationTest.runtimeClasspath
+            reports.html.destination = project.file("$project.reporting.baseDir/$name")
+            project.check.dependsOn it
+            mustRunAfter project.test
         }
     }
 }

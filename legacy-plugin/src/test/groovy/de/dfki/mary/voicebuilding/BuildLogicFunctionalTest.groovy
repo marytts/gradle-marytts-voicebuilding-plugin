@@ -594,10 +594,16 @@ class BuildLogicFunctionalTest {
     }
 
     @Test(dependsOnMethods = ['testProcessLegacyResources'])
+    void testIntegrationTest() {
+        def result = gradle.withArguments('integrationTest').buildAndFail()
+        println result.output
+    }
+
+    @Test(dependsOnMethods = ['testProcessLegacyResources'])
     void testJar() {
         def result = gradle.withArguments('jar').build()
         println result.output
-        assert result.taskPaths(SUCCESS) == [':generateSource', ':compileJava', ':generateServiceLoader', ':generateVoiceConfig', ':classes', ':generatePom', ':generatePomProperties', ':jar']
+        assert result.taskPaths(SUCCESS) == [':generatePom', ':generatePomProperties', ':jar']
         result = gradle.withArguments('testJar').build()
         println result.output
         assert result.taskPaths(SUCCESS) == [':testJar']
