@@ -41,6 +41,6 @@ class BuildLogicFunctionalTest {
     void testHelp() {
         def result = gradle.withArguments().build()
         println result.output
-        assert result.task(':help').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':help']
     }
 }
