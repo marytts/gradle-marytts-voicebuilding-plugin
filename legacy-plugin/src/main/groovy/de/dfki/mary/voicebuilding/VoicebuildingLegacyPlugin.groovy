@@ -51,6 +51,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyInit
             srcDir = project.file("$project.buildDir/wav")
             destDir = project.file("$project.buildDir/pm")
         }
@@ -62,6 +63,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyInit
             srcDir = project.file("$project.buildDir/lab")
             destDir = project.file("$project.buildDir/phonelab_unaligned")
             doLast {
@@ -73,6 +75,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyHalfPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyInit
             srcDir = project.file("$project.buildDir/lab")
             destDir = project.file("$project.buildDir/halfphonelab_unaligned")
             doLast {

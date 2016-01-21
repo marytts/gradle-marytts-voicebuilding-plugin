@@ -66,21 +66,7 @@ class BuildLogicFunctionalTest {
 
         legacyInit.dependsOn wav, text, lab
 
-        legacyPraatPitchmarker.dependsOn legacyInit
-
-        legacyMCEPMaker.dependsOn legacyInit
-
-        legacyPhoneUnitLabelComputer.dependsOn lab
-
-        legacyHalfPhoneUnitLabelComputer.dependsOn lab
-
         generateAllophones.dependsOn legacyInit
-
-        legacyWaveTimelineMaker.dependsOn legacyInit
-
-        legacyBasenameTimelineMaker.dependsOn legacyInit
-
-        legacyMCepTimelineMaker.dependsOn legacyInit
 
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
@@ -462,7 +448,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':testLegacyFeatureLister').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner'])
+    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner', 'testLegacyFeatureLister'])
     void testLegacyPhoneUnitFeatureComputer() {
         def result = gradle.withArguments('legacyPhoneUnitFeatureComputer').build()
         println result.output
@@ -482,7 +468,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':testLegacyPhoneUnitFeatureComputer').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner'])
+    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner', 'testLegacyFeatureLister'])
     void testLegacyHalfPhoneUnitFeatureComputer() {
         def result = gradle.withArguments('legacyHalfPhoneUnitFeatureComputer').build()
         println result.output
@@ -538,7 +524,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':testLegacyBasenameTimelineMaker').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
+    @Test(dependsOnMethods = ['testLegacyMCEPMaker'])
     void testLegacyMCepTimelineMaker() {
         def result = gradle.withArguments('legacyMCepTimelineMaker').build()
         println result.output
@@ -556,7 +542,21 @@ class BuildLogicFunctionalTest {
         assert result.task(':testLegacyMCepTimelineMaker').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyPhoneUnitLabelComputer'])
+    @Test(dependsOnMethods = ['testLegacyPhoneUnitLabelComputer', 'testLegacyPhoneUnitFeatureComputer'])
+    void testLegacyPhoneLabelFeatureAligner() {
+        def result = gradle.withArguments('legacyPhoneLabelFeatureAligner').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':legacyPhoneLabelFeatureAligner']
+    }
+
+    @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitLabelComputer', 'testLegacyHalfPhoneUnitFeatureComputer'])
+    void testLegacyHalfPhoneLabelFeatureAligner() {
+        def result = gradle.withArguments('legacyHalfPhoneLabelFeatureAligner').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':legacyHalfPhoneLabelFeatureAligner']
+    }
+
+    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyPhoneUnitLabelComputer', 'testLegacyPhoneLabelFeatureAligner'])
     void testLegacyPhoneUnitfileWriter() {
         def result = gradle.withArguments('legacyPhoneUnitfileWriter').build()
         println result.output
@@ -575,7 +575,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':testLegacyPhoneUnitfileWriter').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyHalfPhoneUnitLabelComputer'])
+    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyHalfPhoneUnitLabelComputer', 'testLegacyHalfPhoneLabelFeatureAligner'])
     void testLegacyHalfPhoneUnitfileWriter() {
         def result = gradle.withArguments('legacyHalfPhoneUnitfileWriter').build()
         println result.output
