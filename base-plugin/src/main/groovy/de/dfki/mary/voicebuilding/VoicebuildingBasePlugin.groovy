@@ -97,6 +97,8 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             useTestNG()
             testClassesDir = project.sourceSets.integrationTest.output.classesDir
             classpath = project.sourceSets.integrationTest.runtimeClasspath
+            systemProperty 'log4j.logger.marytts', 'INFO,stderr'
+            testLogging.showStandardStreams = true
             reports.html.destination = project.file("$project.reporting.baseDir/$name")
             project.check.dependsOn it
             mustRunAfter project.test
