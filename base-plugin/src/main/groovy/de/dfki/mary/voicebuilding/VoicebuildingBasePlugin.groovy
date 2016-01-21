@@ -60,6 +60,10 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             project.compileJava.dependsOn it
             project.compileTestJava.dependsOn it
             project.compileIntegrationTestJava.dependsOn it
+            doFirst {
+                assert destDir.path.startsWith(project.buildDir.path)
+                project.delete destDir
+            }
         }
 
         project.task('generateVoiceConfig', type: GenerateVoiceConfig) {
