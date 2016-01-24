@@ -11,7 +11,8 @@ class BuildLogicFunctionalTest {
     def buildFile
 
     def group = 'de.dfki.mary'
-    def voiceName = 'cmu-slt'
+    def voiceName = 'cmu-time-awb'
+    def voiceGender = 'male'
     def voiceLicenseUrl = 'http://mary.dfki.de/download/arctic-license.html'
 
     @BeforeSuite
@@ -53,6 +54,7 @@ class BuildLogicFunctionalTest {
 
         voice {
             name = "$voiceName"
+            gender = "$voiceGender"
             license {
                 url = "$voiceLicenseUrl"
             }
@@ -299,8 +301,8 @@ class BuildLogicFunctionalTest {
 
         def expectedLegacyDescriptor = '''<?xml version="1.0"?>
             <marytts-install xmlns="http://mary.dfki.de/installer">
-                <voice locale="en_US" name="''' + voiceName + '''" gender="female" type="unit selection" version="5.1.1">
-                    <description>A female English unit selection voice</description>
+                <voice locale="en_US" name="''' + voiceName + '''" gender="''' + voiceGender + '''" type="unit selection" version="5.1.1">
+                    <description>A ''' + voiceGender + ''' English unit selection voice</description>
                     <license href="''' + voiceLicenseUrl + '''"/>
                     <package md5sum="$ant.md5Hash" filename="$legacyZip.archiveName" size="${legacyZip.archivePath.size()}">
                         <location folder="true" href="http://mary.dfki.de/download/5.1.1/"/>
