@@ -197,135 +197,114 @@ class BuildLogicFunctionalTest {
     void testHelp() {
         def result = gradle.withArguments().build()
         println result.output
-        assert result.task(':help').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':help']
     }
 
     @Test
     void testPlugins() {
         def result = gradle.withArguments('testPlugins').build()
         println result.output
-        assert result.task(':testPlugins').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testPlugins']
     }
 
     @Test
     void testVoiceProps() {
         def result = gradle.withArguments('testVoiceProps').build()
         println result.output
-        assert result.task(':testVoiceProps').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testVoiceProps']
     }
 
     @Test
     void testJavaCompatibility() {
         def result = gradle.withArguments('testJavaCompatibility').build()
         println result.output
-        assert result.task(':testJavaCompatibility').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testJavaCompatibility']
     }
 
     @Test
     void testGenerateSource() {
         def result = gradle.withArguments('generateSource').build()
         println result.output
-        assert result.task(':generateSource').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':generateSource']
         result = gradle.withArguments('testGenerateSource').build()
         println result.output
-        assert result.task(':generateSource').outcome == UP_TO_DATE
-        assert result.task(':testGenerateSource').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testGenerateSource']
     }
 
     @Test(dependsOnMethods = ['testGenerateSource'])
     void testCompileJava() {
         def result = gradle.withArguments('compileJava').build()
         println result.output
-        assert result.task(':generateSource').outcome == UP_TO_DATE
-        assert result.task(':compileJava').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':compileJava']
         result = gradle.withArguments('testCompileJava').build()
         println result.output
-        assert result.task(':compileJava').outcome == UP_TO_DATE
-        assert result.task(':testCompileJava').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testCompileJava']
     }
 
     @Test(dependsOnMethods = ['testCompileJava'])
     void testCompileTestJava() {
         def result = gradle.withArguments('compileTestJava').build()
         println result.output
-        assert result.task(':generateSource').outcome == UP_TO_DATE
-        assert result.task(':compileJava').outcome == UP_TO_DATE
-        assert result.task(':processResources').outcome == UP_TO_DATE
-        assert result.task(':classes').outcome == UP_TO_DATE
-        assert result.task(':compileTestJava').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':compileTestJava']
         result = gradle.withArguments('testCompileTestJava').build()
         println result.output
-        assert result.task(':compileTestJava').outcome == UP_TO_DATE
-        assert result.task(':testCompileTestJava').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testCompileTestJava']
     }
 
     @Test
     void testGenerateVoiceConfig() {
         def result = gradle.withArguments('generateVoiceConfig').build()
         println result.output
-        assert result.task(':generateVoiceConfig').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':generateVoiceConfig']
         result = gradle.withArguments('testGenerateVoiceConfig').build()
         println result.output
-        assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
-        assert result.task(':testGenerateVoiceConfig').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testGenerateVoiceConfig']
     }
 
     @Test
     void testGenerateServiceLoader() {
         def result = gradle.withArguments('generateServiceLoader').build()
         println result.output
-        assert result.task(':generateServiceLoader').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':generateServiceLoader']
         result = gradle.withArguments('testGenerateServiceLoader').build()
         println result.output
-        assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
-        assert result.task(':testGenerateServiceLoader').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testGenerateServiceLoader']
     }
 
     @Test
     void testGeneratePom() {
         def result = gradle.withArguments('generatePom').build()
         println result.output
-        assert result.task(':generatePom').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':generatePom']
         result = gradle.withArguments('testGeneratePom').build()
         println result.output
-        assert result.task(':generatePom').outcome == UP_TO_DATE
-        assert result.task(':testGeneratePom').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testGeneratePom']
     }
 
     @Test
     void testGeneratePomProperties() {
         def result = gradle.withArguments('generatePomProperties').build()
         println result.output
-        assert result.task(':generatePomProperties').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':generatePomProperties']
         result = gradle.withArguments('testGeneratePomProperties').build()
         println result.output
-        assert result.task(':generatePomProperties').outcome == UP_TO_DATE
-        assert result.task(':testGeneratePomProperties').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testGeneratePomProperties']
     }
 
     @Test(dependsOnMethods = ['testCompileJava', 'testGeneratePom', 'testGeneratePomProperties'])
     void testJar() {
         def result = gradle.withArguments('jar').build()
         println result.output
-        assert result.task(':generateSource').outcome == UP_TO_DATE
-        assert result.task(':compileJava').outcome == UP_TO_DATE
-        assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
-        assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
-        assert result.task(':processResources').outcome == UP_TO_DATE
-        assert result.task(':classes').outcome == UP_TO_DATE
-        assert result.task(':generatePom').outcome == UP_TO_DATE
-        assert result.task(':generatePomProperties').outcome == UP_TO_DATE
-        assert result.task(':jar').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':jar']
         result = gradle.withArguments('testJar').build()
         println result.output
-        assert result.task(':jar').outcome == UP_TO_DATE
-        assert result.task(':testJar').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testJar']
     }
 
     @Test(dependsOnMethods = ['testCompileTestJava'])
     void testTest() {
         def result = gradle.withArguments('test').build()
         println result.output
-        assert result.task(':test').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':test']
     }
 }

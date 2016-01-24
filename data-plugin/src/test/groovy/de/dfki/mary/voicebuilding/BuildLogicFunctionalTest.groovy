@@ -143,100 +143,84 @@ class BuildLogicFunctionalTest {
     void testHelp() {
         def result = gradle.withArguments().build()
         println result.output
-        assert result.task(':help').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':help']
     }
 
     @Test
     void testConfigurations() {
         def result = gradle.withArguments('testConfigurations').build()
         println result.output
-        assert result.task(':testConfigurations').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testConfigurations']
     }
 
     @Test
     void testSourceSets() {
         def result = gradle.withArguments('testSourceSets').build()
         println result.output
-        assert result.task(':testSourceSets').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testSourceSets']
     }
 
     @Test
     void testDependencies() {
         def result = gradle.withArguments('testDependencies').build()
         println result.output
-        assert result.task(':testDependencies').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testDependencies']
     }
 
     @Test
     void testPraatPitchmarker() {
         def result = gradle.withArguments('praatPitchmarker').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == SUCCESS
-        assert result.task(':praatPitchmarker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':wav', ':praatPitchmarker']
         result = gradle.withArguments('testPraatPitchmarker').build()
         println result.output
-        assert result.task(':praatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':testPraatPitchmarker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testPraatPitchmarker']
     }
 
     @Test(dependsOnMethods = ['testPraatPitchmarker'])
     void testMcepMaker() {
         def result = gradle.withArguments('mcepMaker').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':praatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':mcepMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':mcepMaker']
         result = gradle.withArguments('testMcepMaker').build()
         println result.output
-        assert result.task(':mcepMaker').outcome == UP_TO_DATE
-        assert result.task(':testMcepMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testMcepMaker']
     }
 
     @Test
     void testGenerateAllophones() {
         def result = gradle.withArguments('generateAllophones').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == SUCCESS
-        assert result.task(':generateAllophones').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':text', ':generateAllophones']
         result = gradle.withArguments('testGenerateAllophones').build()
         println result.output
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':testGenerateAllophones').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testGenerateAllophones']
     }
 
     @Test(dependsOnMethods = ['testGenerateAllophones'])
     void testGeneratePhoneFeatures() {
         def result = gradle.withArguments('generatePhoneFeatures').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':generatePhoneFeatures').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':generatePhoneFeatures']
         result = gradle.withArguments('testGeneratePhoneFeatures').build()
         println result.output
-        assert result.task(':generatePhoneFeatures').outcome == UP_TO_DATE
-        assert result.task(':testGeneratePhoneFeatures').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testGeneratePhoneFeatures']
     }
 
     @Test(dependsOnMethods = ['testGenerateAllophones'])
     void testGenerateHalfPhoneFeatures() {
         def result = gradle.withArguments('generateHalfPhoneFeatures').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':generateHalfPhoneFeatures').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':generateHalfPhoneFeatures']
         result = gradle.withArguments('testGenerateHalfPhoneFeatures').build()
         println result.output
-        assert result.task(':generateHalfPhoneFeatures').outcome == UP_TO_DATE
-        assert result.task(':testGenerateHalfPhoneFeatures').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testGenerateHalfPhoneFeatures']
     }
 
     @Test
     void testMaryJavaExec() {
         def result = gradle.withArguments('testMaryJavaExec').build()
         println result.output
-        assert result.task(':testMaryJavaExec').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS).contains(':testMaryJavaExec')
     }
 }

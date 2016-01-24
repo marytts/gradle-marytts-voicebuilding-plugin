@@ -66,21 +66,7 @@ class BuildLogicFunctionalTest {
 
         legacyInit.dependsOn wav, text, lab
 
-        legacyPraatPitchmarker.dependsOn legacyInit
-
-        legacyMCEPMaker.dependsOn legacyInit
-
-        legacyPhoneUnitLabelComputer.dependsOn lab
-
-        legacyHalfPhoneUnitLabelComputer.dependsOn lab
-
         generateAllophones.dependsOn legacyInit
-
-        legacyWaveTimelineMaker.dependsOn legacyInit
-
-        legacyBasenameTimelineMaker.dependsOn legacyInit
-
-        legacyMCepTimelineMaker.dependsOn legacyInit
 
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
@@ -343,649 +329,297 @@ class BuildLogicFunctionalTest {
     void testHelp() {
         def result = gradle.withArguments().build()
         println result.output
-        assert result.task(':help').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':help']
     }
 
     @Test
     void testPlugins() {
         def result = gradle.withArguments('testPlugins').build()
         println result.output
-        assert result.task(':testPlugins').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testPlugins']
     }
 
     @Test
     void testTemplates() {
         def result = gradle.withArguments('templates').build()
         println result.output
-        assert result.task(':templates').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':templates']
         result = gradle.withArguments('testTemplates').build()
         println result.output
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':testTemplates').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testTemplates']
     }
 
     @Test(dependsOnMethods = ['testTemplates'])
     void testLegacyInit() {
         def result = gradle.withArguments('legacyInit').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == SUCCESS
-        assert result.task(':text').outcome == SUCCESS
-        assert result.task(':lab').outcome == SUCCESS
-        assert result.task(':legacyInit').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':lab', ':text', ':wav', ':legacyInit']
         result = gradle.withArguments('testLegacyInit').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':testLegacyInit').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyInit']
     }
 
     @Test(dependsOnMethods = ['testLegacyInit'])
     void testLegacyPraatPitchmarker() {
         def result = gradle.withArguments('legacyPraatPitchmarker').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyPraatPitchmarker']
         result = gradle.withArguments('testLegacyPraatPitchmarker').build()
         println result.output
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':testLegacyPraatPitchmarker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyPraatPitchmarker']
     }
 
     @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
     void testLegacyMCEPMaker() {
         def result = gradle.withArguments('legacyMCEPMaker').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyMCEPMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyMCEPMaker']
         result = gradle.withArguments('testLegacyMCEPMaker').build()
         println result.output
-        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
-        assert result.task(':testLegacyMCEPMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyMCEPMaker']
     }
 
     @Test(dependsOnMethods = ['testLegacyInit'])
     void testLegacyPhoneUnitLabelComputer() {
         def result = gradle.withArguments('legacyPhoneUnitLabelComputer').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitLabelComputer').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyPhoneUnitLabelComputer']
         result = gradle.withArguments('testLegacyPhoneUnitLabelComputer').build()
         println result.output
-        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':testLegacyPhoneUnitLabelComputer').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyPhoneUnitLabelComputer']
     }
 
     @Test(dependsOnMethods = ['testLegacyInit'])
     void testLegacyHalfPhoneUnitLabelComputer() {
         def result = gradle.withArguments('legacyHalfPhoneUnitLabelComputer').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyHalfPhoneUnitLabelComputer']
         result = gradle.withArguments('testLegacyHalfPhoneUnitLabelComputer').build()
         println result.output
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':testLegacyHalfPhoneUnitLabelComputer').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyHalfPhoneUnitLabelComputer']
     }
 
     @Test(dependsOnMethods = ['testLegacyInit'])
     void testLegacyTranscriptionAligner() {
         def result = gradle.withArguments('legacyTranscriptionAligner').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == SUCCESS
-        assert result.task(':legacyTranscriptionAligner').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':generateAllophones', ':legacyTranscriptionAligner']
         result = gradle.withArguments('testLegacyTranscriptionAligner').build()
         println result.output
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':testLegacyTranscriptionAligner').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyTranscriptionAligner']
     }
 
     @Test
     void testLegacyFeatureLister() {
         def result = gradle.withArguments('legacyFeatureLister').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyFeatureLister']
         result = gradle.withArguments('testLegacyFeatureLister').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':testLegacyFeatureLister').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyFeatureLister']
     }
 
-    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner'])
+    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner', 'testLegacyFeatureLister'])
     void testLegacyPhoneUnitFeatureComputer() {
         def result = gradle.withArguments('legacyPhoneUnitFeatureComputer').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.taskPaths(SUCCESS) == [':legacyPhoneUnitFeatureComputer']
         result = gradle.withArguments('testLegacyPhoneUnitFeatureComputer').build()
         println result.output
-        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':testLegacyPhoneUnitFeatureComputer').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyPhoneUnitFeatureComputer']
     }
 
-    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner'])
+    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner', 'testLegacyFeatureLister'])
     void testLegacyHalfPhoneUnitFeatureComputer() {
         def result = gradle.withArguments('legacyHalfPhoneUnitFeatureComputer').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.taskPaths(SUCCESS) == [':legacyHalfPhoneUnitFeatureComputer']
         result = gradle.withArguments('testLegacyHalfPhoneUnitFeatureComputer').build()
         println result.output
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':testLegacyHalfPhoneUnitFeatureComputer').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyHalfPhoneUnitFeatureComputer']
     }
 
     @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
     void testLegacyWaveTimelineMaker() {
         def result = gradle.withArguments('legacyWaveTimelineMaker').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyWaveTimelineMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyWaveTimelineMaker']
         result = gradle.withArguments('testLegacyWaveTimelineMaker').build()
         println result.output
-        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':testLegacyWaveTimelineMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyWaveTimelineMaker']
     }
 
     @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
     void testLegacyBasenameTimelineMaker() {
         def result = gradle.withArguments('legacyBasenameTimelineMaker').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyBasenameTimelineMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyBasenameTimelineMaker']
         result = gradle.withArguments('testLegacyBasenameTimelineMaker').build()
         println result.output
-        assert result.task(':legacyBasenameTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':testLegacyBasenameTimelineMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyBasenameTimelineMaker']
     }
 
-    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
+    @Test(dependsOnMethods = ['testLegacyMCEPMaker'])
     void testLegacyMCepTimelineMaker() {
         def result = gradle.withArguments('legacyMCepTimelineMaker').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyMCepTimelineMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyMCepTimelineMaker']
         result = gradle.withArguments('testLegacyMCepTimelineMaker').build()
         println result.output
-        assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':testLegacyMCepTimelineMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyMCepTimelineMaker']
     }
 
-    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyPhoneUnitLabelComputer'])
+    @Test(dependsOnMethods = ['testLegacyPhoneUnitLabelComputer', 'testLegacyPhoneUnitFeatureComputer'])
+    void testLegacyPhoneLabelFeatureAligner() {
+        def result = gradle.withArguments('legacyPhoneLabelFeatureAligner').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':legacyPhoneLabelFeatureAligner']
+    }
+
+    @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitLabelComputer', 'testLegacyHalfPhoneUnitFeatureComputer'])
+    void testLegacyHalfPhoneLabelFeatureAligner() {
+        def result = gradle.withArguments('legacyHalfPhoneLabelFeatureAligner').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':legacyHalfPhoneLabelFeatureAligner']
+    }
+
+    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyPhoneUnitLabelComputer', 'testLegacyPhoneLabelFeatureAligner'])
     void testLegacyPhoneUnitfileWriter() {
         def result = gradle.withArguments('legacyPhoneUnitfileWriter').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitfileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyPhoneUnitfileWriter']
         result = gradle.withArguments('testLegacyPhoneUnitfileWriter').build()
         println result.output
-        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':testLegacyPhoneUnitfileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyPhoneUnitfileWriter']
     }
 
-    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyHalfPhoneUnitLabelComputer'])
+    @Test(dependsOnMethods = ['testLegacyPraatPitchmarker', 'testLegacyHalfPhoneUnitLabelComputer', 'testLegacyHalfPhoneLabelFeatureAligner'])
     void testLegacyHalfPhoneUnitfileWriter() {
         def result = gradle.withArguments('legacyHalfPhoneUnitfileWriter').build()
         println result.output
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyHalfPhoneUnitfileWriter']
         result = gradle.withArguments('testLegacyHalfPhoneUnitfileWriter').build()
         println result.output
-        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':testLegacyHalfPhoneUnitfileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyHalfPhoneUnitfileWriter']
     }
 
     @Test(dependsOnMethods = ['testLegacyPhoneUnitfileWriter', 'testLegacyPhoneUnitFeatureComputer'])
     void testLegacyPhoneFeatureFileWriter() {
         def result = gradle.withArguments('legacyPhoneFeatureFileWriter').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneFeatureFileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyPhoneFeatureFileWriter']
         result = gradle.withArguments('testLegacyPhoneFeatureFileWriter').build()
         println result.output
-        assert result.task(':legacyPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':testLegacyPhoneFeatureFileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyPhoneFeatureFileWriter']
     }
 
     @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitfileWriter', 'testLegacyHalfPhoneUnitFeatureComputer'])
     void testLegacyHalfPhoneFeatureFileWriter() {
         def result = gradle.withArguments('legacyHalfPhoneFeatureFileWriter').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyHalfPhoneFeatureFileWriter']
         result = gradle.withArguments('testLegacyHalfPhoneFeatureFileWriter').build()
         println result.output
-        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':testLegacyHalfPhoneFeatureFileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyHalfPhoneFeatureFileWriter']
     }
 
     @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitfileWriter', 'testLegacyWaveTimelineMaker', 'testLegacyHalfPhoneFeatureFileWriter'])
     void testLegacyF0PolynomialFeatureFileWriter() {
         def result = gradle.withArguments('legacyF0PolynomialFeatureFileWriter').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyF0PolynomialFeatureFileWriter']
         result = gradle.withArguments('testLegacyF0PolynomialFeatureFileWriter').build()
         println result.output
-        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':testLegacyF0PolynomialFeatureFileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyF0PolynomialFeatureFileWriter']
     }
 
     @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitfileWriter', 'testLegacyF0PolynomialFeatureFileWriter', 'testLegacyHalfPhoneFeatureFileWriter'])
     void testLegacyAcousticFeatureFileWriter() {
         def result = gradle.withArguments('legacyAcousticFeatureFileWriter').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyAcousticFeatureFileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyAcousticFeatureFileWriter']
         result = gradle.withArguments('testLegacyAcousticFeatureFileWriter').build()
         println result.output
-        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':testLegacyAcousticFeatureFileWriter').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyAcousticFeatureFileWriter']
     }
 
     @Test(dependsOnMethods = ['testLegacyMCepTimelineMaker', 'testLegacyHalfPhoneUnitfileWriter', 'testLegacyAcousticFeatureFileWriter'])
     void testLegacyJoinCostFileMaker() {
         def result = gradle.withArguments('legacyJoinCostFileMaker').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyJoinCostFileMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyJoinCostFileMaker']
         result = gradle.withArguments('testLegacyJoinCostFileMaker').build()
         println result.output
-        assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
-        assert result.task(':testLegacyJoinCostFileMaker').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyJoinCostFileMaker']
     }
 
     @Test(dependsOnMethods = ['testLegacyAcousticFeatureFileWriter'])
     void testLegacyCARTBuilder() {
         def result = gradle.withArguments('legacyCARTBuilder').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyCARTBuilder').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyCARTBuilder']
         result = gradle.withArguments('testLegacyCARTBuilder').build()
         println result.output
-        assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
-        assert result.task(':testLegacyCARTBuilder').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyCARTBuilder']
     }
 
     @Test(dependsOnMethods = ['testLegacyPhoneFeatureFileWriter', 'testLegacyPhoneUnitfileWriter', 'testLegacyWaveTimelineMaker'])
     void testLegacyDurationCARTTrainer() {
         def result = gradle.withArguments('legacyDurationCARTTrainer').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyDurationCARTTrainer').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyDurationCARTTrainer']
         result = gradle.withArguments('testLegacyDurationCARTTrainer').build()
         println result.output
-        assert result.task(':legacyDurationCARTTrainer').outcome == UP_TO_DATE
-        assert result.task(':testLegacyDurationCARTTrainer').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyDurationCARTTrainer']
     }
 
     @Test(dependsOnMethods = ['testLegacyPhoneFeatureFileWriter', 'testLegacyPhoneUnitfileWriter', 'testLegacyWaveTimelineMaker'])
     void testLegacyF0CARTTrainer() {
         def result = gradle.withArguments('legacyF0CARTTrainer').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyF0CARTTrainer').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyF0CARTTrainer']
         result = gradle.withArguments('testLegacyF0CARTTrainer').build()
         println result.output
-        assert result.task(':legacyF0CARTTrainer').outcome == UP_TO_DATE
-        assert result.task(':testLegacyF0CARTTrainer').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyF0CARTTrainer']
     }
 
     @Test(dependsOnMethods = ['testLegacyAcousticFeatureFileWriter', 'testLegacyJoinCostFileMaker', 'testLegacyCARTBuilder'])
     void testProcessLegacyResources() {
         def result = gradle.withArguments('processLegacyResources').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
-        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
-        assert result.task(':processLegacyResources').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':processLegacyResources']
         result = gradle.withArguments('testProcessLegacyResources').build()
         println result.output
-        assert result.task(':processLegacyResources').outcome == UP_TO_DATE
-        assert result.task(':testProcessLegacyResources').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testProcessLegacyResources']
     }
 
     @Test(dependsOnMethods = ['testProcessLegacyResources'])
     void testJar() {
         def result = gradle.withArguments('jar').build()
         println result.output
-        assert result.task(':generateSource').outcome == SUCCESS
-        assert result.task(':compileJava').outcome == SUCCESS
-        assert result.task(':generateServiceLoader').outcome == SUCCESS
-        assert result.task(':generateVoiceConfig').outcome == SUCCESS
-        assert result.task(':processResources').outcome == UP_TO_DATE
-        assert result.task(':classes').outcome == SUCCESS
-        assert result.task(':generatePom').outcome == SUCCESS
-        assert result.task(':generatePomProperties').outcome == SUCCESS
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
-        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
-        assert result.task(':processLegacyResources').outcome == UP_TO_DATE
-        assert result.task(':jar').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':generateSource', ':compileJava', ':generateServiceLoader', ':generateVoiceConfig', ':classes', ':generatePom', ':generatePomProperties', ':jar']
         result = gradle.withArguments('testJar').build()
         println result.output
-        assert result.task(':jar').outcome == UP_TO_DATE
-        assert result.task(':testJar').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testJar']
     }
 
     @Test(dependsOnMethods = ['testJar'])
     void testLegacyZip() {
         def result = gradle.withArguments('legacyZip').build()
         println result.output
-        assert result.task(':generateSource').outcome == UP_TO_DATE
-        assert result.task(':compileJava').outcome == UP_TO_DATE
-        assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
-        assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
-        assert result.task(':processResources').outcome == UP_TO_DATE
-        assert result.task(':classes').outcome == UP_TO_DATE
-        assert result.task(':generatePom').outcome == UP_TO_DATE
-        assert result.task(':generatePomProperties').outcome == UP_TO_DATE
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
-        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
-        assert result.task(':processLegacyResources').outcome == UP_TO_DATE
-        assert result.task(':jar').outcome == UP_TO_DATE
-        assert result.task(':legacyBasenameTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyDurationCARTTrainer').outcome == UP_TO_DATE
-        assert result.task(':legacyF0CARTTrainer').outcome == UP_TO_DATE
-        assert result.task(':legacyZip').outcome == SUCCESS
-        result = gradle.withArguments('testlegacyZip').build()
+        assert result.taskPaths(SUCCESS) == [':legacyZip']
+        result = gradle.withArguments('testLegacyZip').build()
         println result.output
-        assert result.task(':legacyZip').outcome == UP_TO_DATE
-        assert result.task(':testLegacyZip').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyZip']
     }
 
     @Test(dependsOnMethods = ['testLegacyZip'])
     void testLegacyDescriptor() {
         def result = gradle.withArguments('legacyDescriptor').build()
         println result.output
-        assert result.task(':generateSource').outcome == UP_TO_DATE
-        assert result.task(':compileJava').outcome == UP_TO_DATE
-        assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
-        assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
-        assert result.task(':processResources').outcome == UP_TO_DATE
-        assert result.task(':classes').outcome == UP_TO_DATE
-        assert result.task(':generatePom').outcome == UP_TO_DATE
-        assert result.task(':generatePomProperties').outcome == UP_TO_DATE
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':processDataResources').outcome == UP_TO_DATE
-        assert result.task(':lab').outcome == UP_TO_DATE
-        assert result.task(':templates').outcome == UP_TO_DATE
-        assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':wav').outcome == UP_TO_DATE
-        assert result.task(':legacyInit').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == UP_TO_DATE
-        assert result.task(':legacyTranscriptionAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPraatPitchmarker').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyHalfPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyWaveTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyF0PolynomialFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyAcousticFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyCARTBuilder').outcome == UP_TO_DATE
-        assert result.task(':legacyMCEPMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyMCepTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyJoinCostFileMaker').outcome == UP_TO_DATE
-        assert result.task(':processLegacyResources').outcome == UP_TO_DATE
-        assert result.task(':jar').outcome == UP_TO_DATE
-        assert result.task(':legacyBasenameTimelineMaker').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitLabelComputer').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneLabelFeatureAligner').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneUnitfileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyPhoneFeatureFileWriter').outcome == UP_TO_DATE
-        assert result.task(':legacyDurationCARTTrainer').outcome == UP_TO_DATE
-        assert result.task(':legacyF0CARTTrainer').outcome == UP_TO_DATE
-        assert result.task(':legacyZip').outcome == UP_TO_DATE
-        assert result.task(':legacyDescriptor').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':legacyDescriptor']
         result = gradle.withArguments('testLegacyDescriptor').build()
         println result.output
-        assert result.task(':legacyDescriptor').outcome == UP_TO_DATE
-        assert result.task(':testLegacyDescriptor').outcome == SUCCESS
+        assert result.taskPaths(SUCCESS) == [':testLegacyDescriptor']
     }
 }

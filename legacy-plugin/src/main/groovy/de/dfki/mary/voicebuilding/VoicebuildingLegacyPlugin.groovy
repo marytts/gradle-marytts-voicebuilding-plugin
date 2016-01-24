@@ -51,6 +51,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyInit
             srcDir = project.file("$project.buildDir/wav")
             destDir = project.file("$project.buildDir/pm")
         }
@@ -62,13 +63,27 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyInit
             srcDir = project.file("$project.buildDir/lab")
-            destDir = project.file("$project.buildDir/phonelab")
+            destDir = project.file("$project.buildDir/phonelab_unaligned")
+            doLast {
+                project.copy {
+                    from "$project.buildDir/phonelab"
+                    into destDir
+                }
+            }
         }
 
         project.task('legacyHalfPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
+            dependsOn project.legacyInit
             srcDir = project.file("$project.buildDir/lab")
-            destDir = project.file("$project.buildDir/halfphonelab")
+            destDir = project.file("$project.buildDir/halfphonelab_unaligned")
+            doLast {
+                project.copy {
+                    from "$project.buildDir/halfphonelab"
+                    into destDir
+                }
+            }
         }
 
         project.task('legacyTranscriptionAligner', type: LegacyVoiceImportTask) {
@@ -124,12 +139,26 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.task('legacyPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
             dependsOn project.legacyPhoneUnitLabelComputer, project.legacyPhoneUnitFeatureComputer
-            srcDir = project.file("$project.buildDir/phonelab")
+            srcDir = project.file("$project.buildDir/phonelab_unaligned")
+            destDir = project.file("$project.buildDir/phonelab_aligned")
+            doLast {
+                project.copy {
+                    from "$project.buildDir/phonelab"
+                    into destDir
+                }
+            }
         }
 
         project.task('legacyHalfPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
             dependsOn project.legacyHalfPhoneUnitLabelComputer, project.legacyHalfPhoneUnitFeatureComputer
-            srcDir = project.file("$project.buildDir/halfphonelab")
+            srcDir = project.file("$project.buildDir/halfphonelab_unaligned")
+            destDir = project.file("$project.buildDir/halfphonelab_aligned")
+            doLast {
+                project.copy {
+                    from "$project.buildDir/halfphonelab"
+                    into destDir
+                }
+            }
         }
 
         project.task('legacyPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
