@@ -4,14 +4,15 @@ import de.dfki.mary.voicebuilding.tasks.*
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.plugins.GroovyPlugin
 import org.gradle.api.plugins.MavenPlugin
+import org.gradle.api.tasks.testing.Test
 
 class VoicebuildingBasePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        project.plugins.apply JavaPlugin
+        project.plugins.apply GroovyPlugin
         project.plugins.apply MavenPlugin
 
         project.sourceCompatibility = '1.7'
@@ -27,6 +28,20 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             jcenter()
         }
 
+        project.sourceSets {
+            integrationTest {
+                java {
+                    compileClasspath += main.output + test.output
+                    runtimeClasspath += main.output + test.output
+                }
+            }
+        }
+
+        project.configurations {
+            integrationTestCompile.extendsFrom testCompile
+            integrationTestRuntime.extendsFrom testRuntime
+        }
+
         project.dependencies {
             compile(group: 'de.dfki.mary', name: 'marytts-runtime', version: project.maryttsVersion) {
                 exclude module: 'freetts'
@@ -34,14 +49,22 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
                 exclude module: 'freetts-de'
             }
             testCompile group: 'junit', name: 'junit', version: '4.12'
+            integrationTestCompile localGroovy()
+            integrationTestCompile group: 'org.testng', name: 'testng', version: '6.9.4'
         }
 
         project.task('generateSource', type: GenerateSource) {
             destDir = project.file("$project.buildDir/generatedSrc")
             project.sourceSets.main.java.srcDirs += "$destDir/main/java"
             project.sourceSets.test.java.srcDirs += "$destDir/test/java"
+            project.sourceSets.integrationTest.groovy.srcDirs += "$destDir/integrationTest/groovy"
             project.compileJava.dependsOn it
             project.compileTestJava.dependsOn it
+            project.compileIntegrationTestGroovy.dependsOn it
+            doFirst {
+                assert destDir.path.startsWith(project.buildDir.path)
+                project.delete destDir
+            }
         }
 
         project.task('generateVoiceConfig', type: GenerateVoiceConfig) {
@@ -68,6 +91,17 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
                 destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/voice-$project.voice.name/pom.properties")
             }
             project.jar.dependsOn it
+        }
+
+        project.task('integrationTest', type: Test) {
+            useTestNG()
+            testClassesDir = project.sourceSets.integrationTest.output.classesDir
+            classpath = project.sourceSets.integrationTest.runtimeClasspath
+            systemProperty 'log4j.logger.marytts', 'INFO,stderr'
+            testLogging.showStandardStreams = true
+            reports.html.destination = project.file("$project.reporting.baseDir/$name")
+            project.check.dependsOn it
+            mustRunAfter project.test
         }
     }
 }

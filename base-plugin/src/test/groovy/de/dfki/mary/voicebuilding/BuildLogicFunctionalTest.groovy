@@ -37,7 +37,7 @@ class BuildLogicFunctionalTest {
         gradle = GradleRunner.create().withTestKitDir(testKitDir).withProjectDir(projectDir).withPluginClasspath(pluginClasspath)
 
         // Add the logic under test to the test build
-        buildFile << """
+        buildFile.text = """
         buildscript {
             repositories {
                 jcenter()
@@ -100,6 +100,13 @@ class BuildLogicFunctionalTest {
             dependsOn compileTestJava
             doLast {
                 assert file("\$buildDir/classes/test/marytts/voice/\$voice.nameCamelCase/ConfigTest.class").exists()
+            }
+        }
+
+        task testCompileIntegrationTestGroovy(group: 'Verification') {
+            dependsOn compileIntegrationTestGroovy
+            doLast {
+                assert file("\$buildDir/classes/integrationTest/marytts/voice/\$voice.nameCamelCase/LoadVoiceIT.class").exists()
             }
         }
 
@@ -249,6 +256,16 @@ class BuildLogicFunctionalTest {
         result = gradle.withArguments('testCompileTestJava').build()
         println result.output
         assert result.taskPaths(SUCCESS) == [':testCompileTestJava']
+    }
+
+    @Test(dependsOnMethods = ['testCompileTestJava'])
+    void testCompileIntegrationTestGroovy() {
+        def result = gradle.withArguments('compileIntegrationTestGroovy').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':compileIntegrationTestGroovy']
+        result = gradle.withArguments('testCompileIntegrationTestGroovy').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':testCompileIntegrationTestGroovy']
     }
 
     @Test
