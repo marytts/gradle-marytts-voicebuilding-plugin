@@ -5,6 +5,14 @@ import org.gradle.api.tasks.*
 
 class GenerateVoiceConfig extends DefaultTask {
 
+    @Input
+    Map config = [
+            domain      : 'general',
+            gender      : project.voice.gender,
+            locale      : project.voice.locale,
+            samplingRate: project.voice.samplingRate
+    ]
+
     @OutputFile
     File destFile
 
@@ -16,10 +24,9 @@ class GenerateVoiceConfig extends DefaultTask {
                    |name = ${project.voice.name}
                    |locale = ${project.voice.maryLocale}
                    |
-                   |voice.${project.voice.name}.gender = ${project.voice.gender}
-                   |voice.${project.voice.name}.locale = ${project.voice.maryLocale}
-                   |voice.${project.voice.name}.domain = general
-                   |voice.${project.voice.name}.samplingRate = ${project.voice.samplingRate}
                    |""".stripMargin()
+        destFile << config.collect { key, value ->
+            "voice.${project.voice.name}.$key = $value"
+        }.join('\n')
     }
 }
