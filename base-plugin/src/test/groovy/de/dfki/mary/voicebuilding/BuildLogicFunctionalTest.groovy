@@ -130,6 +130,7 @@ class BuildLogicFunctionalTest {
                 def expected = [
                         name                             : "$voiceName",
                         locale                           : "$voiceLocale",
+                        'unitselection.voices.list'      : "$voiceName",
                         "voice.${voiceName}.domain"      : 'general',
                         "voice.${voiceName}.gender"      : "$voiceGender",
                         "voice.${voiceName}.locale"      : "$voiceLocale",

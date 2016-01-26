@@ -24,9 +24,24 @@ class GenerateVoiceConfig extends DefaultTask {
                    |name = ${project.voice.name}
                    |locale = ${project.voice.maryLocale}
                    |
+                   |${voiceType}.voices.list = ${project.voice.name}
+                   |
                    |""".stripMargin()
         destFile << config.collect { key, value ->
             "voice.${project.voice.name}.$key = $value"
         }.join('\n')
+    }
+
+    String getVoiceType() {
+        def type
+        switch (project.voice.type) {
+            case ~/hs?mm/:
+                type = 'hmm'
+                break
+            default:
+                type = 'unitselection'
+                break
+        }
+        type
     }
 }
