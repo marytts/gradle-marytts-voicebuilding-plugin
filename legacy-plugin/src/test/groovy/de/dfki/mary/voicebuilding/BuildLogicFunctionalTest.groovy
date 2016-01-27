@@ -270,7 +270,6 @@ class BuildLogicFunctionalTest {
                 assert file("\$prefix/halfphoneFeatures_ac.mry").exists()
                 assert file("\$prefix/halfphoneUnits.mry").exists()
                 assert file("\$prefix/joinCostFeatures.mry").exists()
-                assert file("\$prefix/phoneUnitFeatureDefinition.txt").exists()
                 assert file("\$prefix/timeline_basenames.mry").exists()
                 assert file("\$prefix/timeline_waveforms.mry").exists()
             }
@@ -378,7 +377,6 @@ class BuildLogicFunctionalTest {
                     "lib/voices/$voiceName/halfphoneFeatures_ac.mry",
                     "lib/voices/$voiceName/halfphoneUnits.mry",
                     "lib/voices/$voiceName/joinCostFeatures.mry",
-                    "lib/voices/$voiceName/phoneUnitFeatureDefinition.txt",
                     "lib/voices/$voiceName/timeline_basenames.mry",
                     "lib/voices/$voiceName/timeline_waveforms.mry",
                     "lib/\$jar.archiveName"

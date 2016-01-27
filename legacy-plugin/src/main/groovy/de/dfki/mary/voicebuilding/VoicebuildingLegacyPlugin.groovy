@@ -320,9 +320,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             from project.legacyWaveTimelineMaker
             from project.legacyBasenameTimelineMaker
             from project.legacyHalfPhoneUnitfileWriter
-            from project.legacyPhoneFeatureFileWriter, {
-                include 'phoneUnitFeatureDefinition.txt'
-            }
             from project.legacyAcousticFeatureFileWriter, {
                 include 'halfphoneFeatures_ac.mry'
             }
