@@ -276,6 +276,75 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        task testGenerateVoiceConfig(group: 'Verification') {
+            dependsOn generateVoiceConfig
+            doLast {
+                def configFile = file("\$buildDir/resources/main/marytts/voice/$voiceNameCamelCase/voice.config")
+                assert configFile.exists()
+                def actual = [:]
+                configFile.eachLine { line ->
+                    switch(line) {
+                        case ~/.+=.+/:
+                            def (key, value) = line.split('=', 2)
+                            actual[key.trim()] = value.trim()
+                            break
+                        default:
+                            break
+                    }
+                }
+                def expected = [
+                        name                                         : "$voiceName",
+                        locale                                       : "$voiceLocale",
+                        'unitselection.voices.list'                  : "$voiceName",
+                        "voice.${voiceName}.acousticModels"          : 'duration F0 midF0 rightF0',
+                        "voice.${voiceName}.audioTimelineFile"       : "MARY_BASE/lib/voices/$voiceName/timeline_waveforms.mry",
+                        "voice.${voiceName}.audioTimelineReaderClass": 'marytts.unitselection.data.TimelineReader',
+                        "voice.${voiceName}.basenameTimeline"        : "MARY_BASE/lib/voices/$voiceName/timeline_basenames.mry",
+                        "voice.${voiceName}.cartFile"                : 'jar:/marytts/voice/$voiceNameCamelCase/cart.mry',
+                        "voice.${voiceName}.cartReaderClass"         : 'marytts.cart.io.MARYCartReader',
+                        "voice.${voiceName}.concatenatorClass"       : 'marytts.unitselection.concat.OverlapUnitConcatenator',
+                        "voice.${voiceName}.databaseClass"           : 'marytts.unitselection.data.DiphoneUnitDatabase',
+                        "voice.${voiceName}.domain"                  : 'general',
+                        "voice.${voiceName}.duration.attribute"      : 'd',
+                        "voice.${voiceName}.duration.data"           : "jar:/marytts/voice/$voiceNameCamelCase/dur.tree",
+                        "voice.${voiceName}.duration.model"          : 'cart',
+                        "voice.${voiceName}.F0.applyTo"              : 'firstVoicedSegments',
+                        "voice.${voiceName}.F0.attribute"            : 'f0',
+                        "voice.${voiceName}.F0.attribute.format"     : '(0,%.0f)',
+                        "voice.${voiceName}.F0.data"                 : "jar:/marytts/voice/$voiceNameCamelCase/f0.left.tree",
+                        "voice.${voiceName}.F0.model"                : 'cart',
+                        "voice.${voiceName}.F0.predictFrom"          : 'firstVowels',
+                        "voice.${voiceName}.featureFile"             : "MARY_BASE/lib/voices/$voiceName/halfphoneFeatures_ac.mry",
+                        "voice.${voiceName}.gender"                  : "$voiceGender",
+                        "voice.${voiceName}.joinCostClass"           : 'marytts.unitselection.select.JoinCostFeatures',
+                        "voice.${voiceName}.joinCostFile"            : "MARY_BASE/lib/voices/$voiceName/joinCostFeatures.mry",
+                        "voice.${voiceName}.joinCostWeights"         : 'jar:/marytts/voice/$voiceNameCamelCase/joinCostWeights.txt',
+                        "voice.${voiceName}.midF0.applyTo"           : 'firstVowels',
+                        "voice.${voiceName}.midF0.attribute"         : 'f0',
+                        "voice.${voiceName}.midF0.attribute.format"  : '(50,%.0f)',
+                        "voice.${voiceName}.midF0.data"              : "jar:/marytts/voice/$voiceNameCamelCase/f0.mid.tree",
+                        "voice.${voiceName}.midF0.model"             : 'cart',
+                        "voice.${voiceName}.midF0.predictFrom"       : 'firstVowels',
+                        "voice.${voiceName}.locale"                  : "$voiceLocale",
+                        "voice.${voiceName}.rightF0.applyTo"         : 'lastVoicedSegments',
+                        "voice.${voiceName}.rightF0.attribute"       : 'f0',
+                        "voice.${voiceName}.rightF0.attribute.format": '(100,%.0f)',
+                        "voice.${voiceName}.rightF0.data"            : "jar:/marytts/voice/$voiceNameCamelCase/f0.right.tree",
+                        "voice.${voiceName}.rightF0.model"           : 'cart',
+                        "voice.${voiceName}.rightF0.predictFrom"     : 'firstVowels',
+                        "voice.${voiceName}.samplingRate"            : '16000',
+                        "voice.${voiceName}.selectorClass"           : 'marytts.unitselection.select.DiphoneUnitSelector',
+                        "voice.${voiceName}.targetCostClass"         : 'marytts.unitselection.select.DiphoneFFRTargetCostFunction',
+                        "voice.${voiceName}.targetCostWeights"       : 'jar:/marytts/voice/$voiceNameCamelCase/halfphoneUnitFeatureDefinition_ac.txt',
+                        "voice.${voiceName}.unitReaderClass"         : 'marytts.unitselection.data.UnitFileReader',
+                        "voice.${voiceName}.unitsFile"               : "MARY_BASE/lib/voices/$voiceName/halfphoneUnits.mry",
+                        "voice.${voiceName}.viterbi.beamsize"        : '100',
+                        "voice.${voiceName}.viterbi.wTargetCosts"    : '0.7',
+                ]
+                assert actual == expected
+            }
+        }
+
         import java.util.zip.ZipFile
 
         task testJar(group: 'Verification') {
@@ -605,11 +674,21 @@ class BuildLogicFunctionalTest {
         assert result.taskPaths(SUCCESS) == [':testLegacyF0CARTTrainer']
     }
 
-    @Test(dependsOnMethods = ['testLegacyAcousticFeatureFileWriter', 'testLegacyJoinCostFileMaker', 'testLegacyCARTBuilder'])
+    @Test
+    void testGenerateVoiceConfig() {
+        def result = gradle.withArguments('generateVoiceConfig').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':generateVoiceConfig']
+        result = gradle.withArguments('testGenerateVoiceConfig').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':testGenerateVoiceConfig']
+    }
+
+    @Test(dependsOnMethods = ['testLegacyAcousticFeatureFileWriter', 'testLegacyJoinCostFileMaker', 'testLegacyCARTBuilder', 'testGenerateVoiceConfig'])
     void testProcessResources() {
         def result = gradle.withArguments('processResources').build()
         println result.output
-        assert result.taskPaths(SUCCESS) == [':generateServiceLoader', ':generateVoiceConfig', ':processResources']
+        assert result.taskPaths(SUCCESS) == [':generateServiceLoader', ':processResources']
         result = gradle.withArguments('testProcessResources').build()
         println result.output
         assert result.taskPaths(SUCCESS) == [':testProcessResources']
