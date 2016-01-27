@@ -334,6 +334,11 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             }
         }
 
+        project.integrationTest {
+            dependsOn project.processLegacyResources
+            systemProperty 'mary.base', project.sourceSets.legacy.output.resourcesDir
+        }
+
         project.task('legacyZip', type: Zip) {
             from project.processLegacyResources
             from project.jar, {

@@ -704,10 +704,11 @@ class BuildLogicFunctionalTest {
         assert result.taskPaths(SUCCESS) == [':testProcessLegacyResources']
     }
 
-    @Test(dependsOnMethods = ['testProcessResources'])
+    @Test(dependsOnMethods = ['testProcessResources', 'testProcessLegacyResources'])
     void testIntegrationTest() {
-        def result = gradle.withArguments('integrationTest').buildAndFail()
+        def result = gradle.withArguments('integrationTest').build()
         println result.output
+        assert result.taskPaths(SUCCESS).contains(':integrationTest')
     }
 
     @Test(dependsOnMethods = ['testProcessResources'])
