@@ -5,19 +5,19 @@ import org.gradle.api.tasks.*
 
 class GenerateVoiceConfig extends DefaultTask {
 
-    @Input
-    Map config = [
-            domain      : 'general',
-            gender      : project.voice.gender,
-            locale      : project.voice.locale,
-            samplingRate: project.voice.samplingRate
-    ]
+    Map config = [:]
 
     @OutputFile
     File destFile
 
     @TaskAction
     void generate() {
+        config << [
+                domain      : 'general',
+                gender      : project.voice.gender,
+                locale      : project.voice.locale,
+                samplingRate: project.voice.samplingRate
+        ]
         destFile <<
                 """|# Auto-generated config file for voice ${project.voice.name}
                    |
