@@ -12,6 +12,7 @@ class BuildLogicFunctionalTest {
 
     def group = 'de.dfki.mary'
     def voiceName = 'cmu-time-awb'
+    def voiceNameCamelCase = 'CmuTimeAwb'
     def voiceGender = 'male'
     def voiceLicenseUrl = 'http://mary.dfki.de/download/arctic-license.html'
 
@@ -249,7 +250,7 @@ class BuildLogicFunctionalTest {
         task testProcessResources(group: 'Verification') {
             dependsOn processResources
             doLast {
-                def prefix = "\$sourceSets.main.output.resourcesDir/marytts/voice/\$voice.nameCamelCase"
+                def prefix = "\$sourceSets.main.output.resourcesDir/marytts/voice/$voiceNameCamelCase"
                 assert file("\$prefix/cart.mry").exists()
                 assert file("\$prefix/dur.tree").exists()
                 assert file("\$prefix/f0.left.tree").exists()
@@ -263,7 +264,7 @@ class BuildLogicFunctionalTest {
         task testProcessLegacyResources(group: 'Verification') {
             dependsOn processLegacyResources
             doLast {
-                def prefix = "\$sourceSets.legacy.output.resourcesDir/lib/voices/\$voice.name"
+                def prefix = "\$sourceSets.legacy.output.resourcesDir/lib/voices/$voiceName"
                 assert file("\$prefix/halfphoneFeatures_ac.mry").exists()
                 assert file("\$prefix/halfphoneUnits.mry").exists()
                 assert file("\$prefix/joinCostFeatures.mry").exists()
@@ -284,15 +285,15 @@ class BuildLogicFunctionalTest {
                     'META-INF/services/marytts.config.MaryConfig',
                     "META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.xml",
                     "META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.properties",
-                    "marytts/voice/\$voice.nameCamelCase/Config.class",
-                    "marytts/voice/\$voice.nameCamelCase/cart.mry",
-                    "marytts/voice/\$voice.nameCamelCase/dur.tree",
-                    "marytts/voice/\$voice.nameCamelCase/f0.left.tree",
-                    "marytts/voice/\$voice.nameCamelCase/f0.mid.tree",
-                    "marytts/voice/\$voice.nameCamelCase/f0.right.tree",
-                    "marytts/voice/\$voice.nameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
-                    "marytts/voice/\$voice.nameCamelCase/joinCostWeights.txt",
-                    "marytts/voice/\$voice.nameCamelCase/voice.config"
+                    "marytts/voice/$voiceNameCamelCase/Config.class",
+                    "marytts/voice/$voiceNameCamelCase/cart.mry",
+                    "marytts/voice/$voiceNameCamelCase/dur.tree",
+                    "marytts/voice/$voiceNameCamelCase/f0.left.tree",
+                    "marytts/voice/$voiceNameCamelCase/f0.mid.tree",
+                    "marytts/voice/$voiceNameCamelCase/f0.right.tree",
+                    "marytts/voice/$voiceNameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
+                    "marytts/voice/$voiceNameCamelCase/joinCostWeights.txt",
+                    "marytts/voice/$voiceNameCamelCase/voice.config"
                 ] as Set
                 assert actual == expected
             }
