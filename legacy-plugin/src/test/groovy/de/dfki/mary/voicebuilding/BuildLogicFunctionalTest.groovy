@@ -246,13 +246,30 @@ class BuildLogicFunctionalTest {
             }
         }
 
-        task testProcessLegacyResources(group: 'Verification') {
-            dependsOn processLegacyResources
+        task testProcessResources(group: 'Verification') {
+            dependsOn processResources
             doLast {
                 def prefix = "\$sourceSets.main.output.resourcesDir/marytts/voice/\$voice.nameCamelCase"
                 assert file("\$prefix/cart.mry").exists()
+                assert file("\$prefix/dur.tree").exists()
+                assert file("\$prefix/f0.left.tree").exists()
+                assert file("\$prefix/f0.mid.tree").exists()
+                assert file("\$prefix/f0.right.tree").exists()
                 assert file("\$prefix/halfphoneUnitFeatureDefinition_ac.txt").exists()
                 assert file("\$prefix/joinCostWeights.txt").exists()
+            }
+        }
+
+        task testProcessLegacyResources(group: 'Verification') {
+            dependsOn processLegacyResources
+            doLast {
+                def prefix = "\$sourceSets.legacy.output.resourcesDir/lib/voices/\$voice.name"
+                assert file("\$prefix/halfphoneFeatures_ac.mry").exists()
+                assert file("\$prefix/halfphoneUnits.mry").exists()
+                assert file("\$prefix/joinCostFeatures.mry").exists()
+                assert file("\$prefix/phoneUnitFeatureDefinition.txt").exists()
+                assert file("\$prefix/timeline_basenames.mry").exists()
+                assert file("\$prefix/timeline_waveforms.mry").exists()
             }
         }
 
@@ -269,6 +286,10 @@ class BuildLogicFunctionalTest {
                     "META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.properties",
                     "marytts/voice/\$voice.nameCamelCase/Config.class",
                     "marytts/voice/\$voice.nameCamelCase/cart.mry",
+                    "marytts/voice/\$voice.nameCamelCase/dur.tree",
+                    "marytts/voice/\$voice.nameCamelCase/f0.left.tree",
+                    "marytts/voice/\$voice.nameCamelCase/f0.mid.tree",
+                    "marytts/voice/\$voice.nameCamelCase/f0.right.tree",
                     "marytts/voice/\$voice.nameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
                     "marytts/voice/\$voice.nameCamelCase/joinCostWeights.txt",
                     "marytts/voice/\$voice.nameCamelCase/voice.config"
@@ -282,10 +303,6 @@ class BuildLogicFunctionalTest {
             doLast {
                 def actual = new ZipFile(legacyZip.archivePath).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
                 def expected = [
-                    "lib/voices/$voiceName/dur.tree",
-                    "lib/voices/$voiceName/f0.left.tree",
-                    "lib/voices/$voiceName/f0.mid.tree",
-                    "lib/voices/$voiceName/f0.right.tree",
                     "lib/voices/$voiceName/halfphoneFeatures_ac.mry",
                     "lib/voices/$voiceName/halfphoneUnits.mry",
                     "lib/voices/$voiceName/joinCostFeatures.mry",
@@ -586,6 +603,16 @@ class BuildLogicFunctionalTest {
     }
 
     @Test(dependsOnMethods = ['testLegacyAcousticFeatureFileWriter', 'testLegacyJoinCostFileMaker', 'testLegacyCARTBuilder'])
+    void testProcessResources() {
+        def result = gradle.withArguments('processResources').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':generateServiceLoader', ':generateVoiceConfig', ':processResources']
+        result = gradle.withArguments('testProcessResources').build()
+        println result.output
+        assert result.taskPaths(SUCCESS) == [':testProcessResources']
+    }
+
+    @Test(dependsOnMethods = ['testLegacyWaveTimelineMaker', 'testLegacyBasenameTimelineMaker', 'testLegacyHalfPhoneUnitfileWriter', 'testLegacyPhoneFeatureFileWriter', 'testLegacyAcousticFeatureFileWriter', 'testLegacyJoinCostFileMaker', 'testLegacyDurationCARTTrainer', 'testLegacyF0CARTTrainer'])
     void testProcessLegacyResources() {
         def result = gradle.withArguments('processLegacyResources').build()
         println result.output
@@ -595,13 +622,13 @@ class BuildLogicFunctionalTest {
         assert result.taskPaths(SUCCESS) == [':testProcessLegacyResources']
     }
 
-    @Test(dependsOnMethods = ['testProcessLegacyResources'])
+    @Test(dependsOnMethods = ['testProcessResources'])
     void testIntegrationTest() {
         def result = gradle.withArguments('integrationTest').buildAndFail()
         println result.output
     }
 
-    @Test(dependsOnMethods = ['testProcessLegacyResources'])
+    @Test(dependsOnMethods = ['testProcessResources'])
     void testJar() {
         def result = gradle.withArguments('jar').build()
         println result.output

@@ -26,6 +26,8 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             }
         }
 
+        project.sourceSets.create 'legacy'
+
         project.configurations.create 'legacy'
 
         project.ext {
@@ -252,7 +254,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile3 = project.file("$project.legacyBuildDir/f0.right.tree")
         }
 
-        project.task('processLegacyResources', type: Copy) {
+        project.processResources {
             from project.legacyAcousticFeatureFileWriter, {
                 include 'halfphoneUnitFeatureDefinition_ac.txt'
             }
@@ -260,18 +262,33 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 include 'joinCostWeights.txt'
             }
             from project.legacyCARTBuilder
-            into project.sourceSets.main.output.resourcesDir
-            project.jar.dependsOn it
+            from project.legacyDurationCARTTrainer
+            from project.legacyF0CARTTrainer
+            project.afterEvaluate {
+                rename { "marytts/voice/$project.voice.nameCamelCase/$it" }
+            }
+        }
+
+        project.processLegacyResources {
+            from project.legacyWaveTimelineMaker
+            from project.legacyBasenameTimelineMaker
+            from project.legacyHalfPhoneUnitfileWriter
+            from project.legacyPhoneFeatureFileWriter, {
+                include 'phoneUnitFeatureDefinition.txt'
+            }
+            from project.legacyAcousticFeatureFileWriter, {
+                include 'halfphoneFeatures_ac.mry'
+            }
+            from project.legacyJoinCostFileMaker, {
+                include 'joinCostFeatures.mry'
+            }
+            project.afterEvaluate {
+                rename { "lib/voices/$project.voice.name/$it" }
+            }
         }
 
         project.task('legacyZip', type: Zip) {
-            dependsOn project.legacyBasenameTimelineMaker,
-                    project.legacyDurationCARTTrainer,
-                    project.legacyF0CARTTrainer,
-                    project.legacyHalfPhoneFeatureFileWriter,
-                    project.legacyJoinCostFileMaker,
-                    project.legacyPhoneFeatureFileWriter,
-                    project.legacyWaveTimelineMaker
+            from project.processLegacyResources
             from project.jar, {
                 rename { "lib/$it" }
             }
@@ -291,26 +308,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                     exclude module: 'sgt'
                 }
                 testCompile "junit:junit:4.11"
-            }
-
-            project.processLegacyResources {
-                rename { "marytts/voice/$project.voice.nameCamelCase/$it" }
-            }
-
-            project.legacyZip {
-                from project.legacyBuildDir, {
-                    include 'dur.tree',
-                            'f0.left.tree',
-                            'f0.mid.tree',
-                            'f0.right.tree',
-                            'halfphoneFeatures_ac.mry',
-                            'halfphoneUnits.mry',
-                            'joinCostFeatures.mry',
-                            'phoneUnitFeatureDefinition.txt',
-                            'timeline_basenames.mry',
-                            'timeline_waveforms.mry'
-                    rename { "lib/voices/$project.voice.name/$it" }
-                }
             }
         }
     }
