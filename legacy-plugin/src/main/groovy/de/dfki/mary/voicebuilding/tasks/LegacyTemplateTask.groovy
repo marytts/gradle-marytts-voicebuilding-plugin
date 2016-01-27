@@ -10,9 +10,7 @@ class LegacyTemplateTask extends DefaultTask {
 
     def resources = [
             'database.config',
-            'LoadVoiceIT.java',
-            'voice.config',
-            'voice-hsmm.config'
+            'LoadVoiceIT.java'
     ]
 
     @TaskAction

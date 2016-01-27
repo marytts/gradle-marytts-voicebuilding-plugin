@@ -12,8 +12,9 @@ class BuildLogicFunctionalTest {
 
     def group = 'de.dfki.mary'
     def voiceName = 'cmu-slt'
+    def voiceGender = 'female'
     def voiceLocale = Locale.US
-    def voiceDescription = "A female $voiceLocale.displayLanguage unit selection voice"
+    def voiceDescription = "A $voiceGender $voiceLocale.displayLanguage unit selection voice"
     def voiceLicenseName = 'Arctic'
     def voiceLicenseUrl = 'http://festvox.org/cmu_arctic/cmu_arctic/cmu_us_slt_arctic/COPYING'
 
@@ -115,7 +116,27 @@ class BuildLogicFunctionalTest {
             doLast {
                 def configFile = file("\$buildDir/resources/main/marytts/voice/\$voice.nameCamelCase/voice.config")
                 assert configFile.exists()
-                assert configFile.withReader { it.readLine().contains(voice.name) }
+                def actual = [:]
+                configFile.eachLine { line ->
+                    switch(line) {
+                        case ~/.+=.+/:
+                            def (key, value) = line.split('=', 2)
+                            actual[key.trim()] = value.trim()
+                            break
+                        default:
+                            break
+                    }
+                }
+                def expected = [
+                        name                             : "$voiceName",
+                        locale                           : "$voiceLocale",
+                        'unitselection.voices.list'      : "$voiceName",
+                        "voice.${voiceName}.domain"      : 'general',
+                        "voice.${voiceName}.gender"      : "$voiceGender",
+                        "voice.${voiceName}.locale"      : "$voiceLocale",
+                        "voice.${voiceName}.samplingRate": '16000'
+                ]
+                assert actual == expected
             }
         }
 
@@ -174,7 +195,9 @@ class BuildLogicFunctionalTest {
         task testGeneratePomProperties(group: 'Verification') {
             dependsOn generatePomProperties
             doLast {
-                def pomPropertiesFile = file("\$buildDir/resources/main/META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.properties")
+                def pomPropertiesFile = file("\$buildDir/resources/main/META-INF/maven/${
+            group.replace '.', '/'
+        }/voice-$voiceName/pom.properties")
                 assert pomPropertiesFile.exists()
                 assert pomPropertiesFile.readLines() == ['version=unspecified', 'groupId=$group', 'artifactId=$projectDir.name']
             }

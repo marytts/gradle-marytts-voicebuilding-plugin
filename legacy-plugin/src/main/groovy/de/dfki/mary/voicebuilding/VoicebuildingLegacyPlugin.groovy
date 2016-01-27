@@ -26,6 +26,8 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             }
         }
 
+        project.sourceSets.create 'legacy'
+
         project.configurations.create 'legacy'
 
         project.ext {
@@ -252,7 +254,54 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile3 = project.file("$project.legacyBuildDir/f0.right.tree")
         }
 
-        project.task('processLegacyResources', type: Copy) {
+        project.generateVoiceConfig {
+            project.afterEvaluate {
+                config << [
+                        'viterbi.wTargetCosts'    : 0.7,
+                        'viterbi.beamsize'        : 100,
+                        databaseClass             : 'marytts.unitselection.data.DiphoneUnitDatabase',
+                        selectorClass             : 'marytts.unitselection.select.DiphoneUnitSelector',
+                        concatenatorClass         : 'marytts.unitselection.concat.OverlapUnitConcatenator',
+                        targetCostClass           : 'marytts.unitselection.select.DiphoneFFRTargetCostFunction',
+                        joinCostClass             : 'marytts.unitselection.select.JoinCostFeatures',
+                        unitReaderClass           : 'marytts.unitselection.data.UnitFileReader',
+                        cartReaderClass           : 'marytts.cart.io.MARYCartReader',
+                        audioTimelineReaderClass  : 'marytts.unitselection.data.TimelineReader',
+                        featureFile               : "MARY_BASE/lib/voices/$project.voice.name/halfphoneFeatures_ac.mry",
+                        targetCostWeights         : "jar:/marytts/voice/$project.voice.nameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
+                        joinCostFile              : "MARY_BASE/lib/voices/$project.voice.name/joinCostFeatures.mry",
+                        joinCostWeights           : "jar:/marytts/voice/$project.voice.nameCamelCase/joinCostWeights.txt",
+                        unitsFile                 : "MARY_BASE/lib/voices/$project.voice.name/halfphoneUnits.mry",
+                        cartFile                  : "jar:/marytts/voice/$project.voice.nameCamelCase/cart.mry",
+                        audioTimelineFile         : "MARY_BASE/lib/voices/$project.voice.name/timeline_waveforms.mry",
+                        basenameTimeline          : "MARY_BASE/lib/voices/$project.voice.name/timeline_basenames.mry",
+                        acousticModels            : 'duration F0 midF0 rightF0',
+                        'duration.model'          : 'cart',
+                        'duration.data'           : "jar:/marytts/voice/$project.voice.nameCamelCase/dur.tree",
+                        'duration.attribute'      : 'd',
+                        'F0.model'                : 'cart',
+                        'F0.data'                 : "jar:/marytts/voice/$project.voice.nameCamelCase/f0.left.tree",
+                        'F0.attribute'            : 'f0',
+                        'F0.attribute.format'     : '(0,%.0f)',
+                        'F0.predictFrom'          : 'firstVowels',
+                        'F0.applyTo'              : 'firstVoicedSegments',
+                        'midF0.model'             : 'cart',
+                        'midF0.data'              : "jar:/marytts/voice/$project.voice.nameCamelCase/f0.mid.tree",
+                        'midF0.attribute'         : 'f0',
+                        'midF0.attribute.format'  : '(50,%.0f)',
+                        'midF0.predictFrom'       : 'firstVowels',
+                        'midF0.applyTo'           : 'firstVowels',
+                        'rightF0.model'           : 'cart',
+                        'rightF0.data'            : "jar:/marytts/voice/$project.voice.nameCamelCase/f0.right.tree",
+                        'rightF0.attribute'       : 'f0',
+                        'rightF0.attribute.format': '(100,%.0f)',
+                        'rightF0.predictFrom'     : 'firstVowels',
+                        'rightF0.applyTo'         : 'lastVoicedSegments'
+                ]
+            }
+        }
+
+        project.processResources {
             from project.legacyAcousticFeatureFileWriter, {
                 include 'halfphoneUnitFeatureDefinition_ac.txt'
             }
@@ -260,18 +309,33 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 include 'joinCostWeights.txt'
             }
             from project.legacyCARTBuilder
-            into project.sourceSets.main.output.resourcesDir
-            project.jar.dependsOn it
+            from project.legacyDurationCARTTrainer
+            from project.legacyF0CARTTrainer
+            project.afterEvaluate {
+                rename { "marytts/voice/$project.voice.nameCamelCase/$it" }
+            }
+        }
+
+        project.processLegacyResources {
+            from project.legacyWaveTimelineMaker
+            from project.legacyBasenameTimelineMaker
+            from project.legacyHalfPhoneUnitfileWriter
+            from project.legacyPhoneFeatureFileWriter, {
+                include 'phoneUnitFeatureDefinition.txt'
+            }
+            from project.legacyAcousticFeatureFileWriter, {
+                include 'halfphoneFeatures_ac.mry'
+            }
+            from project.legacyJoinCostFileMaker, {
+                include 'joinCostFeatures.mry'
+            }
+            project.afterEvaluate {
+                rename { "lib/voices/$project.voice.name/$it" }
+            }
         }
 
         project.task('legacyZip', type: Zip) {
-            dependsOn project.legacyBasenameTimelineMaker,
-                    project.legacyDurationCARTTrainer,
-                    project.legacyF0CARTTrainer,
-                    project.legacyHalfPhoneFeatureFileWriter,
-                    project.legacyJoinCostFileMaker,
-                    project.legacyPhoneFeatureFileWriter,
-                    project.legacyWaveTimelineMaker
+            from project.processLegacyResources
             from project.jar, {
                 rename { "lib/$it" }
             }
@@ -291,26 +355,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                     exclude module: 'sgt'
                 }
                 testCompile "junit:junit:4.11"
-            }
-
-            project.processLegacyResources {
-                rename { "marytts/voice/$project.voice.nameCamelCase/$it" }
-            }
-
-            project.legacyZip {
-                from project.legacyBuildDir, {
-                    include 'dur.tree',
-                            'f0.left.tree',
-                            'f0.mid.tree',
-                            'f0.right.tree',
-                            'halfphoneFeatures_ac.mry',
-                            'halfphoneUnits.mry',
-                            'joinCostFeatures.mry',
-                            'phoneUnitFeatureDefinition.txt',
-                            'timeline_basenames.mry',
-                            'timeline_waveforms.mry'
-                    rename { "lib/voices/$project.voice.name/$it" }
-                }
             }
         }
     }
