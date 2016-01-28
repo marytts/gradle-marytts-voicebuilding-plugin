@@ -331,6 +331,11 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             }
         }
 
+        project.run {
+            dependsOn project.processLegacyResources
+            systemProperty 'mary.base', project.sourceSets.legacy.output.resourcesDir
+        }
+
         project.integrationTest {
             dependsOn project.processLegacyResources
             systemProperty 'mary.base', project.sourceSets.legacy.output.resourcesDir
