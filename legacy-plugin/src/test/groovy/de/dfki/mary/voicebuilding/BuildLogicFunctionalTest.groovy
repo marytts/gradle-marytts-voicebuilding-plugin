@@ -83,7 +83,6 @@ class BuildLogicFunctionalTest {
         task testTemplates(group: 'Verification') {
             dependsOn templates
             doLast {
-                assert fileTree(buildDir).include('templates/*.java').files
                 assert fileTree(buildDir).include('templates/*.config').files
             }
         }
