@@ -178,7 +178,7 @@ class GenerateSource extends DefaultTask {
                                            |        mary.inputType = MaryDataType.TOKENS
                                            |        def example = MaryDataType.getExampleText(MaryDataType.TOKENS, config.locale)
                                            |        def input = DomUtils.parseDocument(example)
-                                           |        def audio = mary.generateAudio(input)
+                                           |        def output = mary.generateAudio(input)
                                            |        assert output
                                            |    }
                                            |}
