@@ -21,7 +21,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         project.voice.extensions.create 'license', VoiceLicenseExtension
 
         project.ext {
-            maryttsVersion = '5.1.1'
+            maryttsVersion = this.getClass().getResource('/maryttsVersion.txt')?.text
         }
 
         project.repositories {

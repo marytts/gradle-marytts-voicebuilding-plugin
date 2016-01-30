@@ -3,3 +3,7 @@ apply from: "$rootDir/testKitLogic.gradle"
 dependencies {
     compile gradleApi()
 }
+
+processResources << {
+    file("$destinationDir/maryttsVersion.txt").text = maryttsVersion
+}
