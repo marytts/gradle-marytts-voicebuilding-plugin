@@ -53,6 +53,14 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             integrationTestCompile group: 'org.testng', name: 'testng', version: '6.9.4'
         }
 
+        project.configurations.all {
+            resolutionStrategy {
+                dependencySubstitution {
+                    force 'org.codehaus.groovy:groovy-all:2.4.4'
+                }
+            }
+        }
+
         project.task('generateSource', type: GenerateSource) {
             destDir = project.file("$project.buildDir/generatedSrc")
             project.sourceSets.main.java.srcDirs += "$destDir/main/java"
