@@ -2,5 +2,4 @@ apply from: "$rootDir/testKitLogic.gradle"
 
 dependencies {
     compile gradleApi()
-    compile group: 'org.unbroken-dome.gradle-plugins', name: 'gradle-testsets-plugin', version: '1.2.0'
 }

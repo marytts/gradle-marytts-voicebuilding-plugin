@@ -8,15 +8,12 @@ import org.gradle.api.plugins.GroovyPlugin
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.testing.Test
 
-import org.unbrokendome.gradle.plugins.testsets.TestSetsPlugin
-
 class VoicebuildingBasePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
         project.plugins.apply GroovyPlugin
         project.plugins.apply MavenPlugin
-        project.plugins.apply TestSetsPlugin
 
         project.sourceCompatibility = '1.7'
 
@@ -31,8 +28,18 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             jcenter()
         }
 
-        project.testSets {
-            integrationTest
+        project.sourceSets {
+            integrationTest {
+                java {
+                    compileClasspath += main.output + test.output
+                    runtimeClasspath += main.output + test.output
+                }
+            }
+        }
+
+        project.configurations {
+            integrationTestCompile.extendsFrom testCompile
+            integrationTestRuntime.extendsFrom testRuntime
         }
 
         project.dependencies {
@@ -86,8 +93,10 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             project.jar.dependsOn it
         }
 
-        project.integrationTest {
+        project.task('integrationTest', type: Test) {
             useTestNG()
+            testClassesDir = project.sourceSets.integrationTest.output.classesDir
+            classpath = project.sourceSets.integrationTest.runtimeClasspath
             systemProperty 'log4j.logger.marytts', 'INFO,stderr'
             testLogging.showStandardStreams = true
             reports.html.destination = project.file("$project.reporting.baseDir/$name")
