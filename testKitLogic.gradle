@@ -7,6 +7,8 @@ test {
     }
     // path to shared testkit gradle home
     systemProperty 'testKitDir', file("$rootProject.buildDir/.gradle")
+    // dynamic marytts version
+    systemProperty 'maryttsVersion', maryttsVersion
 }
 
 // Write the plugin's classpath to a file to share with the tests
