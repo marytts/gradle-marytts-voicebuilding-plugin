@@ -352,8 +352,8 @@ class BuildLogicFunctionalTest {
                 def expected = [
                     'META-INF/MANIFEST.MF',
                     'META-INF/services/marytts.config.MaryConfig',
-                    "META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.xml",
-                    "META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.properties",
+                    "META-INF/maven/$group/voice-$voiceName/pom.xml",
+                    "META-INF/maven/$group/voice-$voiceName/pom.properties",
                     "marytts/voice/$voiceNameCamelCase/Config.class",
                     "marytts/voice/$voiceNameCamelCase/cart.mry",
                     "marytts/voice/$voiceNameCamelCase/dur.tree",

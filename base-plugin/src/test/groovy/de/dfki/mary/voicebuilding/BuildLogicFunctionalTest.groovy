@@ -155,7 +155,7 @@ class BuildLogicFunctionalTest {
         task testGeneratePom(group: 'Verification') {
             dependsOn generatePom
             doLast {
-                def pomFile = file("\$buildDir/resources/main/META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.xml")
+                def pomFile = file("\$buildDir/resources/main/META-INF/maven/$group/voice-$voiceName/pom.xml")
                 assert pomFile.exists()
                 def pomXml = '''<?xml version="1.0"?>
                     <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -195,9 +195,7 @@ class BuildLogicFunctionalTest {
         task testGeneratePomProperties(group: 'Verification') {
             dependsOn generatePomProperties
             doLast {
-                def pomPropertiesFile = file("\$buildDir/resources/main/META-INF/maven/${
-            group.replace '.', '/'
-        }/voice-$voiceName/pom.properties")
+                def pomPropertiesFile = file("\$buildDir/resources/main/META-INF/maven/$group/voice-$voiceName/pom.properties")
                 assert pomPropertiesFile.exists()
                 assert pomPropertiesFile.readLines() == ['version=unspecified', 'groupId=$group', 'artifactId=$projectDir.name']
             }
@@ -212,8 +210,8 @@ class BuildLogicFunctionalTest {
                 def expected = [
                     'META-INF/MANIFEST.MF',
                     'META-INF/services/marytts.config.MaryConfig',
-                    "META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.xml",
-                    "META-INF/maven/${group.replace '.', '/'}/voice-$voiceName/pom.properties",
+                    "META-INF/maven/$group/voice-$voiceName/pom.xml",
+                    "META-INF/maven/$group/voice-$voiceName/pom.properties",
                     "marytts/voice/\$voice.nameCamelCase/Config.class",
                     "marytts/voice/\$voice.nameCamelCase/voice.config"
                 ] as Set
