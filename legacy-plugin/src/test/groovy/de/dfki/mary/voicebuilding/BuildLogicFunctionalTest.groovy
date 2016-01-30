@@ -10,6 +10,7 @@ class BuildLogicFunctionalTest {
     def gradle
     def buildFile
 
+    def maryttsVersion = System.properties.maryttsVersion
     def group = 'de.dfki.mary'
     def voiceName = 'cmu-time-awb'
     def voiceNameCamelCase = 'CmuTimeAwb'
@@ -387,13 +388,13 @@ class BuildLogicFunctionalTest {
 
         def expectedLegacyDescriptor = '''<?xml version="1.0"?>
             <marytts-install xmlns="http://mary.dfki.de/installer">
-                <voice locale="''' + voiceLocale + '''" name="''' + voiceName + '''" gender="''' + voiceGender + '''" type="unit selection" version="5.1.1">
+                <voice locale="''' + voiceLocale + '''" name="''' + voiceName + '''" gender="''' + voiceGender + '''" type="unit selection" version="''' + maryttsVersion + '''">
                     <description>A ''' + voiceGender + ''' English unit selection voice</description>
                     <license href="''' + voiceLicenseUrl + '''"/>
                     <package md5sum="$ant.md5Hash" filename="$legacyZip.archiveName" size="${legacyZip.archivePath.size()}">
-                        <location folder="true" href="http://mary.dfki.de/download/5.1.1/"/>
+                        <location folder="true" href="http://mary.dfki.de/download/''' + maryttsVersion + '''/"/>
                     </package>
-                    <depends language="''' + voiceLocale.toLanguageTag() + '''" version="5.1.1"/>
+                    <depends language="''' + voiceLocale.toLanguageTag() + '''" version="''' + maryttsVersion + '''"/>
                 </voice>
             </marytts-install>'''
 

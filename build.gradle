@@ -18,6 +18,14 @@ allprojects {
         testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
     }
 
+    configurations.all {
+        resolutionStrategy {
+            dependencySubstitution {
+                force 'org.codehaus.groovy:groovy-all:2.4.4'
+            }
+        }
+    }
+
     test {
         useTestNG()
 

@@ -21,7 +21,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         project.voice.extensions.create 'license', VoiceLicenseExtension
 
         project.ext {
-            maryttsVersion = '5.1.1'
+            maryttsVersion = this.getClass().getResource('/maryttsVersion.txt')?.text
         }
 
         project.repositories {
@@ -43,14 +43,18 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.dependencies {
-            compile(group: 'de.dfki.mary', name: 'marytts-runtime', version: project.maryttsVersion) {
-                exclude module: 'freetts'
-                exclude module: 'freetts-en_us'
-                exclude module: 'freetts-de'
-            }
+            compile group: 'de.dfki.mary', name: 'marytts-runtime', version: project.maryttsVersion
             testCompile group: 'junit', name: 'junit', version: '4.12'
             integrationTestCompile localGroovy()
             integrationTestCompile group: 'org.testng', name: 'testng', version: '6.9.4'
+        }
+
+        project.configurations.all {
+            resolutionStrategy {
+                dependencySubstitution {
+                    force 'org.codehaus.groovy:groovy-all:2.4.4'
+                }
+            }
         }
 
         project.task('generateSource', type: GenerateSource) {

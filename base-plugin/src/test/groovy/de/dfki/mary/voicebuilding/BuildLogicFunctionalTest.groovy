@@ -10,6 +10,7 @@ class BuildLogicFunctionalTest {
     def gradle
     def buildFile
 
+    def maryttsVersion = System.properties.maryttsVersion
     def group = 'de.dfki.mary'
     def voiceName = 'cmu-slt'
     def voiceGender = 'female'
@@ -180,7 +181,7 @@ class BuildLogicFunctionalTest {
                         <dependency>
                           <groupId>de.dfki.mary</groupId>
                           <artifactId>marytts-runtime</artifactId>
-                          <version>5.1.1</version>
+                          <version>$maryttsVersion</version>
                           <scope>compile</scope>
                         </dependency>
                       </dependencies>
