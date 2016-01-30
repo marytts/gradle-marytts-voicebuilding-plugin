@@ -81,14 +81,14 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.task('generatePom', type: GeneratePom) {
             project.afterEvaluate {
-                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace('.', '/')}/voice-$project.voice.name/pom.xml")
+                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/$project.group/voice-$project.voice.name/pom.xml")
             }
             project.jar.dependsOn it
         }
 
         project.task('generatePomProperties', type: GeneratePomProperties) {
             project.afterEvaluate {
-                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/${project.group.replace '.', '/'}/voice-$project.voice.name/pom.properties")
+                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/$project.group/voice-$project.voice.name/pom.properties")
             }
             project.jar.dependsOn it
         }

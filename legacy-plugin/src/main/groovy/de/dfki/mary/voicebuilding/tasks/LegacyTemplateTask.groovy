@@ -8,10 +8,7 @@ class LegacyTemplateTask extends DefaultTask {
     @OutputDirectory
     File destDir
 
-    def resources = [
-            'database.config',
-            'LoadVoiceIT.java'
-    ]
+    def resources = ['database.config']
 
     @TaskAction
     void unpack() {

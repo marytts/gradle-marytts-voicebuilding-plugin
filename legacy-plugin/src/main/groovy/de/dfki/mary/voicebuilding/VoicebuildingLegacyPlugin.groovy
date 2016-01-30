@@ -320,9 +320,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             from project.legacyWaveTimelineMaker
             from project.legacyBasenameTimelineMaker
             from project.legacyHalfPhoneUnitfileWriter
-            from project.legacyPhoneFeatureFileWriter, {
-                include 'phoneUnitFeatureDefinition.txt'
-            }
             from project.legacyAcousticFeatureFileWriter, {
                 include 'halfphoneFeatures_ac.mry'
             }
@@ -332,6 +329,11 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             project.afterEvaluate {
                 rename { "lib/voices/$project.voice.name/$it" }
             }
+        }
+
+        project.integrationTest {
+            dependsOn project.processLegacyResources
+            systemProperty 'mary.base', project.sourceSets.legacy.output.resourcesDir
         }
 
         project.task('legacyZip', type: Zip) {
