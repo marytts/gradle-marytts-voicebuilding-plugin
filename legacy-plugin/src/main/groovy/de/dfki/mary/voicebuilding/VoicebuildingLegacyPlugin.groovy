@@ -21,9 +21,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.repositories {
             jcenter()
-            maven {
-                url 'https://oss.jfrog.org/artifactory/repo'
-            }
         }
 
         project.sourceSets.create 'legacy'
