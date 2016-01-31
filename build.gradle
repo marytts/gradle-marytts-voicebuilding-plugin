@@ -49,6 +49,7 @@ apply from: 'testKitLogic.gradle'
 dependencies {
     compile gradleApi()
     compile project('data-plugin')
+    runtime project('legacy-plugin')
 }
 
 task sourceJar(type: Jar) {
