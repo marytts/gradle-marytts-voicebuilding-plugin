@@ -35,6 +35,15 @@ class BuildLogicFunctionalTest {
             id 'de.dfki.mary.voicebuilding-festvox'
         }
 
+        repositories {
+            ivy {
+                url 'http://festvox.org/examples'
+                layout 'pattern', {
+                    artifact '[module]_[classifier]/packed/[artifact].[ext]'
+                }
+            }
+        }
+
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('java')
             assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
