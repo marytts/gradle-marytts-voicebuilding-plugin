@@ -6,6 +6,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.GroovyPlugin
 import org.gradle.api.plugins.MavenPlugin
+import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.testing.Test
 
 class VoicebuildingBasePlugin implements Plugin<Project> {
@@ -106,6 +107,12 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             reports.html.destination = project.file("$project.reporting.baseDir/$name")
             project.check.dependsOn it
             mustRunAfter project.test
+        }
+
+        project.task('run', type: JavaExec) {
+            classpath = project.configurations.runtime + project.sourceSets.main.output
+            main = 'marytts.server.Mary'
+            systemProperty 'log4j.logger.marytts', 'INFO,stderr'
         }
     }
 }
