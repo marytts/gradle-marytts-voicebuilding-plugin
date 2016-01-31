@@ -2,3 +2,7 @@ dependencies {
     runtime group: group, name: 'marytts-lang-en', version: maryttsVersion
     testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
 }
+
+test {
+    workingDir = buildDir
+}
