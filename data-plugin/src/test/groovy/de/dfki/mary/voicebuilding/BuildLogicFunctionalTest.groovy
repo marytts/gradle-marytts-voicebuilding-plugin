@@ -39,6 +39,15 @@ class BuildLogicFunctionalTest {
             id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
         }
 
+        repositories {
+            ivy {
+                url 'http://festvox.org/examples'
+                layout 'pattern', {
+                    artifact '[module]_[classifier]/packed/[artifact].[ext]'
+                }
+            }
+        }
+
         dependencies {
             data "$dataDependency"
             runtime group: 'de.dfki.mary', name: 'marytts-common', version: '$maryttsVersion'

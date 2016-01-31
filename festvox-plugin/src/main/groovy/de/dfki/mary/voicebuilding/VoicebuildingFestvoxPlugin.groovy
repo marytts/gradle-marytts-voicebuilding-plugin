@@ -9,15 +9,6 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        project.repositories {
-            ivy {
-                url 'http://festvox.org/examples'
-                layout 'pattern', {
-                    artifact '[module]_[classifier]/packed/[artifact].[ext]'
-                }
-            }
-        }
-
         project.plugins.apply VoicebuildingDataPlugin
 
         project.processDataResources {

@@ -64,6 +64,15 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        repositories {
+            ivy {
+                url 'http://festvox.org/examples'
+                layout 'pattern', {
+                    artifact '[module]_[classifier]/packed/[artifact].[ext]'
+                }
+            }
+        }
+
         dependencies {
             data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
         }
