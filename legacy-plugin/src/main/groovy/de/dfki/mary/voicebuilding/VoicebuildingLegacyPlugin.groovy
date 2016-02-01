@@ -347,6 +347,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.task('legacyDescriptor', type: LegacyDescriptorTask) {
             dependsOn project.legacyZip
+            project.assemble.dependsOn it
             project.afterEvaluate {
                 srcFile = project.legacyZip.archivePath
                 destFile = project.file("$project.distsDir/${project.legacyZip.archiveName.replace('.zip', '-component-descriptor.xml')}")
