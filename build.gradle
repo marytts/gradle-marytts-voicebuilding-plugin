@@ -7,9 +7,6 @@ allprojects {
 
     repositories {
         jcenter()
-        maven {
-            url 'https://oss.jfrog.org/artifactory/libs-release'
-        }
     }
 
     dependencies {
@@ -49,15 +46,10 @@ allprojects {
 
 apply from: 'testKitLogic.gradle'
 
-repositories {
-    maven {
-        url 'https://oss.jfrog.org/artifactory/repo'
-    }
-}
-
 dependencies {
     compile gradleApi()
     compile project('data-plugin')
+    runtime project('legacy-plugin')
 }
 
 task sourceJar(type: Jar) {

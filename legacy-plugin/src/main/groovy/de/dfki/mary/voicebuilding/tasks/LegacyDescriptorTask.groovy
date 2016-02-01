@@ -20,7 +20,7 @@ class LegacyDescriptorTask extends DefaultTask {
         def builder = new StreamingMarkupBuilder()
         def xml = builder.bind {
             'marytts-install'(xmlns: 'http://mary.dfki.de/installer') {
-                voice(gender: project.voice.gender, locale: project.voice.maryLocale, name: project.voice.name, type: project.voice.type, version: project.maryttsVersion) {
+                voice(gender: project.voice.gender, locale: project.voice.maryLocale, name: project.voice.name, type: project.voice.type, version: project.version) {
                     delegate.description project.voice.description
                     license(href: project.voice.license.url)
                     'package'(filename: srcFile.name, md5sum: project.ant.srcFileHash, size: srcFile.size()) {

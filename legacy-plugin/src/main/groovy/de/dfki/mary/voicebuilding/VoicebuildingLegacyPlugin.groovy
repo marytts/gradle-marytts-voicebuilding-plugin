@@ -21,9 +21,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.repositories {
             jcenter()
-            maven {
-                url 'https://oss.jfrog.org/artifactory/repo'
-            }
         }
 
         project.sourceSets.create 'legacy'
@@ -350,8 +347,11 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.task('legacyDescriptor', type: LegacyDescriptorTask) {
             dependsOn project.legacyZip
-            srcFile = project.legacyZip.archivePath
-            destFile = project.file("$project.distsDir/${project.legacyZip.archiveName.replace('.zip', '-component-descriptor.xml')}")
+            project.assemble.dependsOn it
+            project.afterEvaluate {
+                srcFile = project.legacyZip.archivePath
+                destFile = project.file("$project.distsDir/${project.legacyZip.archiveName.replace('.zip', '-component-descriptor.xml')}")
+            }
         }
 
         project.afterEvaluate {
