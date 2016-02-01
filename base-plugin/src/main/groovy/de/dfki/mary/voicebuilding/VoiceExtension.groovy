@@ -42,6 +42,6 @@ class VoiceExtension {
     }
 
     String getDescription() {
-        description ?: "A $gender $locale.displayLanguage $type voice"
+        description ?: "A $gender ${locale.getDisplayLanguage(Locale.ENGLISH)} $type voice"
     }
 }

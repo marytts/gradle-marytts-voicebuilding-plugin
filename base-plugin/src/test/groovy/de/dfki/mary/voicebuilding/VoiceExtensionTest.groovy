@@ -40,12 +40,12 @@ class VoiceExtensionTest {
 
     @Test
     void testDescription() {
-        assert voice.description == "A female English unit selection voice"
+        assert voice.description == "A female ${Locale.ENGLISH.getDisplayLanguage(Locale.ENGLISH)} unit selection voice"
         voice.gender = 'male'
         voice.type = 'HMM'
         voice.language = 'de'
         voice.region = 'de'
-        assert voice.description == "A male German HMM voice"
+        assert voice.description == "A male ${Locale.GERMAN.getDisplayLanguage(Locale.ENGLISH)} HMM voice"
         voice.description = 'fnord'
         assert voice.description == 'fnord'
     }
