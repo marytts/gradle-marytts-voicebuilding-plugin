@@ -16,7 +16,7 @@ class BuildLogicFunctionalTest {
     def voiceName = 'cmu-slt'
     def voiceGender = 'female'
     def voiceLocale = Locale.US
-    def voiceDescription = "A $voiceGender $voiceLocale.displayLanguage unit selection voice"
+    def voiceDescription = "A $voiceGender ${voiceLocale.getDisplayLanguage(Locale.ENGLISH)} unit selection voice"
     def voiceLicenseName = 'Arctic'
     def voiceLicenseUrl = 'http://festvox.org/cmu_arctic/cmu_arctic/cmu_us_slt_arctic/COPYING'
 
