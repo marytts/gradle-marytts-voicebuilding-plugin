@@ -12,6 +12,7 @@ class BuildLogicFunctionalTest {
 
     def maryttsVersion = System.properties.maryttsVersion
     def group = 'de.dfki.mary'
+    def version = '1.2.3'
     def voiceName = 'cmu-time-awb'
     def voiceNameCamelCase = 'CmuTimeAwb'
     def voiceGender = 'male'
@@ -54,6 +55,7 @@ class BuildLogicFunctionalTest {
         }
 
         group "$group"
+        version "$version"
 
         voice {
             name = "$voiceName"
@@ -397,7 +399,7 @@ class BuildLogicFunctionalTest {
 
         def expectedLegacyDescriptor = '''<?xml version="1.0"?>
             <marytts-install xmlns="http://mary.dfki.de/installer">
-                <voice locale="''' + voiceLocale + '''" name="''' + voiceName + '''" gender="''' + voiceGender + '''" type="unit selection" version="''' + maryttsVersion + '''">
+                <voice locale="''' + voiceLocale + '''" name="''' + voiceName + '''" gender="''' + voiceGender + '''" type="unit selection" version="''' + version + '''">
                     <description>A ''' + voiceGender + ''' English unit selection voice</description>
                     <license href="''' + voiceLicenseUrl + '''"/>
                     <package md5sum="$ant.md5Hash" filename="$legacyZip.archiveName" size="${legacyZip.archivePath.size()}">
@@ -415,7 +417,7 @@ class BuildLogicFunctionalTest {
             doLast {
                 ant.checksum file: legacyZip.archivePath, algorithm: 'MD5', property: 'md5Hash'
                 def expected = \"\"\"$expectedLegacyDescriptor\"\"\"
-                def actual = file(\"\$distsDir/\${legacyZip.archiveName.replace('.zip', '-component-descriptor.xml')}\").text
+                def actual = legacyDescriptor.destFile.text
                 XMLUnit.ignoreWhitespace = true
                 assert XMLUnit.compareXML(expected, actual).similar()
             }

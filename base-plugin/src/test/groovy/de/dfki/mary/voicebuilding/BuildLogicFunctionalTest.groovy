@@ -12,6 +12,7 @@ class BuildLogicFunctionalTest {
 
     def maryttsVersion = System.properties.maryttsVersion
     def group = 'de.dfki.mary'
+    def version = '1.2.3'
     def voiceName = 'cmu-slt'
     def voiceGender = 'female'
     def voiceLocale = Locale.US
@@ -54,6 +55,7 @@ class BuildLogicFunctionalTest {
         }
 
         group "$group"
+        version "$version"
 
         voice {
             name = "$voiceName"
@@ -163,7 +165,7 @@ class BuildLogicFunctionalTest {
                       <modelVersion>4.0.0</modelVersion>
                       <groupId>$group</groupId>
                       <artifactId>$projectDir.name</artifactId>
-                      <version>unspecified</version>
+                      <version>$version</version>
                       <description>$voiceDescription</description>
                       <licenses>
                         <license>
@@ -198,7 +200,7 @@ class BuildLogicFunctionalTest {
             doLast {
                 def pomPropertiesFile = file("\$buildDir/resources/main/META-INF/maven/$group/voice-$voiceName/pom.properties")
                 assert pomPropertiesFile.exists()
-                assert pomPropertiesFile.readLines() == ['version=unspecified', 'groupId=$group', 'artifactId=$projectDir.name']
+                assert pomPropertiesFile.readLines() == ['version=$version', 'groupId=$group', 'artifactId=$projectDir.name']
             }
         }
 
