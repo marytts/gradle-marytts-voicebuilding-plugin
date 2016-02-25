@@ -39,12 +39,14 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             proc = 'which praat'.execute()
             proc.waitFor()
             praat = proc.in.text
-            try {
-                // test for Praat 6
-                'praat --version'.execute()
-                praat = 'praat --run'
-            } catch (all) {
-                // ignore and assume we have Praat 5
+            // test for Praat 6
+            def praat = 'praat'
+            def praatTestProc = [praat, '--version'].execute()
+            praatTestProc.waitFor()
+            if (praatTestProc.exitValue()) {
+                // assume we have Praat 5
+            } else {
+                praat += ' --run'
             }
         }
 
