@@ -37,10 +37,18 @@ class PraatPitchmarkerTask extends DefaultTask {
         def basenamesFile = project.file("$temporaryDir/basenames.lst")
         basenamesFile.text = basenames.join('\n')
 
+        // test for Praat 6
+        def praat = 'praat'
+        try {
+            'praat --version'.execute()
+            praat = 'praat --run'
+        } catch (all) {
+            // assume we have Praat 5
+        }
+
         // run praat script
         project.exec {
-            executable 'praat'
-            args scriptFile, basenamesFile, srcDir, destDir, minPitch, maxPitch
+            commandLine = praat.tokenize() + [scriptFile, basenamesFile, srcDir, destDir, minPitch, maxPitch]
         }
 
         // convert praat .PointProcess file to EST .pm file
