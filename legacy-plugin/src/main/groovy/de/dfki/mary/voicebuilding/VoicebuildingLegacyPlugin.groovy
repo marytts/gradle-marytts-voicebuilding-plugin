@@ -39,6 +39,13 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             proc = 'which praat'.execute()
             proc.waitFor()
             praat = proc.in.text
+            try {
+                // test for Praat 6
+                'praat --version'.execute()
+                praat = 'praat --run'
+            } catch (all) {
+                // ignore and assume we have Praat 5
+            }
         }
 
         project.task('templates', type: LegacyTemplateTask) {
