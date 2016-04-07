@@ -34,20 +34,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             def proc = 'which ch_track'.execute()
             proc.waitFor()
             speechToolsDir = new File(proc.in.text)?.parentFile?.parent
-
-            // configure praat
-            proc = 'which praat'.execute()
-            proc.waitFor()
-            praat = proc.in.text
-            // test for Praat 6
-            def praat = 'praat'
-            def praatTestProc = [praat, '--version'].execute()
-            praatTestProc.waitFor()
-            if (praatTestProc.exitValue()) {
-                // assume we have Praat 5
-            } else {
-                praat += ' --run'
-            }
         }
 
         project.task('templates', type: LegacyTemplateTask) {

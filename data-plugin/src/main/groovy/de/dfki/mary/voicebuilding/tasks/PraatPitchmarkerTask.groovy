@@ -40,7 +40,7 @@ class PraatPitchmarkerTask extends DefaultTask {
         // test for Praat 6
         def praat = ['praat']
         def praatTestProc = [praat.first(), '--version'].execute()
-        praatTestProc.waitFor()
+        praatTestProc.waitForOrKill(100)
         if (praatTestProc.exitValue()) {
             // assume we have Praat 5
         } else {
