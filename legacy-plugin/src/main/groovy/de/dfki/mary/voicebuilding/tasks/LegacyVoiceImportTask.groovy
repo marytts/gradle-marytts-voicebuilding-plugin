@@ -48,6 +48,7 @@ class LegacyVoiceImportTask extends DefaultTask {
             main 'marytts.tools.voiceimport.DatabaseImportMain'
             workingDir project.buildDir
             args name - 'legacy'
+            systemProperties = ['java.awt.headless': true]
         }
     }
 
