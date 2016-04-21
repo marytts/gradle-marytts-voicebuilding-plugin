@@ -27,6 +27,9 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.repositories {
             jcenter()
+            maven {
+                url 'https://oss.jfrog.org/artifactory/oss-snapshot-local/'
+            }
         }
 
         project.sourceSets {
