@@ -48,6 +48,14 @@ class BuildLogicFunctionalTest {
             }
         }
 
+        sourceSets {
+            marytts
+        }
+
+        configurations {
+            marytts
+        }
+
         dependencies {
             data "$dataDependency"
             runtime group: 'de.dfki.mary', name: 'marytts-common', version: '$maryttsVersion'
@@ -61,10 +69,12 @@ class BuildLogicFunctionalTest {
 
         task testConfigurations(group: 'Verification') << {
             assert configurations.data
+            assert configurations.marytts
         }
 
         task testSourceSets(group: 'Verification') << {
             assert sourceSets.data
+            assert sourceSets.marytts
         }
 
         task testDependencies(group: 'Verification') << {
