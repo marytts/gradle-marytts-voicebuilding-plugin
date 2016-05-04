@@ -207,18 +207,18 @@ class BuildLogicFunctionalTest {
 
     @Test
     void testGenerateAllophones() {
-        def result = gradle.withArguments('generateAllophones').buildAndFail()
+        def result = gradle.withArguments('generateAllophones').build()
         println result.output
         assert result.task(':text').outcome in [SUCCESS, UP_TO_DATE]
-        assert result.task(':generateAllophones').outcome == FAILED
-        result = gradle.withArguments('testGenerateAllophones').buildAndFail()
+        assert result.task(':generateAllophones').outcome in [SUCCESS, UP_TO_DATE]
+        result = gradle.withArguments('testGenerateAllophones').build()
         println result.output
         assert result.task(':text').outcome == UP_TO_DATE
-        assert result.task(':generateAllophones').outcome == FAILED
-        assert result.task(':testGenerateAllophones')?.outcome in [null, FAILED]
+        assert result.task(':generateAllophones').outcome == UP_TO_DATE
+        assert result.task(':testGenerateAllophones').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testGenerateAllophones'], enabled = false)
+    @Test(dependsOnMethods = ['testGenerateAllophones'])
     void testGeneratePhoneFeatures() {
         def result = gradle.withArguments('generatePhoneFeatures').build()
         println result.output
@@ -229,7 +229,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':testGeneratePhoneFeatures').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testGenerateAllophones'], enabled = false)
+    @Test(dependsOnMethods = ['testGenerateAllophones'])
     void testGenerateHalfPhoneFeatures() {
         def result = gradle.withArguments('generateHalfPhoneFeatures').build()
         println result.output
