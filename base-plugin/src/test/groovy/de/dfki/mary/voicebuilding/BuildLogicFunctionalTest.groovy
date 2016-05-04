@@ -14,6 +14,7 @@ class BuildLogicFunctionalTest {
     def group = 'de.dfki.mary'
     def version = '1.2.3'
     def voiceName = 'cmu-slt'
+    def voiceNameCamelCase = 'CmuSlt'
     def voiceGender = 'female'
     def voiceLocale = Locale.US
     def voiceDescription = "A $voiceGender ${voiceLocale.getDisplayLanguage(Locale.ENGLISH)} unit selection voice"
@@ -74,7 +75,7 @@ class BuildLogicFunctionalTest {
             assert voice.name == "$voiceName"
             assert voice.language == "$voiceLocale.language"
             assert voice.region == "$voiceLocale.country"
-            assert voice.nameCamelCase == 'CmuSlt'
+            assert voice.nameCamelCase == "$voiceNameCamelCase"
             assert voice.locale == new Locale("$voiceLocale.language", "$voiceLocale.country")
             assert voice.localeXml == "${voiceLocale.toLanguageTag()}"
             assert voice.description == "$voiceDescription"
