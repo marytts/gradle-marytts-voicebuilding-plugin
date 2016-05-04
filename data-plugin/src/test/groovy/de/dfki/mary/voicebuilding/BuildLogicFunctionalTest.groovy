@@ -51,6 +51,7 @@ class BuildLogicFunctionalTest {
         dependencies {
             data "$dataDependency"
             runtime group: 'de.dfki.mary', name: 'marytts-common', version: '$maryttsVersion'
+            maryttsRuntime group: 'de.dfki.mary', name: "marytts-lang-\$voice.locale.language", version: '$maryttsVersion'
         }
 
         task testPlugins(group: 'Verification') << {
@@ -71,6 +72,7 @@ class BuildLogicFunctionalTest {
 
         task testDependencies(group: 'Verification') << {
             assert configurations.data.dependencies.find { it.name == "$dataDependencyName" }
+            assert configurations.maryttsRuntime.dependencies.find { it.name == "marytts-lang-\$voice.locale.language" }
         }
 
         task testProcessDataResources {
