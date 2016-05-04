@@ -48,14 +48,6 @@ class BuildLogicFunctionalTest {
             }
         }
 
-        sourceSets {
-            marytts
-        }
-
-        configurations {
-            marytts
-        }
-
         dependencies {
             data "$dataDependency"
             runtime group: 'de.dfki.mary', name: 'marytts-common', version: '$maryttsVersion'

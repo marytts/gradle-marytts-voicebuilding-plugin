@@ -11,9 +11,15 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply VoicebuildingBasePlugin
 
-        project.configurations.create 'data'
+        project.configurations {
+            create 'data'
+            create 'marytts'
+        }
 
-        project.sourceSets.create 'data'
+        project.sourceSets {
+            create 'data'
+            create 'marytts'
+        }
 
         project.task('wav', type: AudioConverterTask) {
             dependsOn project.processDataResources
