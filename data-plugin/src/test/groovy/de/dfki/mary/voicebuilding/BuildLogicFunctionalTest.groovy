@@ -147,7 +147,7 @@ class BuildLogicFunctionalTest {
         }
 
         task testMaryJavaExec(type: JavaExec) {
-            classpath sourceSets.main.runtimeClasspath
+            classpath sourceSets.marytts.runtimeClasspath
             main 'marytts.util.PrintSystemProperties'
         }
         """
