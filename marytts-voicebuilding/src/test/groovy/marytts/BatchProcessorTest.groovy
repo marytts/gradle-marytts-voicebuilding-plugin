@@ -3,6 +3,8 @@ package marytts
 import groovy.json.JsonBuilder
 import groovy.util.logging.Log4j
 
+import org.custommonkey.xmlunit.*
+
 import org.testng.annotations.*
 
 @Log4j
@@ -23,6 +25,7 @@ class BatchProcessorTest {
                 stream << getClass().getResourceAsStream("${example}.text")
             }
         }
+        XMLUnit.ignoreWhitespace = true
     }
 
     @Test
@@ -47,5 +50,14 @@ class BatchProcessorTest {
 
         // run the batch
         BatchProcessor.main([batchFile.path] as String[]);
+
+        // test the result
+        batch.each { request ->
+            def expected = getClass().getResourceAsStream(new File(request.outputFile).name).text
+            def actual = new File(request.outputFile).text
+            def comparison = XMLUnit.compareXML(expected, actual)
+            def data = new DetailedDiff(comparison)
+            assert data.similar()
+        }
     }
 }
