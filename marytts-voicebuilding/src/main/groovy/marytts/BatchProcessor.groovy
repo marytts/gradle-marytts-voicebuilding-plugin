@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 import groovy.util.logging.Log4j
 import groovy.xml.XmlUtil
 
+import marytts.util.MaryUtils
 import marytts.util.data.audio.MaryAudioUtils
 import marytts.util.dom.DomUtils
 
@@ -16,6 +17,7 @@ class BatchProcessor {
                 new File(arg).withReader('UTF-8') { reader ->
                     new JsonSlurper().parse(reader).each { request ->
                         try {
+                            mary.locale = MaryUtils.string2locale(request.locale)
                             def input = new File(request.inputFile).getText('UTF-8')
                             mary.inputType = request.inputType
                             if (mary.isXMLType(request.inputType)) {
