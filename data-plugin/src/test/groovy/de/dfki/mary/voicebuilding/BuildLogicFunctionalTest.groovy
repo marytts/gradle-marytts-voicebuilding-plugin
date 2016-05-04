@@ -50,8 +50,6 @@ class BuildLogicFunctionalTest {
 
         dependencies {
             data "$dataDependency"
-            runtime group: 'de.dfki.mary', name: 'marytts-common', version: '$maryttsVersion'
-            maryttsRuntime group: 'de.dfki.mary', name: "marytts-lang-\$voice.locale.language", version: '$maryttsVersion'
         }
 
         task testPlugins(group: 'Verification') << {

@@ -21,6 +21,10 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             create 'marytts'
         }
 
+        project.dependencies {
+            maryttsRuntime group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion
+        }
+
         project.task('wav', type: AudioConverterTask) {
             dependsOn project.processDataResources
             srcDir = project.file("$project.sourceSets.data.output.resourcesDir")
