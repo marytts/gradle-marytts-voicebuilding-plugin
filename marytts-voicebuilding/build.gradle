@@ -1,6 +1,6 @@
 dependencies {
-    runtime group: group, name: 'marytts-lang-en', version: maryttsVersion
     testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
+    testRuntime group: group, name: 'marytts-lang-en', version: maryttsVersion
 }
 
 test {
