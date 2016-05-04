@@ -3,8 +3,8 @@ apply from: "$rootDir/testKitLogic.gradle"
 dependencies {
     compile gradleApi()
     compile project(':base-plugin')
+    runtime project(':marytts-voicebuilding')
     testRuntime project(':festvox-plugin')
-    testRuntime project(':marytts-voicebuilding')
 }
 
 createClasspathManifest << {
