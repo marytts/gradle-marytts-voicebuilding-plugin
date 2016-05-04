@@ -1,6 +1,6 @@
 dependencies {
     testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
-    testRuntime group: group, name: 'marytts-lang-en', version: maryttsVersion
+    testRuntime group: 'de.dfki.mary', name: 'voice-cmu-slt-hsmm', version: maryttsVersion
 }
 
 test {
