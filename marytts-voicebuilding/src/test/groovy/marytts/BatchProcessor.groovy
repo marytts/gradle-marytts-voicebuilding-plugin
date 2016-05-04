@@ -4,6 +4,7 @@ import groovy.json.JsonSlurper
 import groovy.util.logging.Log4j
 import groovy.xml.XmlUtil
 
+import marytts.util.data.audio.MaryAudioUtils
 import marytts.util.dom.DomUtils
 
 @Log4j
@@ -21,25 +22,24 @@ class BatchProcessor {
                                 input = DomUtils.parseDocument(input)
                             }
                             mary.outputType = request.outputType
-                            def output
+                            def outputFile = new File(request.outputFile)
+                            outputFile.parentFile.mkdirs()
                             switch (request.outputType) {
                                 case { mary.isTextType(it) }:
-                                    output = mary.generateText(input)
+                                    outputFile.text = mary.generateText(input)
                                     break
                                 case { mary.isXMLType(it) }:
                                     def outputDocument = mary.generateXML(input).documentElement
-                                    output = XmlUtil.serialize(outputDocument)
+                                    outputFile.text = XmlUtil.serialize(outputDocument)
                                     break
                                 case { mary.isAudioType(it) }:
-                                    output = mary.generateAudio(input)
+                                    def audio = mary.generateAudio(input)
+                                    def samples = MaryAudioUtils.getSamplesAsDoubleArray(audio)
+                                    MaryAudioUtils.writeWavFile(samples, outputFile.path, audio.format)
                                     break
                                 default:
                                     log.error "Cannot process to $it"
                             }
-                            log.info output
-                            def outputFile = new File(request.outputFile)
-                            outputFile.parentFile.mkdirs()
-                            outputFile.text = output
                             log.info "Wrote to $outputFile"
                         } catch (e) {
                             log.error e.message

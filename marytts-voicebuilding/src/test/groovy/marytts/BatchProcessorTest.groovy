@@ -157,4 +157,35 @@ class BatchProcessorTest {
             assert expected == actual
         }
     }
+
+    @Test(dependsOnMethods = 'processPhonemesToAcoustParams')
+    void processAcoustParamsToAudio() {
+        // create batch
+        def batch = examples.collect { example ->
+            def inputPath = "$tmpDir/acoustparams/${example}.acoustparams"
+            def outputPath = inputPath.replaceAll('acoustparams', 'audio')
+            [
+                    locale    : "${Locale.US}",
+                    inputType : 'ACOUSTPARAMS',
+                    outputType: 'AUDIO',
+                    inputFile : inputPath,
+                    outputFile: outputPath
+            ]
+        }
+        def json = new JsonBuilder(batch).toPrettyString()
+        log.info "batch = $json"
+        def batchFile = File.createTempFile('batch', '.json')
+        log.info "batchFile = $batchFile"
+        batchFile.text = json
+
+        // run the batch
+        BatchProcessor.main([batchFile.path] as String[]);
+
+        // test the result
+        batch.each { request ->
+            def expected = getClass().getResourceAsStream(new File(request.outputFile).name).read()
+            def actual = new File(request.outputFile).newInputStream().read()
+            assert expected == actual
+        }
+    }
 }
