@@ -25,7 +25,7 @@ class BatchProcessorTest {
         }
     }
 
-    @Test(expectedExceptions = MissingPropertyException.class)
+    @Test
     void processTextToTokens() {
         // create batch
         def batch = examples.collect { example ->
