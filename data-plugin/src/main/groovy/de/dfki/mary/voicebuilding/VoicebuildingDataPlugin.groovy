@@ -35,8 +35,9 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         project.generateSource {
             def maryttsGroovySrcDir = project.file("$destDir/marytts")
             project.sourceSets.marytts.groovy.srcDir maryttsGroovySrcDir
+            ext.srcFileNames = ['BatchProcessor.groovy']
             doLast {
-                ['BatchProcessor.groovy', 'FeatureLister.groovy'].each { srcFileName ->
+                srcFileNames.each { srcFileName ->
                     def destFile = project.file("$maryttsGroovySrcDir/$srcFileName")
                     destFile.parentFile.mkdirs()
                     destFile.withOutputStream { stream ->

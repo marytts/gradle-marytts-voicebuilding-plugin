@@ -36,6 +36,8 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             speechToolsDir = new File(proc.in.text)?.parentFile?.parent
         }
 
+        project.generateSource.srcFileNames << 'FeatureLister.groovy'
+
         project.task('templates', type: LegacyTemplateTask) {
             destDir = project.file("$project.buildDir/templates")
         }
