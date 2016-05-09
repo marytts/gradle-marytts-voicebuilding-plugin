@@ -73,12 +73,10 @@ class BuildLogicFunctionalTest {
                     artifact '[module]_[classifier]/packed/[artifact].[ext]'
                 }
             }
-            mavenLocal()
         }
 
         dependencies {
             data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
-            maryttsRuntime group: 'de.dfki.mary', name: 'marytts-voicebuilding', version: '0.5.3-SNAPSHOT'
         }
 
         text.srcFileName = 'time.data'
