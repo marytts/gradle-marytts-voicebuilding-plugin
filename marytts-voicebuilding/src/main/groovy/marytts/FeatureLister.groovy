@@ -56,4 +56,18 @@ class FeatureLister {
         def shortValuedFeatureNames = fpm.listShortValuedFeatureProcessorNames().tokenize()
         byteValuedFeatureNames + shortValuedFeatureNames
     }
+
+    static void main(String[] args) {
+        def locale = Locale.forLanguageTag(System.properties.locale)
+        log.info "locale = $locale"
+        def lister = new FeatureLister(locale)
+        def destFile = new File(System.properties.outputFile)
+        try {
+            destFile.text = lister.listFeatures().join('\n')
+            log.info "Wrote to $destFile"
+        } catch (e) {
+            log.warn "Could not write to file $destFile": e.message
+            println lister.listFeatures().join('\n')
+        }
+    }
 }

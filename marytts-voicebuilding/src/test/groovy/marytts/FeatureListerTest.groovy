@@ -29,4 +29,15 @@ class FeatureListerTest {
         def actual = new FeatureLister(Locale.GERMAN).listFeatures()
         Assert.assertEquals expected, actual
     }
+
+    @Test
+    void testFeatureListerMain() {
+        def expected = getClass().getResourceAsStream("features.de.txt").readLines()
+        def actualFile = new File(tmpDir, 'actual.txt')
+        System.setProperty('locale', "${Locale.GERMAN}")
+        System.setProperty('outputFile', actualFile.path)
+        FeatureLister.main()
+        def actual = actualFile.readLines()
+        assert expected == actual
+    }
 }
