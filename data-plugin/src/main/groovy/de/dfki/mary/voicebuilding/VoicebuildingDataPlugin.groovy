@@ -23,7 +23,9 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.dependencies {
             maryttsCompile localGroovy()
-            maryttsCompile group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion
+            project.afterEvaluate {
+                maryttsCompile group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion
+            }
         }
 
         project.task('wav', type: AudioConverterTask) {
