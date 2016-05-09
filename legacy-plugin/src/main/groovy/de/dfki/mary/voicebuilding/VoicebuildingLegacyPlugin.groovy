@@ -93,24 +93,34 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.file("$project.legacyBuildDir/features.txt")
         }
 
-        project.task('legacyPhoneUnitFeatureComputer', type: LegacyUnitFeatureComputerTask) {
+        project.task('legacyPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
             dependsOn project.legacyTranscriptionAligner, project.legacyFeatureLister
-            rootFeature = 'phone'
-            exclude = ['halfphone_lr', 'halfphone_unitname']
-            outputType = 'TARGETFEATURES'
             srcDir = project.file("$project.buildDir/allophones")
             destDir = project.file("$project.buildDir/phonefeatures")
-            fileExt = 'pfeats'
+            inputType = 'ALLOPHONES'
+            inputExt = 'xml'
+            outputType = 'TARGETFEATURES'
+            outputExt = 'pfeats'
+            doFirst {
+                outputTypeParams = ['phone'] + project.legacyFeatureLister.destFile.readLines().findAll {
+                    it != 'phone' && !(it in ['halfphone_lr', 'halfphone_unitname'])
+                }
+            }
         }
 
-        project.task('legacyHalfPhoneUnitFeatureComputer', type: LegacyUnitFeatureComputerTask) {
+        project.task('legacyHalfPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
             dependsOn project.legacyTranscriptionAligner, project.legacyFeatureLister
-            rootFeature = 'halfphone_unitname'
-            exclude = []
-            outputType = 'HALFPHONE_TARGETFEATURES'
             srcDir = project.file("$project.buildDir/allophones")
             destDir = project.file("$project.buildDir/halfphonefeatures")
-            fileExt = 'hpfeats'
+            inputType = 'ALLOPHONES'
+            inputExt = 'xml'
+            outputType = 'HALFPHONE_TARGETFEATURES'
+            outputExt = 'hpfeats'
+            doFirst {
+                outputTypeParams = ['halfphone_unitname'] + project.legacyFeatureLister.destFile.readLines().findAll {
+                    it != 'halfphone_unitname'
+                }
+            }
         }
 
         project.task('legacyWaveTimelineMaker', type: LegacyVoiceImportTask) {
