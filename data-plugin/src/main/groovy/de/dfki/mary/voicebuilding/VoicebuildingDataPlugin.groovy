@@ -22,13 +22,29 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         project.dependencies {
-            maryttsRuntime group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion
+            maryttsCompile localGroovy()
+            maryttsCompile group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion
         }
 
         project.task('wav', type: AudioConverterTask) {
             dependsOn project.processDataResources
             srcDir = project.file("$project.sourceSets.data.output.resourcesDir")
             destDir = project.file("$project.buildDir/wav")
+        }
+
+        project.generateSource {
+            def maryttsGroovySrcDir = project.file("$destDir/marytts")
+            project.sourceSets.marytts.groovy.srcDir maryttsGroovySrcDir
+            doLast {
+                ['BatchProcessor.groovy'].each { srcFileName ->
+                    def destFile = project.file("$maryttsGroovySrcDir/$srcFileName")
+                    destFile.parentFile.mkdirs()
+                    destFile.withOutputStream { stream ->
+                        stream << getClass().getResourceAsStream("/marytts/$srcFileName")
+                    }
+                }
+            }
+            project.compileMaryttsJava.dependsOn it
         }
 
         project.task('generateAllophones', type: MaryInterfaceBatchTask) {
