@@ -49,7 +49,7 @@ class BatchProcessorTest {
         batchFile.text = json
 
         // run the batch
-        BatchProcessor.main([batchFile.path] as String[]);
+        BatchProcessor.main([batchFile.path] as String[])
 
         // test the result
         batch.each { request ->
@@ -82,7 +82,7 @@ class BatchProcessorTest {
         batchFile.text = json
 
         // run the batch
-        BatchProcessor.main([batchFile.path] as String[]);
+        BatchProcessor.main([batchFile.path] as String[])
 
         // test the result
         batch.each { request ->
@@ -115,7 +115,7 @@ class BatchProcessorTest {
         batchFile.text = json
 
         // run the batch
-        BatchProcessor.main([batchFile.path] as String[]);
+        BatchProcessor.main([batchFile.path] as String[])
 
         // test the result
         batch.each { request ->
@@ -148,7 +148,7 @@ class BatchProcessorTest {
         batchFile.text = json
 
         // run the batch
-        BatchProcessor.main([batchFile.path] as String[]);
+        BatchProcessor.main([batchFile.path] as String[])
 
         // test the result
         batch.each { request ->
@@ -179,7 +179,7 @@ class BatchProcessorTest {
         batchFile.text = json
 
         // run the batch
-        BatchProcessor.main([batchFile.path] as String[]);
+        BatchProcessor.main([batchFile.path] as String[])
 
         // test the result
         batch.each { request ->
