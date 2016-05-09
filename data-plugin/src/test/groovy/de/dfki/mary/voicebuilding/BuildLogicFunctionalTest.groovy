@@ -46,12 +46,10 @@ class BuildLogicFunctionalTest {
                     artifact '[module]_[classifier]/packed/[artifact].[ext]'
                 }
             }
-            mavenLocal()
         }
 
         dependencies {
             data "$dataDependency"
-            maryttsRuntime group: 'de.dfki.mary', name: 'marytts-voicebuilding', version: '0.5.3-SNAPSHOT'
         }
 
         task testPlugins(group: 'Verification') << {
