@@ -1,7 +1,5 @@
 package de.dfki.mary.voicebuilding.tasks
 
-import marytts.features.FeatureProcessorManager
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 
@@ -12,15 +10,13 @@ class LegacyFeatureListerTask extends DefaultTask {
 
     @TaskAction
     void generate() {
-        def fpm
-        try {
-            fpm = Class.forName("marytts.language.${project.voice.language}.features.FeatureProcessorManager").newInstance()
-        } catch (e) {
-            logger.info "Reflection failed: $e"
-            logger.warn "Instantiating generic FeatureProcessorManager for locale $project.voice.maryLocale"
-            fpm = new FeatureProcessorManager(project.voice.maryLocale)
+        project.javaexec {
+            classpath project.sourceSets.marytts.runtimeClasspath
+            main 'marytts.FeatureLister'
+            systemProperties = [
+                    locale    : project.voice.maryLocale,
+                    outputFile: destFile
+            ]
         }
-        def featureNames = fpm.listByteValuedFeatureProcessorNames() + ' ' + fpm.listShortValuedFeatureProcessorNames()
-        destFile.text = featureNames.replace(' ', '\n')
     }
 }
