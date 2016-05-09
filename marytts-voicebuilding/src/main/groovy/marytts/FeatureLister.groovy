@@ -13,35 +13,40 @@ class FeatureLister {
         this(Locale.US)
     }
 
+    FeatureLister(String localeStr) {
+        this(Locale.forLanguageTag(localeStr.replaceAll('_', '-')))
+    }
+
     FeatureLister(Locale locale) {
+        log.info "locale = $locale"
         fpm = loadFeatureProcessorManager(locale)
     }
 
     FeatureProcessorManager loadFeatureProcessorManager(Locale locale) {
         try {
-            def fpm = Class.forName("marytts.language.${locale}.features.FeatureProcessorManager").newInstance()
-            log.info "Instantiated localized FetureProcessorManager for locale ${locale}"
+            def fpm = Class.forName("marytts.language.${locale.toLanguageTag()}.features.FeatureProcessorManager").newInstance()
+            log.info "Instantiated localized FeatureProcessorManager for locale ${locale.toLanguageTag()}"
             return fpm
         } catch (e) {
             log.info "Reflection failed: $e"
         }
         try {
             def fpm = Class.forName("marytts.language.${locale.language}.features.FeatureProcessorManager").newInstance()
-            log.info "Instantiated localized FetureProcessorManager for locale ${locale.language}"
+            log.info "Instantiated localized FeatureProcessorManager for locale ${locale.language}"
             return fpm
         } catch (e) {
             log.info "Reflection failed: $e"
         }
         try {
-            fpm = new FeatureProcessorManager(locale)
-            log.info "Instantiated generic FeatureProcessorManager for locale ${locale}"
+            fpm = new FeatureProcessorManager(locale.toLanguageTag())
+            log.info "Instantiated generic FeatureProcessorManager for locale ${locale.toLanguageTag()}"
             return fpm
         } catch (e) {
-            log.info "Could not instantiate generic FeatureProcessorManager for locale ${locale}"
+            log.info "Could not instantiate generic FeatureProcessorManager for locale ${locale.toLanguageTag()}"
         }
         try {
             fpm = new FeatureProcessorManager(locale.language)
-            log.info "Instantiated generic FeatureProcessorManager for locale ${locale.locale}"
+            log.info "Instantiated generic FeatureProcessorManager for locale ${locale.language}"
             return fpm
         } catch (e) {
             log.info "Could not instantiate generic FeatureProcessorManager for locale ${locale.language}"
@@ -58,8 +63,7 @@ class FeatureLister {
     }
 
     static void main(String[] args) {
-        def locale = Locale.forLanguageTag(System.properties.locale)
-        log.info "locale = $locale"
+        def locale = System.properties.locale
         def lister = new FeatureLister(locale)
         def destFile = new File(System.properties.outputFile)
         try {
