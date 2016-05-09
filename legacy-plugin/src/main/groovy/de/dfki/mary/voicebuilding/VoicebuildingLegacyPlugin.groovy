@@ -88,13 +88,13 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destDir = project.file("$project.buildDir/allophones")
         }
 
-        project.task('legacyFeatureLister', type: LegacyFeatureListerTask) {
+        project.task('featureLister', type: FeatureListerTask) {
             dependsOn project.maryttsClasses
             destFile = project.file("$project.legacyBuildDir/features.txt")
         }
 
-        project.task('legacyPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
-            dependsOn project.legacyTranscriptionAligner, project.legacyFeatureLister
+        project.task('phoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
+            dependsOn project.legacyTranscriptionAligner, project.featureLister
             srcDir = project.file("$project.buildDir/allophones")
             destDir = project.file("$project.buildDir/phonefeatures")
             inputType = 'ALLOPHONES'
@@ -102,14 +102,14 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             outputType = 'TARGETFEATURES'
             outputExt = 'pfeats'
             doFirst {
-                outputTypeParams = ['phone'] + project.legacyFeatureLister.destFile.readLines().findAll {
+                outputTypeParams = ['phone'] + project.featureLister.destFile.readLines().findAll {
                     it != 'phone' && !(it in ['halfphone_lr', 'halfphone_unitname'])
                 }
             }
         }
 
-        project.task('legacyHalfPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
-            dependsOn project.legacyTranscriptionAligner, project.legacyFeatureLister
+        project.task('halfPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
+            dependsOn project.legacyTranscriptionAligner, project.featureLister
             srcDir = project.file("$project.buildDir/allophones")
             destDir = project.file("$project.buildDir/halfphonefeatures")
             inputType = 'ALLOPHONES'
@@ -117,7 +117,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             outputType = 'HALFPHONE_TARGETFEATURES'
             outputExt = 'hpfeats'
             doFirst {
-                outputTypeParams = ['halfphone_unitname'] + project.legacyFeatureLister.destFile.readLines().findAll {
+                outputTypeParams = ['halfphone_unitname'] + project.featureLister.destFile.readLines().findAll {
                     it != 'halfphone_unitname'
                 }
             }
@@ -145,7 +145,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPhoneUnitLabelComputer, project.legacyPhoneUnitFeatureComputer
+            dependsOn project.legacyPhoneUnitLabelComputer, project.phoneUnitFeatureComputer
             srcDir = project.file("$project.buildDir/phonelab_unaligned")
             destDir = project.file("$project.buildDir/phonelab_aligned")
             doLast {
@@ -157,7 +157,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyHalfPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyHalfPhoneUnitLabelComputer, project.legacyHalfPhoneUnitFeatureComputer
+            dependsOn project.legacyHalfPhoneUnitLabelComputer, project.halfPhoneUnitFeatureComputer
             srcDir = project.file("$project.buildDir/halfphonelab_unaligned")
             destDir = project.file("$project.buildDir/halfphonelab_aligned")
             doLast {
@@ -183,7 +183,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPhoneUnitfileWriter, project.legacyPhoneUnitFeatureComputer
+            dependsOn project.legacyPhoneUnitfileWriter, project.phoneUnitFeatureComputer
             srcFile = project.file("$project.legacyBuildDir/phoneUnits.mry")
             srcDir = project.file("$project.buildDir/phonefeatures")
             destFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
@@ -192,7 +192,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.task('legacyHalfPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
             dependsOn project.legacyHalfPhoneUnitfileWriter
-            dependsOn project.legacyHalfPhoneUnitFeatureComputer
+            dependsOn project.halfPhoneUnitFeatureComputer
             srcFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
             srcDir = project.file("$project.buildDir/halfphonefeatures")
             destFile = project.file("$project.legacyBuildDir/halfphoneFeatures.mry")

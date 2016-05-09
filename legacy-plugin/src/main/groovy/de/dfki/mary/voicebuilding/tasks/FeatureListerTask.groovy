@@ -3,7 +3,7 @@ package de.dfki.mary.voicebuilding.tasks
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 
-class LegacyFeatureListerTask extends DefaultTask {
+class FeatureListerTask extends DefaultTask {
 
     @OutputFile
     File destFile
