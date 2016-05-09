@@ -17,7 +17,7 @@ class FeatureListerTest {
     }
 
     @Test
-    void testUsFeatureLister() {
+    void testUSFeatureLister() {
         def expected = getClass().getResourceAsStream("features.en_US.txt").readLines()
         def actual = new FeatureLister(Locale.US).listFeatures()
         Assert.assertEquals expected, actual
@@ -31,11 +31,26 @@ class FeatureListerTest {
     }
 
     @Test
-    void testFeatureListerMain() {
+    void testUSEnglishFeatureListerMain() {
+        def expected = getClass().getResourceAsStream("features.en_US.txt").readLines()
+        def actualFile = new File(tmpDir, 'actual.txt')
+        System.setProperty('locale', "${Locale.US}")
+        log.info "locale = ${System.properties.locale}"
+        System.setProperty('outputFile', actualFile.path)
+        log.info "outputFile = ${System.properties.outputFile}"
+        FeatureLister.main()
+        def actual = actualFile.readLines()
+        assert expected == actual
+    }
+
+    @Test
+    void testGermanFeatureListerMain() {
         def expected = getClass().getResourceAsStream("features.de.txt").readLines()
         def actualFile = new File(tmpDir, 'actual.txt')
         System.setProperty('locale', "${Locale.GERMAN}")
+        log.info "locale = ${System.properties.locale}"
         System.setProperty('outputFile', actualFile.path)
+        log.info "outputFile = ${System.properties.outputFile}"
         FeatureLister.main()
         def actual = actualFile.readLines()
         assert expected == actual
