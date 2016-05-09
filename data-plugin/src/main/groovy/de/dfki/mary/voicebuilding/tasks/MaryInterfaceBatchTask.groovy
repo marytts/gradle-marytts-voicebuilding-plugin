@@ -17,6 +17,10 @@ class MaryInterfaceBatchTask extends DefaultTask {
     @Input
     String outputType
 
+    @Optional
+    @Input
+    List<String> outputTypeParams
+
     @Input
     String inputExt
 
@@ -32,11 +36,12 @@ class MaryInterfaceBatchTask extends DefaultTask {
         srcDir.eachFileMatch(FileType.FILES, ~/.+\.$inputExt/) { srcFile ->
             def destFile = new File(destDir, srcFile.name.replace(inputExt, outputExt))
             batch << [
-                    locale    : "$project.voice.maryLocale",
-                    inputType : inputType,
-                    inputFile : "$srcFile",
-                    outputType: outputType,
-                    outputFile: "$destFile"
+                    locale          : "$project.voice.maryLocale",
+                    inputType       : inputType,
+                    inputFile       : "$srcFile",
+                    outputType      : outputType,
+                    outputTypeParams: outputTypeParams,
+                    outputFile      : "$destFile"
             ]
         }
         def batchFile = project.file("$temporaryDir/batch.json")
