@@ -32,6 +32,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         project.task('generateAllophones', type: MaryInterfaceBatchTask) {
+            inputs.files project.generateSource
             srcDir = project.file("$project.buildDir/text")
             destDir = project.file("$project.buildDir/prompt_allophones")
             inputType = 'TEXT'
