@@ -24,6 +24,9 @@ class BatchProcessor {
                                 input = DomUtils.parseDocument(input)
                             }
                             mary.outputType = request.outputType
+                            if (request.outputTypeParams) {
+                                mary.outputTypeParams = request.outputTypeParams.join(' ')
+                            }
                             def outputFile = new File(request.outputFile)
                             outputFile.parentFile.mkdirs()
                             switch (request.outputType) {

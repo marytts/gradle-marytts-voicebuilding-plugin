@@ -134,11 +134,16 @@ class BatchProcessorTest {
             def inputPath = "$tmpDir/acoustparams/${example}.acoustparams"
             def outputPath = inputPath.replaceAll('acoustparams', 'targetfeatures')
             [
-                    locale    : "${Locale.US}",
-                    inputType : 'ACOUSTPARAMS',
-                    outputType: 'TARGETFEATURES',
-                    inputFile : inputPath,
-                    outputFile: outputPath
+                    locale          : "${Locale.US}",
+                    inputType       : 'ACOUSTPARAMS',
+                    outputType      : 'TARGETFEATURES',
+                    outputTypeParams: [
+                            'phone',
+                            'stressed',
+                            'accented'
+                    ],
+                    inputFile       : inputPath,
+                    outputFile      : outputPath
             ]
         }
         def json = new JsonBuilder(batch).toPrettyString()
