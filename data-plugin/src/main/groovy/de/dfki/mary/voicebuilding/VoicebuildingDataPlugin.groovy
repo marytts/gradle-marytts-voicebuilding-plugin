@@ -36,7 +36,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             def maryttsGroovySrcDir = project.file("$destDir/marytts")
             project.sourceSets.marytts.groovy.srcDir maryttsGroovySrcDir
             doLast {
-                ['BatchProcessor.groovy'].each { srcFileName ->
+                ['BatchProcessor.groovy', 'FeatureLister.groovy'].each { srcFileName ->
                     def destFile = project.file("$maryttsGroovySrcDir/$srcFileName")
                     destFile.parentFile.mkdirs()
                     destFile.withOutputStream { stream ->
@@ -48,7 +48,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         project.task('generateAllophones', type: MaryInterfaceBatchTask) {
-            inputs.files project.generateSource
+            inputs.files project.maryttsClasses
             srcDir = project.file("$project.buildDir/text")
             destDir = project.file("$project.buildDir/prompt_allophones")
             inputType = 'TEXT'
