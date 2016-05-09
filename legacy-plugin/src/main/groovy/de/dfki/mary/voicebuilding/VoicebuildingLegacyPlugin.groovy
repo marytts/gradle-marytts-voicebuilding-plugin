@@ -1,15 +1,8 @@
 package de.dfki.mary.voicebuilding
 
 import de.dfki.mary.voicebuilding.tasks.*
-
-import groovy.xml.StreamingMarkupBuilder
-import groovy.xml.XmlUtil
-
-import org.apache.commons.codec.digest.DigestUtils
-
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.bundling.Zip
 
 class VoicebuildingLegacyPlugin implements Plugin<Project> {
