@@ -150,11 +150,6 @@ class BuildLogicFunctionalTest {
                 assert fileTree("\$buildDir/halfphonefeatures").include('*.hpfeats').files
             }
         }
-
-        task testMaryJavaExec(type: JavaExec) {
-            classpath sourceSets.marytts.runtimeClasspath
-            main 'marytts.util.PrintSystemProperties'
-        }
         """
     }
 
@@ -256,12 +251,5 @@ class BuildLogicFunctionalTest {
         println result.output
         assert result.task(':generateHalfPhoneFeatures').outcome == UP_TO_DATE
         assert result.task(':testGenerateHalfPhoneFeatures').outcome == SUCCESS
-    }
-
-    @Test
-    void testMaryJavaExec() {
-        def result = gradle.withArguments('testMaryJavaExec').build()
-        println result.output
-        assert result.task(':testMaryJavaExec').outcome == SUCCESS
     }
 }
