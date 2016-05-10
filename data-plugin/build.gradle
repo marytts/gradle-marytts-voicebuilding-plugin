@@ -3,9 +3,11 @@ apply from: "$rootDir/testKitLogic.gradle"
 dependencies {
     compile gradleApi()
     compile project(':base-plugin')
-    runtime group: 'de.dfki.mary', name: 'marytts-lang-en', version: maryttsVersion
     testRuntime project(':festvox-plugin')
-    testRuntime project(':marytts-voicebuilding')
+}
+
+processResources {
+    from project(':marytts-voicebuilding').sourceSets.main.allSource
 }
 
 createClasspathManifest << {

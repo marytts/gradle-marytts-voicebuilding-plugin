@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<maryxml xmlns="http://mary.dfki.de/2002/MaryXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.5" xml:lang="en-US">
+  <p>
+    <s>
+      <t g2p_method="lexicon" ph="' w E l - k @ m" pos="VB">Welcome</t>
+      <t g2p_method="lexicon" ph="' t u" pos="TO">to</t>
+      <t g2p_method="lexicon" ph="D @" pos="DT">the</t>
+      <t g2p_method="lexicon" ph="' w r= l d" pos="NN">world</t>
+      <t g2p_method="lexicon" ph="' V v" pos="IN">of</t>
+      <t g2p_method="lexicon" ph="s - ' p i tS" pos="NN">speech</t>
+      <t g2p_method="lexicon" ph="' s I n - T @ - s @ s" pos="NN">synthesis</t>
+      <t pos=".">!</t>
+    </s>
+  </p>
+</maryxml>
