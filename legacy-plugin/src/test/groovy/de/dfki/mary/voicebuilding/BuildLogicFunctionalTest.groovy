@@ -10,7 +10,7 @@ class BuildLogicFunctionalTest {
     def gradle
     def buildFile
 
-    def maryttsVersion = System.properties.maryttsVersion
+    def maryVersion = System.properties.maryVersion
     def group = 'de.dfki.mary'
     def version = '1.2.3'
     def voiceName = 'cmu-time-awb'
@@ -403,9 +403,9 @@ class BuildLogicFunctionalTest {
                     <description>A ''' + voiceGender + ''' English unit selection voice</description>
                     <license href="''' + voiceLicenseUrl + '''"/>
                     <package md5sum="$ant.md5Hash" filename="$legacyZip.archiveName" size="${legacyZip.archivePath.size()}">
-                        <location folder="true" href="http://mary.dfki.de/download/''' + maryttsVersion + '''/"/>
+                        <location folder="true" href="http://mary.dfki.de/download/''' + maryVersion + '''/"/>
                     </package>
-                    <depends language="''' + voiceLocale.toLanguageTag() + '''" version="''' + maryttsVersion + '''"/>
+                    <depends language="''' + voiceLocale.toLanguageTag() + '''" version="''' + maryVersion + '''"/>
                 </voice>
             </marytts-install>'''
 

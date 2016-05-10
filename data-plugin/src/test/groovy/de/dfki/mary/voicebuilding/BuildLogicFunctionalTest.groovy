@@ -10,7 +10,6 @@ class BuildLogicFunctionalTest {
     def gradle
     def buildFile
 
-    def maryttsVersion = System.properties.maryttsVersion
     def dataDependencyName = 'cmu_time_awb'
     def dataDependency = "org.festvox:$dataDependencyName::ldom@tar.bz2"
 
