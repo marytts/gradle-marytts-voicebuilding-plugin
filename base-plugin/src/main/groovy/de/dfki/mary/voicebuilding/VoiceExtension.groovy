@@ -25,8 +25,13 @@ class VoiceExtension {
         name?.split(/[^_A-Za-z0-9]/).collect { it.capitalize() }.join()
     }
 
+    void setLanguage(String newLanguage) {
+        language = newLanguage
+        region = null
+    }
+
     Locale getLocale() {
-        new Locale(language, region)
+        region ? new Locale(language, region) : new Locale(language)
     }
 
     String getLocaleXml() {
