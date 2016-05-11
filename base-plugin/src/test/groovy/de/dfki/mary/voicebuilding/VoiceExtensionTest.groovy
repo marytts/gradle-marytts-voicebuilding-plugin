@@ -20,7 +20,7 @@ class VoiceExtensionTest {
     }
 
     @Test
-    void testLocale() {
+    void testEnglishLocale() {
         assert voice.locale == Locale.US
         assert voice.localeXml == 'en-US'
         assert voice.maryLocale == 'en_US'
@@ -30,12 +30,17 @@ class VoiceExtensionTest {
         assert voice.localeXml == 'en-GB'
         assert voice.maryLocale == 'en_GB'
         assert voice.maryLocaleXml == 'en-GB'
+    }
+
+    @Test
+    void testGermanLocal() {
         voice.language = 'de'
+        assert !voice.region
+        assert voice.locale == Locale.forLanguageTag('de')
         voice.region = 'DE'
         assert voice.locale == Locale.GERMANY
-        assert voice.localeXml == 'de-DE'
-        assert voice.maryLocale == 'de'
-        assert voice.maryLocaleXml == 'de'
+        voice.region = 'AT'
+        assert voice.locale == Locale.forLanguageTag('de-AT')
     }
 
     @Test
