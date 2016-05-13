@@ -1,0 +1,18 @@
+ByteValuedFeatureProcessors
+phone 0 @ @U A AI D E EI I N O OI S T U V Z _ aU b d dZ f g h i j k l m n p r r= s t tS u v w z {
+stressed 0 1
+accented 0 1
+ShortValuedFeatureProcessors
+ContinuousFeatureProcessors
+
+h 0 0
+@ 0 0
+l 1 1
+@U 1 1
+_ 0 0
+
+24 0 0
+1 0 0
+28 1 1
+2 1 1
+17 0 0

@@ -10,7 +10,7 @@ class BuildLogicFunctionalTest {
     def gradle
     def buildFile
 
-    def maryttsVersion = System.properties.maryttsVersion
+    def maryVersion = System.properties.maryVersion
     def group = 'de.dfki.mary'
     def version = '1.2.3'
     def voiceName = 'cmu-time-awb'
@@ -142,22 +142,22 @@ class BuildLogicFunctionalTest {
             }
         }
 
-        task testLegacyFeatureLister(group: 'Verification') {
-            dependsOn legacyFeatureLister
+        task testFeatureLister(group: 'Verification') {
+            dependsOn featureLister
             doLast {
                 assert file("\$buildDir/mary/features.txt").exists()
             }
         }
 
-        task testLegacyPhoneUnitFeatureComputer(group: 'Verification') {
-            dependsOn legacyPhoneUnitFeatureComputer
+        task testPhoneUnitFeatureComputer(group: 'Verification') {
+            dependsOn phoneUnitFeatureComputer
             doLast {
                 assert fileTree(buildDir).include('phonefeatures/*.pfeats').files
             }
         }
 
-        task testLegacyHalfPhoneUnitFeatureComputer(group: 'Verification') {
-            dependsOn legacyHalfPhoneUnitFeatureComputer
+        task testHalfPhoneUnitFeatureComputer(group: 'Verification') {
+            dependsOn halfPhoneUnitFeatureComputer
             doLast {
                 assert fileTree(buildDir).include('halfphonefeatures/*.hpfeats').files
             }
@@ -403,9 +403,9 @@ class BuildLogicFunctionalTest {
                     <description>A ''' + voiceGender + ''' English unit selection voice</description>
                     <license href="''' + voiceLicenseUrl + '''"/>
                     <package md5sum="$ant.md5Hash" filename="$legacyZip.archiveName" size="${legacyZip.archivePath.size()}">
-                        <location folder="true" href="http://mary.dfki.de/download/''' + maryttsVersion + '''/"/>
+                        <location folder="true" href="http://mary.dfki.de/download/''' + maryVersion + '''/"/>
                     </package>
-                    <depends language="''' + voiceLocale.toLanguageTag() + '''" version="''' + maryttsVersion + '''"/>
+                    <depends language="''' + voiceLocale.toLanguageTag() + '''" version="''' + maryVersion + '''"/>
                 </voice>
             </marytts-install>'''
 
@@ -525,36 +525,36 @@ class BuildLogicFunctionalTest {
     }
 
     @Test
-    void testLegacyFeatureLister() {
-        def result = gradle.withArguments('legacyFeatureLister').build()
+    void testFeatureLister() {
+        def result = gradle.withArguments('featureLister').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testLegacyFeatureLister').build()
+        assert result.task(':featureLister').outcome in [SUCCESS, UP_TO_DATE]
+        result = gradle.withArguments('testFeatureLister').build()
         println result.output
-        assert result.task(':legacyFeatureLister').outcome == UP_TO_DATE
-        assert result.task(':testLegacyFeatureLister').outcome == SUCCESS
+        assert result.task(':featureLister').outcome == UP_TO_DATE
+        assert result.task(':testFeatureLister').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner', 'testLegacyFeatureLister'])
-    void testLegacyPhoneUnitFeatureComputer() {
-        def result = gradle.withArguments('legacyPhoneUnitFeatureComputer').build()
+    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner', 'testFeatureLister'])
+    void testPhoneUnitFeatureComputer() {
+        def result = gradle.withArguments('phoneUnitFeatureComputer').build()
         println result.output
-        assert result.task(':legacyPhoneUnitFeatureComputer').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testLegacyPhoneUnitFeatureComputer').build()
+        assert result.task(':phoneUnitFeatureComputer').outcome in [SUCCESS, UP_TO_DATE]
+        result = gradle.withArguments('testPhoneUnitFeatureComputer').build()
         println result.output
-        assert result.task(':legacyPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':testLegacyPhoneUnitFeatureComputer').outcome == SUCCESS
+        assert result.task(':phoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':testPhoneUnitFeatureComputer').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner', 'testLegacyFeatureLister'])
-    void testLegacyHalfPhoneUnitFeatureComputer() {
-        def result = gradle.withArguments('legacyHalfPhoneUnitFeatureComputer').build()
+    @Test(dependsOnMethods = ['testLegacyTranscriptionAligner', 'testFeatureLister'])
+    void testHalfPhoneUnitFeatureComputer() {
+        def result = gradle.withArguments('halfPhoneUnitFeatureComputer').build()
         println result.output
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testLegacyHalfPhoneUnitFeatureComputer').build()
+        assert result.task(':halfPhoneUnitFeatureComputer').outcome in [SUCCESS, UP_TO_DATE]
+        result = gradle.withArguments('testHalfPhoneUnitFeatureComputer').build()
         println result.output
-        assert result.task(':legacyHalfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
-        assert result.task(':testLegacyHalfPhoneUnitFeatureComputer').outcome == SUCCESS
+        assert result.task(':halfPhoneUnitFeatureComputer').outcome == UP_TO_DATE
+        assert result.task(':testHalfPhoneUnitFeatureComputer').outcome == SUCCESS
     }
 
     @Test(dependsOnMethods = ['testLegacyPraatPitchmarker'])
@@ -590,14 +590,14 @@ class BuildLogicFunctionalTest {
         assert result.task(':testLegacyMCepTimelineMaker').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testLegacyPhoneUnitLabelComputer', 'testLegacyPhoneUnitFeatureComputer'])
+    @Test(dependsOnMethods = ['testLegacyPhoneUnitLabelComputer', 'testPhoneUnitFeatureComputer'])
     void testLegacyPhoneLabelFeatureAligner() {
         def result = gradle.withArguments('legacyPhoneLabelFeatureAligner').build()
         println result.output
         assert result.task(':legacyPhoneLabelFeatureAligner').outcome in [SUCCESS, UP_TO_DATE]
     }
 
-    @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitLabelComputer', 'testLegacyHalfPhoneUnitFeatureComputer'])
+    @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitLabelComputer', 'testHalfPhoneUnitFeatureComputer'])
     void testLegacyHalfPhoneLabelFeatureAligner() {
         def result = gradle.withArguments('legacyHalfPhoneLabelFeatureAligner').build()
         println result.output
@@ -626,7 +626,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':testLegacyHalfPhoneUnitfileWriter').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testLegacyPhoneUnitfileWriter', 'testLegacyPhoneUnitFeatureComputer'])
+    @Test(dependsOnMethods = ['testLegacyPhoneUnitfileWriter', 'testPhoneUnitFeatureComputer'])
     void testLegacyPhoneFeatureFileWriter() {
         def result = gradle.withArguments('legacyPhoneFeatureFileWriter').build()
         println result.output
@@ -637,7 +637,7 @@ class BuildLogicFunctionalTest {
         assert result.task(':testLegacyPhoneFeatureFileWriter').outcome == SUCCESS
     }
 
-    @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitfileWriter', 'testLegacyHalfPhoneUnitFeatureComputer'])
+    @Test(dependsOnMethods = ['testLegacyHalfPhoneUnitfileWriter', 'testHalfPhoneUnitFeatureComputer'])
     void testLegacyHalfPhoneFeatureFileWriter() {
         def result = gradle.withArguments('legacyHalfPhoneFeatureFileWriter').build()
         println result.output

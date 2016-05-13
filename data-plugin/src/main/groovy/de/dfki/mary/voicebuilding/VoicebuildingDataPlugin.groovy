@@ -11,9 +11,22 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply VoicebuildingBasePlugin
 
-        project.configurations.create 'data'
+        project.configurations {
+            create 'data'
+            create 'marytts'
+        }
 
-        project.sourceSets.create 'data'
+        project.sourceSets {
+            create 'data'
+            create 'marytts'
+        }
+
+        project.dependencies {
+            maryttsCompile localGroovy()
+            project.afterEvaluate {
+                maryttsCompile group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion
+            }
+        }
 
         project.task('wav', type: AudioConverterTask) {
             dependsOn project.processDataResources
@@ -21,7 +34,24 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.file("$project.buildDir/wav")
         }
 
+        project.generateSource {
+            def maryttsGroovySrcDir = project.file("$destDir/marytts")
+            project.sourceSets.marytts.groovy.srcDir maryttsGroovySrcDir
+            ext.srcFileNames = ['BatchProcessor.groovy']
+            doLast {
+                srcFileNames.each { srcFileName ->
+                    def destFile = project.file("$maryttsGroovySrcDir/$srcFileName")
+                    destFile.parentFile.mkdirs()
+                    destFile.withOutputStream { stream ->
+                        stream << getClass().getResourceAsStream("/marytts/$srcFileName")
+                    }
+                }
+            }
+            project.compileMaryttsJava.dependsOn it
+        }
+
         project.task('generateAllophones', type: MaryInterfaceBatchTask) {
+            inputs.files project.maryttsClasses
             srcDir = project.file("$project.buildDir/text")
             destDir = project.file("$project.buildDir/prompt_allophones")
             inputType = 'TEXT'
