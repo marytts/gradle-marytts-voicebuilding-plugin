@@ -37,7 +37,8 @@ class FestvoxLabTask extends Copy {
     FestvoxLabTask() {
         include '*.lab'
         filter {
-            it.replaceAll(/\w+$/) {
+            def label = it.trim().split(/\s+/, 3).last()
+            it.trim().replaceAll(label) {
                 mapping[it] ?: it
             }
         }
