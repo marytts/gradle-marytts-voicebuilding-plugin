@@ -187,6 +187,12 @@ class BuildLogicFunctionalTest {
                           <version>$maryVersion</version>
                           <scope>compile</scope>
                         </dependency>
+                        <dependency>
+                          <groupId>de.dfki.mary</groupId>
+                          <artifactId>marytts-lang-$voiceLocale.language</artifactId>
+                          <version>$maryVersion</version>
+                          <scope>runtime</scope>
+                        </dependency>
                       </dependencies>
                     </project>'''
                 XMLUnit.ignoreWhitespace = true
