@@ -50,6 +50,12 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             integrationTestCompile group: 'org.testng', name: 'testng', version: '6.9.4'
         }
 
+        project.afterEvaluate {
+            project.dependencies {
+                runtime "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
+            }
+        }
+
         project.configurations.all {
             resolutionStrategy {
                 dependencySubstitution {
