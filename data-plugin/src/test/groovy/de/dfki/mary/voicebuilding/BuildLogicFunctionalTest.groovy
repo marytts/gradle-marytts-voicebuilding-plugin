@@ -45,12 +45,6 @@ class BuildLogicFunctionalTest {
                     artifact '[organisation]/[module]/[artifact].[ext]'
                 }
             }
-            ivy {
-                url 'http://festvox.org/examples'
-                layout 'pattern', {
-                    artifact '[module]_[classifier]/packed/[artifact].[ext]'
-                }
-            }
         }
 
         dependencies {
