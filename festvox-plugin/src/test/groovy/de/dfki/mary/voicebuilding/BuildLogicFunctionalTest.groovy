@@ -37,6 +37,12 @@ class BuildLogicFunctionalTest {
 
         repositories {
             ivy {
+                url 'https://dl.bintray.com/marytts/marytts'
+                layout 'pattern', {
+                    artifact '[organisation]/[module]/[artifact].[ext]'
+                }
+            }
+            ivy {
                 url 'http://festvox.org/examples'
                 layout 'pattern', {
                     artifact '[module]_[classifier]/packed/[artifact].[ext]'
