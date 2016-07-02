@@ -1,13 +1,15 @@
 plugins {
     id 'base'
+    id 'maven-publish'
+}
+
+allprojects {
+    group 'de.dfki.mary'
+    version '0.5.3-SNAPSHOT'
 }
 
 subprojects {
     apply plugin: 'groovy'
-    apply plugin: 'maven-publish'
-
-    group 'de.dfki.mary'
-    version '0.5.3-SNAPSHOT'
 
     repositories {
         jcenter()
@@ -39,14 +41,39 @@ subprojects {
         from sourceSets.main.allJava
     }
 
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
+}
 
-                artifact sourceJar {
-                    classifier "sources"
-                }
+publishing {
+    publications {
+        basePlugin(MavenPublication) {
+            artifactId project(':base-plugin').name
+            from project(':base-plugin').components.java
+            artifact project(':base-plugin').sourceJar {
+                classifier 'sources'
+            }
+        }
+
+        dataPlugin(MavenPublication) {
+            artifactId project(':data-plugin').name
+            from project(':data-plugin').components.java
+            artifact project(':data-plugin').sourceJar {
+                classifier 'sources'
+            }
+        }
+
+        festvoxPlugin(MavenPublication) {
+            artifactId project(':festvox-plugin').name
+            from project(':festvox-plugin').components.java
+            artifact project(':festvox-plugin').sourceJar {
+                classifier 'sources'
+            }
+        }
+
+        legacyPlugin(MavenPublication) {
+            artifactId project(':legacy-plugin').name
+            from project(':legacy-plugin').components.java
+            artifact project(':legacy-plugin').sourceJar {
+                classifier 'sources'
             }
         }
     }
