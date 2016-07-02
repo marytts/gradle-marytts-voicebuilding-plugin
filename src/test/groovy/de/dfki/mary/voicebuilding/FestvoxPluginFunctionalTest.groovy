@@ -5,7 +5,7 @@ import org.testng.annotations.*
 
 import static org.gradle.testkit.runner.TaskOutcome.*
 
-class BuildLogicFunctionalTest {
+class FestvoxPluginFunctionalTest {
 
     def gradle
     def buildFile

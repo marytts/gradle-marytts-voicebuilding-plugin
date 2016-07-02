@@ -5,7 +5,7 @@ import org.testng.annotations.*
 
 import static org.gradle.testkit.runner.TaskOutcome.*
 
-class BuildLogicFunctionalTest {
+class DataPluginFunctionalTest {
 
     def gradle
     def buildFile
