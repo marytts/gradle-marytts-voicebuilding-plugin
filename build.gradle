@@ -1,42 +1,37 @@
 plugins {
     id 'groovy'
     id 'maven-publish'
+    id 'java-gradle-plugin'
 }
 
-allprojects {
-    group 'de.dfki.mary'
-    version '0.5.3-SNAPSHOT'
+group 'de.dfki.mary'
+version '0.5.3-SNAPSHOT'
+
+repositories {
+    jcenter()
 }
 
-subprojects {
-    apply plugin: 'groovy'
+dependencies {
+    compile localGroovy()
+    compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion
+    testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
+    testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
+}
 
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        compile localGroovy()
-        compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion
-        testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
-    }
-
-    configurations.all {
-        resolutionStrategy {
-            dependencySubstitution {
-                force 'org.codehaus.groovy:groovy-all:2.4.4'
-            }
+configurations.all {
+    resolutionStrategy {
+        dependencySubstitution {
+            force 'org.codehaus.groovy:groovy-all:2.4.4'
         }
     }
+}
 
-    test {
-        useTestNG()
+test {
+    useTestNG()
 
-        testLogging {
-            exceptionFormat = 'full'
-        }
+    testLogging {
+        exceptionFormat = 'full'
     }
-
 }
 
 task sourceJar(type: Jar) {
