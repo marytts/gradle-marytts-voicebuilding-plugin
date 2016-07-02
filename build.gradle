@@ -33,6 +33,13 @@ test {
     testLogging {
         exceptionFormat = 'full'
     }
+
+    doFirst {
+        // path to shared testkit gradle home
+        systemProperty 'testProjectDir', temporaryDir
+        // dynamic marytts version
+        systemProperty 'maryVersion', maryttsVersion
+    }
 }
 
 task sourceJar(type: Jar) {
