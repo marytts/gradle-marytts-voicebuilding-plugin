@@ -4,6 +4,27 @@ plugins {
     id 'java-gradle-plugin'
 }
 
+gradlePlugin {
+    plugins {
+        base {
+            id = 'de.dfki.mary.voicebuilding-base'
+            implementationClass = 'de.dfki.mary.voicebuilding.VoicebuildingBasePlugin'
+        }
+        data {
+            id = 'de.dfki.mary.voicebuilding-data'
+            implementationClass = 'de.dfki.mary.voicebuilding.VoicebuildingDataPlugin'
+        }
+        festvox {
+            id = 'de.dfki.mary.voicebuilding-festvox'
+            implementationClass = 'de.dfki.mary.voicebuilding.VoicebuildingFestvoxPlugin'
+        }
+        legacy {
+            id = 'de.dfki.mary.voicebuilding-legacy'
+            implementationClass = 'de.dfki.mary.voicebuilding.VoicebuildingLegacyPlugin'
+        }
+    }
+}
+
 group 'de.dfki.mary'
 version '0.5.3-SNAPSHOT'
 
