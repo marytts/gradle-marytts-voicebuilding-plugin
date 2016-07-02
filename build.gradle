@@ -1,4 +1,8 @@
-allprojects {
+plugins {
+    id 'base'
+}
+
+subprojects {
     apply plugin: 'groovy'
     apply plugin: 'maven-publish'
 
@@ -31,6 +35,10 @@ allprojects {
         }
     }
 
+    task sourceJar(type: Jar) {
+        from sourceSets.main.allJava
+    }
+
     publishing {
         publications {
             mavenJava(MavenPublication) {
@@ -42,16 +50,4 @@ allprojects {
             }
         }
     }
-}
-
-apply from: 'testKitLogic.gradle'
-
-dependencies {
-    compile gradleApi()
-    compile project('data-plugin')
-    runtime project('legacy-plugin')
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
 }
