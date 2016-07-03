@@ -2,7 +2,6 @@ plugins {
     id 'groovy'
     id 'java-gradle-plugin'
     id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.7'
 }
 
 group 'de.dfki.mary'
@@ -80,24 +79,13 @@ publishing {
             }
         }
     }
-}
-
-bintray {
-    user = findProperty('bintrayUser')
-    key = findProperty('bintrayApiKey')
-    publications = ['mavenJava']
-    pkg {
-        name = project.name
-        repo = 'marytts'
-        userOrg = 'marytts'
-        licenses = ['GPL-3.0']
-        desc = project.description
-        githubRepo = 'marytts/gradle-marytts-voicebuilding-plugin'
-        githubReleaseNotesFile = 'README.md'
-        publicDownloadNumbers = true
-        version {
-            name = project.version
-            vcsTag = "v$project.version"
+    repositories {
+        maven {
+            url "https://api.bintray.com/maven/marytts/marytts/$project.name"
+            credentials {
+                username = findProperty('bintrayUser')
+                password = findProperty('bintrayApiKey')
+            }
         }
     }
 }
