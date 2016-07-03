@@ -1,8 +1,12 @@
 plugins {
     id 'groovy'
-    id 'maven-publish'
     id 'java-gradle-plugin'
+    id 'maven-publish'
 }
+
+group 'de.dfki.mary'
+version '0.5.3-SNAPSHOT'
+description 'A replacement (incubating) for the legacy VoiceImportTools in MaryTTS'
 
 gradlePlugin {
     plugins {
@@ -24,9 +28,6 @@ gradlePlugin {
         }
     }
 }
-
-group 'de.dfki.mary'
-version '0.5.3-SNAPSHOT'
 
 repositories {
     jcenter()
