@@ -50,11 +50,9 @@ configurations.all {
 
 test {
     useTestNG()
-
     testLogging {
         exceptionFormat = 'full'
     }
-
     doFirst {
         // path to shared testkit gradle home
         systemProperty 'testProjectDir', temporaryDir

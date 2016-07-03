@@ -1,9 +1,24 @@
+plugins {
+    id 'groovy'
+}
+
+repositories {
+    jcenter()
+}
+
 dependencies {
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.4'
+    compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion
+    testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
     testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
     testRuntime group: 'de.dfki.mary', name: 'voice-cmu-slt-hsmm', version: maryttsVersion
     testRuntime group: 'de.dfki.mary', name: 'marytts-lang-de', version: maryttsVersion
 }
 
 test {
+    useTestNG()
     workingDir = buildDir
+    testLogging {
+        exceptionFormat = 'full'
+    }
 }
