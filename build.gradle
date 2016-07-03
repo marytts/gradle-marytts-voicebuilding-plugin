@@ -1,57 +1,81 @@
-allprojects {
-    apply plugin: 'groovy'
-    apply plugin: 'maven-publish'
+plugins {
+    id 'groovy'
+    id 'maven-publish'
+    id 'java-gradle-plugin'
+}
 
-    group 'de.dfki.mary'
-    version '0.5.3-SNAPSHOT'
-
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        compile localGroovy()
-        compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion
-        testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
-    }
-
-    configurations.all {
-        resolutionStrategy {
-            dependencySubstitution {
-                force 'org.codehaus.groovy:groovy-all:2.4.4'
-            }
+gradlePlugin {
+    plugins {
+        base {
+            id = 'de.dfki.mary.voicebuilding-base'
+            implementationClass = 'de.dfki.mary.voicebuilding.VoicebuildingBasePlugin'
         }
-    }
-
-    test {
-        useTestNG()
-
-        testLogging {
-            exceptionFormat = 'full'
+        data {
+            id = 'de.dfki.mary.voicebuilding-data'
+            implementationClass = 'de.dfki.mary.voicebuilding.VoicebuildingDataPlugin'
         }
-    }
-
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                from components.java
-
-                artifact sourceJar {
-                    classifier "sources"
-                }
-            }
+        festvox {
+            id = 'de.dfki.mary.voicebuilding-festvox'
+            implementationClass = 'de.dfki.mary.voicebuilding.VoicebuildingFestvoxPlugin'
+        }
+        legacy {
+            id = 'de.dfki.mary.voicebuilding-legacy'
+            implementationClass = 'de.dfki.mary.voicebuilding.VoicebuildingLegacyPlugin'
         }
     }
 }
 
-apply from: 'testKitLogic.gradle'
+group 'de.dfki.mary'
+version '0.5.3-SNAPSHOT'
+
+repositories {
+    jcenter()
+}
 
 dependencies {
-    compile gradleApi()
-    compile project('data-plugin')
-    runtime project('legacy-plugin')
+    compile localGroovy()
+    compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion
+    testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
+    testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
+}
+
+configurations.all {
+    resolutionStrategy {
+        dependencySubstitution {
+            force 'org.codehaus.groovy:groovy-all:2.4.4'
+            substitute module('org.slf4j:slf4j-log4j12:1.6.1') with module('org.slf4j:log4j-over-slf4j:1.6.1')
+        }
+    }
+}
+
+processResources << {
+    file("$destinationDir/maryttsVersion.txt").text = maryttsVersion
+}
+
+test {
+    useTestNG()
+    testLogging {
+        exceptionFormat = 'full'
+    }
+    doFirst {
+        // path to shared testkit gradle home
+        systemProperty 'testProjectDir', temporaryDir
+        // dynamic marytts version
+        systemProperty 'maryVersion', maryttsVersion
+    }
 }
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourceJar {
+                classifier 'sources'
+            }
+        }
+    }
 }

@@ -5,31 +5,20 @@ import org.testng.annotations.*
 
 import static org.gradle.testkit.runner.TaskOutcome.*
 
-class BuildLogicFunctionalTest {
+class FestvoxPluginFunctionalTest {
 
     def gradle
     def buildFile
 
     @BeforeSuite
     void setup() {
-        def testKitDir = new File(System.properties.testKitDir)
-
-        def projectDir = new File(System.properties.testProjectDir)
+        def projectDir = new File("${System.properties.testProjectDir}/festvoxPlugin")
         projectDir.mkdirs()
-        buildFile = new File(projectDir, 'build.gradle')
 
-        def pluginClasspathResource = getClass().classLoader.findResource("plugin-classpath.txt")
-        if (pluginClasspathResource == null) {
-            throw new IllegalStateException("Did not find plugin classpath resource, run `testClasses` build task.")
-        }
-
-        def pluginClasspath = pluginClasspathResource.readLines()
-                .collect { it.replace('\\', '\\\\') } // escape backslashes in Windows paths
-                .collect { new File(it) }
-
-        gradle = GradleRunner.create().withTestKitDir(testKitDir).withProjectDir(projectDir).withPluginClasspath(pluginClasspath)
+        gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath()
 
         // Add the logic under test to the test build
+        buildFile = new File(projectDir, 'build.gradle')
         buildFile.text = """
         plugins {
             id 'de.dfki.mary.voicebuilding-festvox'
