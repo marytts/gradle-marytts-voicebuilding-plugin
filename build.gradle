@@ -48,6 +48,10 @@ configurations.all {
     }
 }
 
+processResources << {
+    file("$destinationDir/maryttsVersion.txt").text = maryttsVersion
+}
+
 test {
     useTestNG()
     testLogging {

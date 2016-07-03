@@ -22,3 +22,7 @@ test {
         exceptionFormat = 'full'
     }
 }
+
+parent.processResources {
+    from sourceSets.main.allSource
+}
