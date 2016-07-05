@@ -147,6 +147,7 @@ class GenerateSource extends DefaultTask {
                                            |        mary.locale = config.locale
                                            |        mary.outputType = MaryDataType.TARGETFEATURES
                                            |        def input = MaryDataType.getExampleText(MaryDataType.TEXT, config.locale)
+                                           |        assert input : "Could not get example text for \$MaryDataType.TEXT / locale \$config.locale"
                                            |        def output = mary.generateText(input)
                                            |        assert output
                                            |    }
@@ -157,6 +158,7 @@ class GenerateSource extends DefaultTask {
                                            |        def config = new Config()
                                            |        mary.voice = config.name
                                            |        def input = MaryDataType.getExampleText(MaryDataType.TEXT, config.locale)
+                                           |        assert input : "Could not get example text for \$MaryDataType.TEXT / locale \$config.locale"
                                            |        def output = mary.generateAudio(input)
                                            |        assert output
                                            |    }
@@ -167,6 +169,7 @@ class GenerateSource extends DefaultTask {
                                            |        mary.inputType = MaryDataType.TOKENS
                                            |        mary.outputType = MaryDataType.TARGETFEATURES
                                            |        def example = MaryDataType.getExampleText(MaryDataType.TOKENS, config.locale)
+                                           |        assert example : "Could not get example text for \$MaryDataType.TOKENS / locale \$config.locale"
                                            |        def input = DomUtils.parseDocument(example)
                                            |        def output = mary.generateText(input)
                                            |        assert output
@@ -177,6 +180,7 @@ class GenerateSource extends DefaultTask {
                                            |        mary.locale = config.locale
                                            |        mary.inputType = MaryDataType.TOKENS
                                            |        def example = MaryDataType.getExampleText(MaryDataType.TOKENS, config.locale)
+                                           |        assert example : "Could not get example text for \$MaryDataType.TOKENS / locale \$config.locale"
                                            |        def input = DomUtils.parseDocument(example)
                                            |        def output = mary.generateAudio(input)
                                            |        assert output
