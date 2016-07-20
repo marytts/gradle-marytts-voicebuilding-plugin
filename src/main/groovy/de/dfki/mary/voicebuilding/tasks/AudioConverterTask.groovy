@@ -19,13 +19,16 @@ class AudioConverterTask extends DefaultTask {
     @Input
     String destFileExt = 'wav'
 
+    @Input
+    int samplingRate = 16000
+
     @TaskAction
     void process() {
         srcDir.eachFileMatch(FileType.FILES, ~/.+\.$srcFileExt/) { srcFile ->
             def destFile = project.file("$destDir/${srcFile.name.replaceAll(~/$srcFileExt$/, destFileExt)}")
             project.exec {
                 executable 'sox'
-                args srcFile, destFile
+                args srcFile, destFile, 'rate', samplingRate
             }
         }
     }
