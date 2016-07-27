@@ -50,6 +50,7 @@ class MaryInterfaceBatchTask extends DefaultTask {
             classpath project.sourceSets.marytts.runtimeClasspath
             main 'marytts.BatchProcessor'
             args batchFile
+            systemProperties << ['mary.base': project.buildDir]
         }
     }
 }
