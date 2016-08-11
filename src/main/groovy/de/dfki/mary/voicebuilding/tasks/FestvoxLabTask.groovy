@@ -43,5 +43,9 @@ class FestvoxLabTask extends Copy {
                 mapping[it] ?: it
             }
         }
+        fileMode = 0644
+        eachFile {
+            project.logger.debug "Wrote $it"
+        }
     }
 }
