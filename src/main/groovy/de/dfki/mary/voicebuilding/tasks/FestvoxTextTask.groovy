@@ -24,7 +24,7 @@ class FestvoxTextTask extends DefaultTask {
             if (m.matches()) {
                 def destFile = new File("$destDir/${m.group('utt')}.txt")
                 project.logger.debug "Wrote $destFile"
-                destFile.text = m.group('text')
+                destFile.text = m.group('text').trim()
                 processed += 1
             } else {
                 project.logger.warn "Could not process line:\n$line"
