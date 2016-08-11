@@ -1,6 +1,7 @@
 package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.*
 
 class FestvoxTextTask extends DefaultTask {
@@ -28,6 +29,9 @@ class FestvoxTextTask extends DefaultTask {
             } else {
                 project.logger.warn "Could not process line:\n$line"
             }
+        }
+        if (processed < 1) {
+            throw new GradleException("Could not extract any utterances from $srcFile")
         }
         project.logger.info "Extracted $processed utterances into $destDir"
     }
