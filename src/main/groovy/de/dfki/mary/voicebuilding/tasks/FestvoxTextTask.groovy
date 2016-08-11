@@ -20,7 +20,7 @@ class FestvoxTextTask extends DefaultTask {
         def srcFile = project.file("$project.sourceSets.data.output.resourcesDir/$srcFileName")
         def processed = 0
         srcFile.eachLine { line ->
-            def m = line =~ /\( (?<utt>.+) "(?<text>.+)" \)/
+            def m = line =~ /\( ?(?<utt>.+) "(?<text>.+)" ?\)/
             if (m.matches()) {
                 def destFile = new File("$destDir/${m.group('utt')}.txt")
                 project.logger.debug "Wrote $destFile"
