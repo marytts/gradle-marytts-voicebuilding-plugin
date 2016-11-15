@@ -2,6 +2,7 @@ plugins {
     id 'groovy'
     id 'java-gradle-plugin'
     id 'maven-publish'
+    id 'com.gradle.plugin-publish' version '0.9.6'
 }
 
 group 'de.dfki.mary'
@@ -25,6 +26,31 @@ gradlePlugin {
         legacy {
             id = 'de.dfki.mary.voicebuilding-legacy'
             implementationClass = 'de.dfki.mary.voicebuilding.VoicebuildingLegacyPlugin'
+        }
+    }
+}
+
+pluginBundle {
+    website = 'http://mary.dfki.de'
+    vcsUrl = 'https://github.com/marytts/gradle-marytts-voicebuilding-plugin'
+    description = 'A replacement for the legacy VoiceImportTools in MaryTTS'
+    tags = ['TTS', 'speech synthesis', 'voicebuilding']
+    plugins {
+        base {
+            id = 'de.dfki.mary.voicebuilding-base'
+            displayName = 'Voicebuilding Base Plugin'
+        }
+        data {
+            id = 'de.dfki.mary.voicebuilding-data'
+            displayName = 'Voicebuilding Data Plugin'
+        }
+        festvox {
+            id = 'de.dfki.mary.voicebuilding-festvox'
+            displayName = 'Voicebuilding FestVox Plugin'
+        }
+        legacy {
+            id = 'de.dfki.mary.voicebuilding-legacy'
+            displayName = 'Voicebuilding Legacy Plugin'
         }
     }
 }
