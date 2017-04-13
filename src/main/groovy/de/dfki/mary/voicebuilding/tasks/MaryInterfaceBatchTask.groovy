@@ -27,6 +27,9 @@ class MaryInterfaceBatchTask extends DefaultTask {
     @Input
     String outputExt
 
+    @Input
+    Map<String, String> maryttsProperties = ['mary.base': project.buildDir]
+
     @OutputDirectory
     File destDir
 
@@ -50,7 +53,7 @@ class MaryInterfaceBatchTask extends DefaultTask {
             classpath project.sourceSets.marytts.runtimeClasspath
             main 'marytts.BatchProcessor'
             args batchFile
-            systemProperties << ['mary.base': project.buildDir]
+            systemProperties << maryttsProperties
         }
     }
 }
