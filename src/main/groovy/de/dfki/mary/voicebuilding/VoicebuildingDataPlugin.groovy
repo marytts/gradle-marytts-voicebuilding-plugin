@@ -22,7 +22,9 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         project.repositories {
-            mavenLocal()
+            maven {
+                url 'https://oss.jfrog.org/artifactory/oss-snapshot-local'
+            }
         }
 
         project.dependencies {
