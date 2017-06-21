@@ -197,7 +197,6 @@ class DataPluginFunctionalTest {
         def result = gradle.withArguments('generateAllophones').build()
         println result.output
         assert result.task(':text').outcome in [SUCCESS, UP_TO_DATE]
-        assert result.task(':generateSource').outcome in [SUCCESS, UP_TO_DATE]
         assert result.task(':generateAllophones').outcome in [SUCCESS, UP_TO_DATE]
         result = gradle.withArguments('testGenerateAllophones').build()
         println result.output
