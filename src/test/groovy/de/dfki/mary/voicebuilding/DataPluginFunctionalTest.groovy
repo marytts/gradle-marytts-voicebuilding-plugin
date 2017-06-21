@@ -66,14 +66,7 @@ class DataPluginFunctionalTest {
             assert configurations.data.dependencies.find { it.name == "$dataDependencyName" }
             assert configurations.maryttsCompile.dependencies.find { it.name == "marytts-lang-\$voice.locale.language" }
         }
-
-        task testCompileMaryttsGroovy(group: 'Verification') {
-            dependsOn compileMaryttsGroovy
-            doLast {
-                assert file("\$buildDir/classes/marytts/marytts/BatchProcessor.class").exists()
-            }
-        }
-
+        
         task testProcessDataResources {
             group 'Verification'
             dependsOn processDataResources
@@ -176,18 +169,6 @@ class DataPluginFunctionalTest {
     }
 
     @Test
-    void testCompileMaryttsGroovy() {
-        def result = gradle.withArguments('compileMaryttsGroovy').build()
-        println result.output
-        assert result.task(':generateSource').outcome in [SUCCESS, UP_TO_DATE]
-        assert result.task(':compileMaryttsGroovy').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testCompileMaryttsGroovy').build()
-        println result.output
-        assert result.task(':compileMaryttsGroovy').outcome == UP_TO_DATE
-        assert result.task(':testCompileMaryttsGroovy').outcome == SUCCESS
-    }
-
-    @Test
     void testPraatPitchmarker() {
         def result = gradle.withArguments('praatPitchmarker').build()
         println result.output
@@ -216,7 +197,6 @@ class DataPluginFunctionalTest {
         def result = gradle.withArguments('generateAllophones').build()
         println result.output
         assert result.task(':text').outcome in [SUCCESS, UP_TO_DATE]
-        assert result.task(':generateSource').outcome in [SUCCESS, UP_TO_DATE]
         assert result.task(':generateAllophones').outcome in [SUCCESS, UP_TO_DATE]
         result = gradle.withArguments('testGenerateAllophones').build()
         println result.output

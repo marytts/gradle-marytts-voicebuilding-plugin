@@ -21,33 +21,24 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             create 'marytts'
         }
 
+        project.repositories {
+            maven {
+                url 'https://oss.jfrog.org/artifactory/oss-snapshot-local'
+            }
+        }
+
         project.dependencies {
             maryttsCompile localGroovy()
             project.afterEvaluate {
                 maryttsCompile group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion
             }
+            maryttsRuntime group: 'de.dfki.mary', name: "marytts-voicebuilding", version: '0.1-SNAPSHOT'
         }
 
         project.task('wav', type: AudioConverterTask) {
             dependsOn project.processDataResources
             srcDir = project.file("$project.sourceSets.data.output.resourcesDir")
             destDir = project.file("$project.buildDir/wav")
-        }
-
-        project.generateSource {
-            def maryttsGroovySrcDir = project.file("$destDir/marytts")
-            project.sourceSets.marytts.groovy.srcDir maryttsGroovySrcDir
-            ext.srcFileNames = ['BatchProcessor.groovy']
-            doLast {
-                srcFileNames.each { srcFileName ->
-                    def destFile = project.file("$maryttsGroovySrcDir/$srcFileName")
-                    destFile.parentFile.mkdirs()
-                    destFile.withOutputStream { stream ->
-                        stream << getClass().getResourceAsStream("/marytts/$srcFileName")
-                    }
-                }
-            }
-            project.compileMaryttsJava.dependsOn it
         }
 
         project.task('generateAllophones', type: MaryInterfaceBatchTask) {
