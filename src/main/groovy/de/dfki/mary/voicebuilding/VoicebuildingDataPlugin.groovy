@@ -21,18 +21,12 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             create 'marytts'
         }
 
-        project.repositories {
-            maven {
-                url 'https://oss.jfrog.org/artifactory/oss-snapshot-local'
-            }
-        }
-
         project.dependencies {
             maryttsCompile localGroovy()
             project.afterEvaluate {
                 maryttsCompile group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion
             }
-            maryttsRuntime group: 'de.dfki.mary', name: "marytts-voicebuilding", version: '0.1-SNAPSHOT'
+            maryttsRuntime group: 'de.dfki.mary', name: "marytts-voicebuilding", version: '0.1'
         }
 
         project.task('wav', type: AudioConverterTask) {
