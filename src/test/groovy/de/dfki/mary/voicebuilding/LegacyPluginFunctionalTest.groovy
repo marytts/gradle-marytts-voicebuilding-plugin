@@ -43,15 +43,22 @@ class LegacyPluginFunctionalTest {
             id 'de.dfki.mary.voicebuilding-festvox'
         }
 
+        def maryVersion = "$maryVersion"
+        def voiceName = "$voiceName"
+        def voiceNameCamelCase = "$voiceNameCamelCase"
+        def voiceGender = "$voiceGender"
+        def voiceLocale = new Locale.Builder().setLanguage("$voiceLocale.language").setRegion("$voiceLocale.country").build()
+        def voiceLicenseUrl = "$voiceLicenseUrl"
+
         group "$group"
         version "$version"
 
         voice {
-            name = "$voiceName"
-            gender = "$voiceGender"
-            region = "$voiceLocale.country"
+            name = "\$voiceName"
+            gender = "\$voiceGender"
+            region = "\$voiceLocale.country"
             license {
-                url = "$voiceLicenseUrl"
+                url = "\$voiceLicenseUrl"
             }
         }
 
@@ -258,7 +265,7 @@ class LegacyPluginFunctionalTest {
         task testProcessResources(group: 'Verification') {
             dependsOn processResources
             doLast {
-                def prefix = "\$sourceSets.main.output.resourcesDir/marytts/voice/$voiceNameCamelCase"
+                def prefix = "\$sourceSets.main.output.resourcesDir/marytts/voice/\$voiceNameCamelCase"
                 assert file("\$prefix/cart.mry").exists()
                 assert file("\$prefix/dur.tree").exists()
                 assert file("\$prefix/f0.left.tree").exists()
@@ -272,7 +279,7 @@ class LegacyPluginFunctionalTest {
         task testProcessLegacyResources(group: 'Verification') {
             dependsOn processLegacyResources
             doLast {
-                def prefix = "\$sourceSets.legacy.output.resourcesDir/lib/voices/$voiceName"
+                def prefix = "\$sourceSets.legacy.output.resourcesDir/lib/voices/\$voiceName"
                 assert file("\$prefix/halfphoneFeatures_ac.mry").exists()
                 assert file("\$prefix/halfphoneUnits.mry").exists()
                 assert file("\$prefix/joinCostFeatures.mry").exists()
@@ -284,60 +291,60 @@ class LegacyPluginFunctionalTest {
         task testGenerateVoiceConfig(group: 'Verification') {
             dependsOn generateVoiceConfig
             doLast {
-                def configFile = file("\$buildDir/resources/main/marytts/voice/$voiceNameCamelCase/voice.config")
+                def configFile = file("\$buildDir/resources/main/marytts/voice/\$voiceNameCamelCase/voice.config")
                 assert configFile.exists()
                 def actual = new Properties()
                 configFile.withInputStream {
                     actual.load it
                 }
                 def expected = [
-                        name                                         : "$voiceName",
-                        locale                                       : "$voiceLocale",
-                        'unitselection.voices.list'                  : "$voiceName",
-                        "voice.${voiceName}.acousticModels"          : 'duration F0 midF0 rightF0',
-                        "voice.${voiceName}.audioTimelineFile"       : "MARY_BASE/lib/voices/$voiceName/timeline_waveforms.mry",
-                        "voice.${voiceName}.audioTimelineReaderClass": 'marytts.unitselection.data.TimelineReader',
-                        "voice.${voiceName}.basenameTimeline"        : "MARY_BASE/lib/voices/$voiceName/timeline_basenames.mry",
-                        "voice.${voiceName}.cartFile"                : 'jar:/marytts/voice/$voiceNameCamelCase/cart.mry',
-                        "voice.${voiceName}.cartReaderClass"         : 'marytts.cart.io.MARYCartReader',
-                        "voice.${voiceName}.concatenatorClass"       : 'marytts.unitselection.concat.OverlapUnitConcatenator',
-                        "voice.${voiceName}.databaseClass"           : 'marytts.unitselection.data.DiphoneUnitDatabase',
-                        "voice.${voiceName}.domain"                  : 'general',
-                        "voice.${voiceName}.duration.attribute"      : 'd',
-                        "voice.${voiceName}.duration.data"           : "jar:/marytts/voice/$voiceNameCamelCase/dur.tree",
-                        "voice.${voiceName}.duration.model"          : 'cart',
-                        "voice.${voiceName}.F0.applyTo"              : 'firstVoicedSegments',
-                        "voice.${voiceName}.F0.attribute"            : 'f0',
-                        "voice.${voiceName}.F0.attribute.format"     : '(0,%.0f)',
-                        "voice.${voiceName}.F0.data"                 : "jar:/marytts/voice/$voiceNameCamelCase/f0.left.tree",
-                        "voice.${voiceName}.F0.model"                : 'cart',
-                        "voice.${voiceName}.F0.predictFrom"          : 'firstVowels',
-                        "voice.${voiceName}.featureFile"             : "MARY_BASE/lib/voices/$voiceName/halfphoneFeatures_ac.mry",
-                        "voice.${voiceName}.gender"                  : "$voiceGender",
-                        "voice.${voiceName}.joinCostClass"           : 'marytts.unitselection.select.JoinCostFeatures',
-                        "voice.${voiceName}.joinCostFile"            : "MARY_BASE/lib/voices/$voiceName/joinCostFeatures.mry",
-                        "voice.${voiceName}.joinCostWeights"         : 'jar:/marytts/voice/$voiceNameCamelCase/joinCostWeights.txt',
-                        "voice.${voiceName}.midF0.applyTo"           : 'firstVowels',
-                        "voice.${voiceName}.midF0.attribute"         : 'f0',
-                        "voice.${voiceName}.midF0.attribute.format"  : '(50,%.0f)',
-                        "voice.${voiceName}.midF0.data"              : "jar:/marytts/voice/$voiceNameCamelCase/f0.mid.tree",
-                        "voice.${voiceName}.midF0.model"             : 'cart',
-                        "voice.${voiceName}.midF0.predictFrom"       : 'firstVowels',
-                        "voice.${voiceName}.locale"                  : "$voiceLocale",
-                        "voice.${voiceName}.rightF0.applyTo"         : 'lastVoicedSegments',
-                        "voice.${voiceName}.rightF0.attribute"       : 'f0',
-                        "voice.${voiceName}.rightF0.attribute.format": '(100,%.0f)',
-                        "voice.${voiceName}.rightF0.data"            : "jar:/marytts/voice/$voiceNameCamelCase/f0.right.tree",
-                        "voice.${voiceName}.rightF0.model"           : 'cart',
-                        "voice.${voiceName}.rightF0.predictFrom"     : 'firstVowels',
-                        "voice.${voiceName}.samplingRate"            : '16000',
-                        "voice.${voiceName}.selectorClass"           : 'marytts.unitselection.select.DiphoneUnitSelector',
-                        "voice.${voiceName}.targetCostClass"         : 'marytts.unitselection.select.DiphoneFFRTargetCostFunction',
-                        "voice.${voiceName}.targetCostWeights"       : 'jar:/marytts/voice/$voiceNameCamelCase/halfphoneUnitFeatureDefinition_ac.txt',
-                        "voice.${voiceName}.unitReaderClass"         : 'marytts.unitselection.data.UnitFileReader',
-                        "voice.${voiceName}.unitsFile"               : "MARY_BASE/lib/voices/$voiceName/halfphoneUnits.mry",
-                        "voice.${voiceName}.viterbi.beamsize"        : '100',
-                        "voice.${voiceName}.viterbi.wTargetCosts"    : '0.7',
+                        name                                         : "\$voiceName",
+                        locale                                       : "\$voiceLocale",
+                        'unitselection.voices.list'                  : "\$voiceName",
+                        "voice.\${voiceName}.acousticModels"          : 'duration F0 midF0 rightF0',
+                        "voice.\${voiceName}.audioTimelineFile"       : "MARY_BASE/lib/voices/\$voiceName/timeline_waveforms.mry",
+                        "voice.\${voiceName}.audioTimelineReaderClass": 'marytts.unitselection.data.TimelineReader',
+                        "voice.\${voiceName}.basenameTimeline"        : "MARY_BASE/lib/voices/\$voiceName/timeline_basenames.mry",
+                        "voice.\${voiceName}.cartFile"                : "jar:/marytts/voice/\$voiceNameCamelCase/cart.mry",
+                        "voice.\${voiceName}.cartReaderClass"         : 'marytts.cart.io.MARYCartReader',
+                        "voice.\${voiceName}.concatenatorClass"       : 'marytts.unitselection.concat.OverlapUnitConcatenator',
+                        "voice.\${voiceName}.databaseClass"           : 'marytts.unitselection.data.DiphoneUnitDatabase',
+                        "voice.\${voiceName}.domain"                  : 'general',
+                        "voice.\${voiceName}.duration.attribute"      : 'd',
+                        "voice.\${voiceName}.duration.data"           : "jar:/marytts/voice/\$voiceNameCamelCase/dur.tree",
+                        "voice.\${voiceName}.duration.model"          : 'cart',
+                        "voice.\${voiceName}.F0.applyTo"              : 'firstVoicedSegments',
+                        "voice.\${voiceName}.F0.attribute"            : 'f0',
+                        "voice.\${voiceName}.F0.attribute.format"     : '(0,%.0f)',
+                        "voice.\${voiceName}.F0.data"                 : "jar:/marytts/voice/\$voiceNameCamelCase/f0.left.tree",
+                        "voice.\${voiceName}.F0.model"                : 'cart',
+                        "voice.\${voiceName}.F0.predictFrom"          : 'firstVowels',
+                        "voice.\${voiceName}.featureFile"             : "MARY_BASE/lib/voices/\$voiceName/halfphoneFeatures_ac.mry",
+                        "voice.\${voiceName}.gender"                  : "\$voiceGender",
+                        "voice.\${voiceName}.joinCostClass"           : 'marytts.unitselection.select.JoinCostFeatures',
+                        "voice.\${voiceName}.joinCostFile"            : "MARY_BASE/lib/voices/\$voiceName/joinCostFeatures.mry",
+                        "voice.\${voiceName}.joinCostWeights"         : "jar:/marytts/voice/\$voiceNameCamelCase/joinCostWeights.txt",
+                        "voice.\${voiceName}.midF0.applyTo"           : 'firstVowels',
+                        "voice.\${voiceName}.midF0.attribute"         : 'f0',
+                        "voice.\${voiceName}.midF0.attribute.format"  : '(50,%.0f)',
+                        "voice.\${voiceName}.midF0.data"              : "jar:/marytts/voice/\$voiceNameCamelCase/f0.mid.tree",
+                        "voice.\${voiceName}.midF0.model"             : 'cart',
+                        "voice.\${voiceName}.midF0.predictFrom"       : 'firstVowels',
+                        "voice.\${voiceName}.locale"                  : "\$voiceLocale",
+                        "voice.\${voiceName}.rightF0.applyTo"         : 'lastVoicedSegments',
+                        "voice.\${voiceName}.rightF0.attribute"       : 'f0',
+                        "voice.\${voiceName}.rightF0.attribute.format": '(100,%.0f)',
+                        "voice.\${voiceName}.rightF0.data"            : "jar:/marytts/voice/\$voiceNameCamelCase/f0.right.tree",
+                        "voice.\${voiceName}.rightF0.model"           : 'cart',
+                        "voice.\${voiceName}.rightF0.predictFrom"     : 'firstVowels',
+                        "voice.\${voiceName}.samplingRate"            : '16000',
+                        "voice.\${voiceName}.selectorClass"           : 'marytts.unitselection.select.DiphoneUnitSelector',
+                        "voice.\${voiceName}.targetCostClass"         : 'marytts.unitselection.select.DiphoneFFRTargetCostFunction',
+                        "voice.\${voiceName}.targetCostWeights"       : "jar:/marytts/voice/\$voiceNameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
+                        "voice.\${voiceName}.unitReaderClass"         : 'marytts.unitselection.data.UnitFileReader',
+                        "voice.\${voiceName}.unitsFile"               : "MARY_BASE/lib/voices/\$voiceName/halfphoneUnits.mry",
+                        "voice.\${voiceName}.viterbi.beamsize"        : '100',
+                        "voice.\${voiceName}.viterbi.wTargetCosts"    : '0.7'
                 ] as Properties
                 assert actual == expected
             }
@@ -352,17 +359,17 @@ class LegacyPluginFunctionalTest {
                 def expected = [
                     'META-INF/MANIFEST.MF',
                     'META-INF/services/marytts.config.MaryConfig',
-                    "META-INF/maven/$group/voice-$voiceName/pom.xml",
-                    "META-INF/maven/$group/voice-$voiceName/pom.properties",
-                    "marytts/voice/$voiceNameCamelCase/Config.class",
-                    "marytts/voice/$voiceNameCamelCase/cart.mry",
-                    "marytts/voice/$voiceNameCamelCase/dur.tree",
-                    "marytts/voice/$voiceNameCamelCase/f0.left.tree",
-                    "marytts/voice/$voiceNameCamelCase/f0.mid.tree",
-                    "marytts/voice/$voiceNameCamelCase/f0.right.tree",
-                    "marytts/voice/$voiceNameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
-                    "marytts/voice/$voiceNameCamelCase/joinCostWeights.txt",
-                    "marytts/voice/$voiceNameCamelCase/voice.config"
+                    "META-INF/maven/\$project.group/voice-\$voiceName/pom.xml",
+                    "META-INF/maven/\$project.group/voice-\$voiceName/pom.properties",
+                    "marytts/voice/\$voiceNameCamelCase/Config.class",
+                    "marytts/voice/\$voiceNameCamelCase/cart.mry",
+                    "marytts/voice/\$voiceNameCamelCase/dur.tree",
+                    "marytts/voice/\$voiceNameCamelCase/f0.left.tree",
+                    "marytts/voice/\$voiceNameCamelCase/f0.mid.tree",
+                    "marytts/voice/\$voiceNameCamelCase/f0.right.tree",
+                    "marytts/voice/\$voiceNameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
+                    "marytts/voice/\$voiceNameCamelCase/joinCostWeights.txt",
+                    "marytts/voice/\$voiceNameCamelCase/voice.config"
                 ] as Set
                 assert actual == expected
             }
@@ -373,11 +380,11 @@ class LegacyPluginFunctionalTest {
             doLast {
                 def actual = new ZipFile(legacyZip.archivePath).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
                 def expected = [
-                    "lib/voices/$voiceName/halfphoneFeatures_ac.mry",
-                    "lib/voices/$voiceName/halfphoneUnits.mry",
-                    "lib/voices/$voiceName/joinCostFeatures.mry",
-                    "lib/voices/$voiceName/timeline_basenames.mry",
-                    "lib/voices/$voiceName/timeline_waveforms.mry",
+                    "lib/voices/\$voiceName/halfphoneFeatures_ac.mry",
+                    "lib/voices/\$voiceName/halfphoneUnits.mry",
+                    "lib/voices/\$voiceName/joinCostFeatures.mry",
+                    "lib/voices/\$voiceName/timeline_basenames.mry",
+                    "lib/voices/\$voiceName/timeline_waveforms.mry",
                     "lib/\$jar.archiveName"
                 ] as Set
                 assert actual == expected
@@ -392,13 +399,13 @@ class LegacyPluginFunctionalTest {
                 ant.checksum file: legacyZip.archivePath, algorithm: 'MD5', property: 'md5Hash'
                 def expected  = new groovy.xml.StreamingMarkupBuilder().bind {
                     'marytts-install'(xmlns: "http://mary.dfki.de/installer") {
-                        voice(locale: '$voiceLocale', name: '$voiceName', gender: '$voiceGender', type: 'unit selection', version: '$version') {
-                            delegate.description "A $voiceGender English unit selection voice"
-                            license(href: '$voiceLicenseUrl')
+                        voice(locale: voiceLocale, name: voiceName, gender: voiceGender, type: 'unit selection', version: version) {
+                            delegate.description "A \$voiceGender English unit selection voice"
+                            license(href: voiceLicenseUrl)
                             delegate.package(md5sum: ant.md5Hash, filename: legacyZip.archiveName, size: legacyZip.archivePath.size()) {
-                                location(folder: true, href: "http://mary.dfki.de/download/$maryVersion/")
+                                location(folder: true, href: "http://mary.dfki.de/download/\$maryVersion/")
                             }
-                            depends(language: '${voiceLocale.toLanguageTag()}', version: '$maryVersion')
+                            depends(language: voiceLocale.toLanguageTag(), version: maryVersion)
                         }
                     }
                 } as String
