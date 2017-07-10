@@ -143,40 +143,43 @@ class BasePluginFunctionalTest {
             doLast {
                 def pomFile = file("\$buildDir/resources/main/META-INF/maven/$group/voice-$voiceName/pom.xml")
                 assert pomFile.exists()
-                def pomXml = '''<?xml version="1.0"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-                      <modelVersion>4.0.0</modelVersion>
-                      <groupId>$group</groupId>
-                      <artifactId>$projectDir.name</artifactId>
-                      <version>$version</version>
-                      <description>$voiceDescription</description>
-                      <licenses>
-                        <license>
-                          <name>$voiceLicenseName</name>
-                          <url>$voiceLicenseUrl</url>
-                        </license>
-                      </licenses>
-                      <dependencies>
-                        <dependency>
-                          <groupId>junit</groupId>
-                          <artifactId>junit</artifactId>
-                          <version>4.12</version>
-                          <scope>test</scope>
-                        </dependency>
-                        <dependency>
-                          <groupId>de.dfki.mary</groupId>
-                          <artifactId>marytts-runtime</artifactId>
-                          <version>$maryVersion</version>
-                          <scope>compile</scope>
-                        </dependency>
-                        <dependency>
-                          <groupId>de.dfki.mary</groupId>
-                          <artifactId>marytts-lang-$voiceLocale.language</artifactId>
-                          <version>$maryVersion</version>
-                          <scope>runtime</scope>
-                        </dependency>
-                      </dependencies>
-                    </project>'''
+                def pomXml  = new groovy.xml.StreamingMarkupBuilder().bind {
+                    project(xmlns: "http://maven.apache.org/POM/4.0.0",
+                            'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance",
+                            'xsi:schemaLocation': "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd") {
+                        modelVersion '4.0.0'
+                        groupId '$group'
+                        artifactId projectDir.name
+                        delegate.version '$version'
+                        delegate.description '$voiceDescription'
+                        licenses {
+                            license {
+                                delegate.name '$voiceLicenseName'
+                                url '$voiceLicenseUrl'
+                            }
+                        }
+                        delegate.dependencies {
+                            dependency {
+                                groupId 'junit'
+                                artifactId 'junit'
+                                delegate.version '4.12'
+                                scope 'test'
+                            }
+                            dependency {
+                                groupId 'de.dfki.mary'
+                                artifactId 'marytts-runtime'
+                                delegate.version '$maryVersion'
+                                scope 'compile'
+                            }
+                            dependency {
+                                groupId 'de.dfki.mary'
+                                artifactId "marytts-lang-$voiceLocale.language"
+                                delegate.version '$maryVersion'
+                                scope 'runtime'
+                            }
+                        }
+                    }
+                } as String
                 XMLUnit.ignoreWhitespace = true
                 def diff = XMLUnit.compareXML(pomFile.text, pomXml)
                 diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier())
