@@ -44,6 +44,15 @@ class BasePluginFunctionalTest {
             id 'de.dfki.mary.voicebuilding-base'
         }
 
+        def maryVersion = "$maryVersion"
+        def voiceName = "$voiceName"
+        def voiceNameCamelCase = "$voiceNameCamelCase"
+        def voiceGender = "$voiceGender"
+        def voiceLocale = new Locale.Builder().setLanguage("$voiceLocale.language").setRegion("$voiceLocale.country").build()
+        def voiceDescription = "$voiceDescription"
+        def voiceLicenseName = "$voiceLicenseName"
+        def voiceLicenseUrl = "$voiceLicenseUrl"
+
         group "$group"
         version "$version"
 
@@ -61,14 +70,14 @@ class BasePluginFunctionalTest {
         }
 
         task testVoiceProps(group: 'Verification') << {
-            assert voice.name == "$voiceName"
-            assert voice.language == "$voiceLocale.language"
-            assert voice.region == "$voiceLocale.country"
-            assert voice.nameCamelCase == "$voiceNameCamelCase"
-            assert voice.locale == new Locale("$voiceLocale.language", "$voiceLocale.country")
-            assert voice.localeXml == "${voiceLocale.toLanguageTag()}"
-            assert voice.description == "$voiceDescription"
-            assert voice.license?.name == "$voiceLicenseName"
+            assert voice.name == "\$voiceName"
+            assert voice.language == "\$voiceLocale.language"
+            assert voice.region == "\$voiceLocale.country"
+            assert voice.nameCamelCase == "\$voiceNameCamelCase"
+            assert voice.locale == new Locale("\$voiceLocale.language", "\$voiceLocale.country")
+            assert voice.localeXml == "\${voiceLocale.toLanguageTag()}"
+            assert voice.description == "\$voiceDescription"
+            assert voice.license?.name == "\$voiceLicenseName"
         }
 
         task testJavaCompatibility(group: 'Verification') << {
@@ -114,13 +123,13 @@ class BasePluginFunctionalTest {
                     actual.load it
                 }
                 def expected = [
-                        name                             : "$voiceName",
-                        locale                           : "$voiceLocale",
-                        'unitselection.voices.list'      : "$voiceName",
-                        "voice.${voiceName}.domain"      : 'general',
-                        "voice.${voiceName}.gender"      : "$voiceGender",
-                        "voice.${voiceName}.locale"      : "$voiceLocale",
-                        "voice.${voiceName}.samplingRate": '16000'
+                        name                             : "\$voiceName",
+                        locale                           : "\$voiceLocale",
+                        'unitselection.voices.list'      : "\$voiceName",
+                        "voice.\${voiceName}.domain"      : 'general',
+                        "voice.\${voiceName}.gender"      : "\$voiceGender",
+                        "voice.\${voiceName}.locale"      : "\$voiceLocale",
+                        "voice.\${voiceName}.samplingRate": '16000'
                 ] as Properties
                 assert actual == expected
             }
@@ -141,21 +150,21 @@ class BasePluginFunctionalTest {
         task testGeneratePom(group: 'Verification') {
             dependsOn generatePom
             doLast {
-                def pomFile = file("\$buildDir/resources/main/META-INF/maven/$group/voice-$voiceName/pom.xml")
+                def pomFile = file("\$buildDir/resources/main/META-INF/maven/\$project.group/voice-\$voiceName/pom.xml")
                 assert pomFile.exists()
                 def pomXml  = new groovy.xml.StreamingMarkupBuilder().bind {
                     project(xmlns: "http://maven.apache.org/POM/4.0.0",
                             'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance",
                             'xsi:schemaLocation': "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd") {
                         modelVersion '4.0.0'
-                        groupId '$group'
+                        groupId project.group
                         artifactId projectDir.name
-                        delegate.version '$version'
-                        delegate.description '$voiceDescription'
+                        delegate.version project.version
+                        delegate.description voiceDescription
                         licenses {
                             license {
-                                delegate.name '$voiceLicenseName'
-                                url '$voiceLicenseUrl'
+                                delegate.name voiceLicenseName
+                                url voiceLicenseUrl
                             }
                         }
                         delegate.dependencies {
@@ -168,13 +177,13 @@ class BasePluginFunctionalTest {
                             dependency {
                                 groupId 'de.dfki.mary'
                                 artifactId 'marytts-runtime'
-                                delegate.version '$maryVersion'
+                                delegate.version maryVersion
                                 scope 'compile'
                             }
                             dependency {
                                 groupId 'de.dfki.mary'
-                                artifactId "marytts-lang-$voiceLocale.language"
-                                delegate.version '$maryVersion'
+                                artifactId "marytts-lang-\$voiceLocale.language"
+                                delegate.version maryVersion
                                 scope 'runtime'
                             }
                         }
@@ -190,9 +199,9 @@ class BasePluginFunctionalTest {
         task testGeneratePomProperties(group: 'Verification') {
             dependsOn generatePomProperties
             doLast {
-                def pomPropertiesFile = file("\$buildDir/resources/main/META-INF/maven/$group/voice-$voiceName/pom.properties")
+                def pomPropertiesFile = file("\$buildDir/resources/main/META-INF/maven/\$project.group/voice-\$voiceName/pom.properties")
                 assert pomPropertiesFile.exists()
-                assert pomPropertiesFile.readLines() == ['version=$version', 'groupId=$group', 'artifactId=$projectDir.name']
+                assert pomPropertiesFile.readLines() == ["version=\$version", "groupId=\$project.group", "artifactId=\$projectDir.name"]
             }
         }
 
@@ -205,8 +214,8 @@ class BasePluginFunctionalTest {
                 def expected = [
                     'META-INF/MANIFEST.MF',
                     'META-INF/services/marytts.config.MaryConfig',
-                    "META-INF/maven/$group/voice-$voiceName/pom.xml",
-                    "META-INF/maven/$group/voice-$voiceName/pom.properties",
+                    "META-INF/maven/\$project.group/voice-\$voiceName/pom.xml",
+                    "META-INF/maven/\$project.group/voice-\$voiceName/pom.properties",
                     "marytts/voice/\$voice.nameCamelCase/Config.class",
                     "marytts/voice/\$voice.nameCamelCase/voice.config"
                 ] as Set
