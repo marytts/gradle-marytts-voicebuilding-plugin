@@ -27,6 +27,9 @@ class DataPluginFunctionalTest {
             id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
         }
 
+        def dataDependencyName = "$dataDependencyName"
+        def dataDependency = "$dataDependency"
+
         repositories {
             ivy {
                 url 'https://dl.bintray.com/marytts/marytts'
@@ -43,7 +46,7 @@ class DataPluginFunctionalTest {
         }
 
         dependencies {
-            data "$dataDependency"
+            data "\$dataDependency"
         }
 
         task testPlugins(group: 'Verification') << {
@@ -63,7 +66,7 @@ class DataPluginFunctionalTest {
         }
 
         task testDependencies(group: 'Verification') << {
-            assert configurations.data.dependencies.find { it.name == "$dataDependencyName" }
+            assert configurations.data.dependencies.find { it.name == "\$dataDependencyName" }
             assert configurations.maryttsCompile.dependencies.find { it.name == "marytts-lang-\$voice.locale.language" }
         }
         
