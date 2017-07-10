@@ -390,28 +390,25 @@ class LegacyPluginFunctionalTest {
                 assert actual == expected
             }
         }
-        """
 
-        def expectedLegacyDescriptor = '''<?xml version="1.0"?>
-            <marytts-install xmlns="http://mary.dfki.de/installer">
-                <voice locale="''' + voiceLocale + '''" name="''' + voiceName + '''" gender="''' + voiceGender + '''" type="unit selection" version="''' + version + '''">
-                    <description>A ''' + voiceGender + ''' English unit selection voice</description>
-                    <license href="''' + voiceLicenseUrl + '''"/>
-                    <package md5sum="$ant.md5Hash" filename="$legacyZip.archiveName" size="${legacyZip.archivePath.size()}">
-                        <location folder="true" href="http://mary.dfki.de/download/''' + maryVersion + '''/"/>
-                    </package>
-                    <depends language="''' + voiceLocale.toLanguageTag() + '''" version="''' + maryVersion + '''"/>
-                </voice>
-            </marytts-install>'''
-
-        buildFile << """
         import org.custommonkey.xmlunit.XMLUnit
 
         task testLegacyDescriptor(group: 'Verification') {
             dependsOn legacyDescriptor
             doLast {
                 ant.checksum file: legacyZip.archivePath, algorithm: 'MD5', property: 'md5Hash'
-                def expected = \"\"\"$expectedLegacyDescriptor\"\"\"
+                def expected  = new groovy.xml.StreamingMarkupBuilder().bind {
+                    'marytts-install'(xmlns: "http://mary.dfki.de/installer") {
+                        voice(locale: '$voiceLocale', name: '$voiceName', gender: '$voiceGender', type: 'unit selection', version: '$version') {
+                            delegate.description "A $voiceGender English unit selection voice"
+                            license(href: '$voiceLicenseUrl')
+                            delegate.package(md5sum: ant.md5Hash, filename: legacyZip.archiveName, size: legacyZip.archivePath.size()) {
+                                location(folder: true, href: "http://mary.dfki.de/download/$maryVersion/")
+                            }
+                            depends(language: '${voiceLocale.toLanguageTag()}', version: '$maryVersion')
+                        }
+                    }
+                } as String
                 def actual = legacyDescriptor.destFile.text
                 XMLUnit.ignoreWhitespace = true
                 assert XMLUnit.compareXML(expected, actual).similar()
