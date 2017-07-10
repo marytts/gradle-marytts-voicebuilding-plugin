@@ -109,16 +109,9 @@ class BasePluginFunctionalTest {
             doLast {
                 def configFile = file("\$buildDir/resources/main/marytts/voice/\$voice.nameCamelCase/voice.config")
                 assert configFile.exists()
-                def actual = [:]
-                configFile.eachLine { line ->
-                    switch(line) {
-                        case ~/.+=.+/:
-                            def (key, value) = line.split('=', 2)
-                            actual[key.trim()] = value.trim()
-                            break
-                        default:
-                            break
-                    }
+                def actual = new Properties()
+                configFile.withInputStream {
+                    actual.load it
                 }
                 def expected = [
                         name                             : "$voiceName",
@@ -128,7 +121,7 @@ class BasePluginFunctionalTest {
                         "voice.${voiceName}.gender"      : "$voiceGender",
                         "voice.${voiceName}.locale"      : "$voiceLocale",
                         "voice.${voiceName}.samplingRate": '16000'
-                ]
+                ] as Properties
                 assert actual == expected
             }
         }
