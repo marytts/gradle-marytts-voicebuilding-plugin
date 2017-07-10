@@ -286,16 +286,9 @@ class LegacyPluginFunctionalTest {
             doLast {
                 def configFile = file("\$buildDir/resources/main/marytts/voice/$voiceNameCamelCase/voice.config")
                 assert configFile.exists()
-                def actual = [:]
-                configFile.eachLine { line ->
-                    switch(line) {
-                        case ~/.+=.+/:
-                            def (key, value) = line.split('=', 2)
-                            actual[key.trim()] = value.trim()
-                            break
-                        default:
-                            break
-                    }
+                def actual = new Properties()
+                configFile.withInputStream {
+                    actual.load it
                 }
                 def expected = [
                         name                                         : "$voiceName",
@@ -345,7 +338,7 @@ class LegacyPluginFunctionalTest {
                         "voice.${voiceName}.unitsFile"               : "MARY_BASE/lib/voices/$voiceName/halfphoneUnits.mry",
                         "voice.${voiceName}.viterbi.beamsize"        : '100',
                         "voice.${voiceName}.viterbi.wTargetCosts"    : '0.7',
-                ]
+                ] as Properties
                 assert actual == expected
             }
         }
