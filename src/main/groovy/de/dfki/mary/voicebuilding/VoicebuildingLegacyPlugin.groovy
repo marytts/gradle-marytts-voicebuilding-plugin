@@ -12,10 +12,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.plugins.apply VoicebuildingDataPlugin
 
-        project.repositories {
-            jcenter()
-        }
-
         project.sourceSets.create 'legacy'
 
         project.configurations.create 'legacy'
