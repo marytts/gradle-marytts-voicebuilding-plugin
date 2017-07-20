@@ -33,7 +33,6 @@ class DataPluginFunctionalTest {
                 ['help', false],
                 ['testConfigurations', false],
                 ['testSourceSets', false],
-                ['dependencies', false],
                 ['testDependencies', false],
                 ['praatPitchmarker', true],
                 ['mcepMaker', true],

@@ -42,7 +42,6 @@ class BasePluginFunctionalTest {
         [
                 ['help', false],
                 ['testPlugins', false],
-                ['dependencies', false],
                 ['testVoiceProps', false],
                 ['testJavaCompatibility', false],
                 ['generateSource', true],
