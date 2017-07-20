@@ -21,25 +21,32 @@ dependencies {
     data dataDependency
 }
 
-task testPlugins(group: 'Verification') << {
-    assert plugins.findPlugin('java')
-    assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
-    assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
+task testPlugins(group: 'Verification') {
+    doLast {
+        assert plugins.findPlugin('java')
+        assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
+        assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
+    }
 }
 
-task testConfigurations(group: 'Verification') << {
-    assert configurations.data
-    assert configurations.marytts
+task testConfigurations(group: 'Verification') {
+    doLast {
+        assert configurations.data
+        assert configurations.marytts
+    }
 }
 
-task testSourceSets(group: 'Verification') << {
-    assert sourceSets.data
-    assert sourceSets.marytts
+task testSourceSets(group: 'Verification') {
+    doLast {
+        assert sourceSets.data
+    }
 }
 
-task testDependencies(group: 'Verification') << {
-    assert configurations.data.dependencies.find { it.name == dataDependencyName }
-    assert configurations.maryttsCompile.dependencies.find { it.name == "marytts-lang-$voice.locale.language" }
+task testDependencies(group: 'Verification') {
+    doLast {
+        assert configurations.data.dependencies.find { it.name == dataDependencyName }
+        assert configurations.marytts.dependencies.find { it.name == "marytts-lang-$voice.locale.language" }
+    }
 }
 
 task testProcessDataResources {

@@ -12,10 +12,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.plugins.apply VoicebuildingDataPlugin
 
-        project.repositories {
-            jcenter()
-        }
-
         project.sourceSets.create 'legacy'
 
         project.configurations.create 'legacy'
@@ -80,7 +76,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('featureLister', type: FeatureListerTask) {
-            dependsOn project.maryttsClasses
             destFile = project.file("$project.legacyBuildDir/features.txt")
         }
 
@@ -355,12 +350,14 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             project.dependencies {
-                compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
+                compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion", {
+                    exclude module: 'groovy-all'
+                }
                 legacy("de.dfki.mary:marytts-builder:$project.maryttsVersion") {
                     exclude module: 'mwdumper'
                     exclude module: 'sgt'
                 }
-                testCompile "junit:junit:4.11"
+                testCompile "junit:junit:4.12"
             }
         }
     }

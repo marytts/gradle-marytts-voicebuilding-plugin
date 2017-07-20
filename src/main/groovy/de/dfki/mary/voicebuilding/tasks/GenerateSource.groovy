@@ -1,7 +1,5 @@
 package de.dfki.mary.voicebuilding.tasks
 
-import groovy.util.FileTreeBuilder
-
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.*
 

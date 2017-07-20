@@ -23,25 +23,31 @@ def voiceLocale = new Locale.Builder()
         .setRegion(voiceLocaleRegion)
         .build()
 
-task testPlugins(group: 'Verification') << {
-    assert plugins.findPlugin('java')
-    assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
+task testPlugins(group: 'Verification') {
+    doLast {
+        assert plugins.findPlugin('java')
+        assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
+    }
 }
 
-task testVoiceProps(group: 'Verification') << {
-    assert voice.name == voiceName
-    assert voice.language == voiceLocale.language
-    assert voice.region == voiceLocale.country
-    assert voice.nameCamelCase == voiceNameCamelCase
-    assert voice.locale == voiceLocale
-    assert voice.localeXml == voiceLocale.toLanguageTag()
-    assert voice.description == voiceDescription
-    assert voice.license?.name == voiceLicenseName
+task testVoiceProps(group: 'Verification') {
+    doLast {
+        assert voice.name == voiceName
+        assert voice.language == voiceLocale.language
+        assert voice.region == voiceLocale.country
+        assert voice.nameCamelCase == voiceNameCamelCase
+        assert voice.locale == voiceLocale
+        assert voice.localeXml == voiceLocale.toLanguageTag()
+        assert voice.description == voiceDescription
+        assert voice.license?.name == voiceLicenseName
+    }
 }
 
-task testJavaCompatibility(group: 'Verification') << {
-    assert "$sourceCompatibility" == '1.7'
-    assert "$targetCompatibility" == '1.7'
+task testJavaCompatibility(group: 'Verification') {
+    doLast {
+        assert "$sourceCompatibility" == '1.7'
+        assert "$targetCompatibility" == '1.7'
+    }
 }
 
 task testGenerateSource(group: 'Verification') {
