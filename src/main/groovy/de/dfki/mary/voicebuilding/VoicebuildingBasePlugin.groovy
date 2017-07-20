@@ -44,7 +44,9 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.dependencies {
-            compile group: 'de.dfki.mary', name: 'marytts-runtime', version: project.maryttsVersion
+            compile group: 'de.dfki.mary', name: 'marytts-runtime', version: project.maryttsVersion, {
+                exclude module: 'groovy-all'
+            }
             testCompile group: 'junit', name: 'junit', version: '4.12'
             integrationTestCompile localGroovy()
             integrationTestCompile group: 'org.testng', name: 'testng', version: '6.9.4'
@@ -52,14 +54,8 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             project.dependencies {
-                runtime "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion"
-            }
-        }
-
-        project.configurations.all {
-            resolutionStrategy {
-                dependencySubstitution {
-                    force 'org.codehaus.groovy:groovy-all:2.4.4'
+                runtime "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion", {
+                    exclude module: 'groovy-all'
                 }
             }
         }
