@@ -29,6 +29,19 @@ class BasePluginFunctionalTest {
         gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath()
 
         // Add the logic under test to the test build
+        new File(projectDir, 'gradle.properties').withWriter {
+            it.println "maryVersion=$maryVersion"
+            it.println "voiceName=$voiceName"
+            it.println "voiceNameCamelCase=$voiceNameCamelCase"
+            it.println "voiceGender=$voiceGender"
+            it.println "voiceLocaleLanguage=$voiceLocale.language"
+            it.println "voiceLocaleRegion=$voiceLocale.country"
+            it.println "voiceDescription=$voiceDescription"
+            it.println "voiceLicenseName=$voiceLicenseName"
+            it.println "voiceLicenseUrl=$voiceLicenseUrl"
+            it.println "group=$group"
+            it.println "version=$version"
+        }
         buildFile = new File(projectDir, 'build.gradle')
         buildFile.text = """
         buildscript {
@@ -44,25 +57,14 @@ class BasePluginFunctionalTest {
             id 'de.dfki.mary.voicebuilding-base'
         }
 
-        def maryVersion = "$maryVersion"
-        def voiceName = "$voiceName"
-        def voiceNameCamelCase = "$voiceNameCamelCase"
-        def voiceGender = "$voiceGender"
-        def voiceLocale = new Locale.Builder().setLanguage("$voiceLocale.language").setRegion("$voiceLocale.country").build()
-        def voiceDescription = "$voiceDescription"
-        def voiceLicenseName = "$voiceLicenseName"
-        def voiceLicenseUrl = "$voiceLicenseUrl"
-
-        group "$group"
-        version "$version"
-
         voice {
-            name = "$voiceName"
+            name = "\$voiceName"
             license {
-                name = "$voiceLicenseName"
-                url = "$voiceLicenseUrl"
+                name = "\$voiceLicenseName"
+                url = "\$voiceLicenseUrl"
             }
         }
+        def voiceLocale = new Locale.Builder().setLanguage(voiceLocaleLanguage).setRegion(voiceLocaleRegion).build()
 
         task testPlugins(group: 'Verification') << {
             assert plugins.findPlugin('java')
