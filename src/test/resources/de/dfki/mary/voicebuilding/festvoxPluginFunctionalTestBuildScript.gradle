@@ -17,19 +17,23 @@ repositories {
     }
 }
 
-task testPlugins(group: 'Verification') << {
-    assert plugins.findPlugin('java')
-    assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
-    assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
-    assert plugins.findPlugin('de.dfki.mary.voicebuilding-festvox')
+task testPlugins(group: 'Verification') {
+    doLast {
+        assert plugins.findPlugin('java')
+        assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
+        assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
+        assert plugins.findPlugin('de.dfki.mary.voicebuilding-festvox')
+    }
 }
 
 dependencies {
     data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
 }
 
-task testDataDependencies(group: 'Verification') << {
-    assert configurations.data.dependencies.find { it.name == 'cmu_time_awb' }
+task testDataDependencies(group: 'Verification') {
+    doLast {
+        assert configurations.data.dependencies.find { it.name == 'cmu_time_awb' }
+    }
 }
 
 task testProcessDataResources {

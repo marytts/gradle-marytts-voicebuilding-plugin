@@ -50,11 +50,13 @@ legacyInit.dependsOn wav, text, lab
 
 generateAllophones.dependsOn legacyInit
 
-task testPlugins(group: 'Verification') << {
-    assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
-    assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
-    assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
-    assert plugins.findPlugin('de.dfki.mary.voicebuilding-festvox')
+task testPlugins(group: 'Verification') {
+    doLast {
+        assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')
+        assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
+        assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
+        assert plugins.findPlugin('de.dfki.mary.voicebuilding-festvox')
+    }
 }
 
 task testTemplates(group: 'Verification') {
@@ -261,9 +263,9 @@ task testGenerateVoiceConfig(group: 'Verification') {
             actual.load it
         }
         def expected = [
-                name                                          : "$voiceName",
-                locale                                        : "$voiceLocale",
-                'unitselection.voices.list'                   : "$voiceName",
+                name                                         : "$voiceName",
+                locale                                       : "$voiceLocale",
+                'unitselection.voices.list'                  : "$voiceName",
                 "voice.${voiceName}.acousticModels"          : 'duration F0 midF0 rightF0',
                 "voice.${voiceName}.audioTimelineFile"       : "MARY_BASE/lib/voices/$voiceName/timeline_waveforms.mry",
                 "voice.${voiceName}.audioTimelineReaderClass": 'marytts.unitselection.data.TimelineReader',
