@@ -8,7 +8,6 @@ import static org.gradle.testkit.runner.TaskOutcome.*
 class DataPluginFunctionalTest {
 
     def gradle
-    def buildFile
 
     def dataDependencyName = 'cmu_time_awb'
     def dataDependency = "org.festvox:$dataDependencyName::ldom@tar.bz2"
@@ -21,126 +20,13 @@ class DataPluginFunctionalTest {
         gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath()
 
         // Add the logic under test to the test build
-        buildFile = new File(projectDir, 'build.gradle')
-        buildFile.text = """
-        plugins {
-            id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
+        new File(projectDir, 'gradle.properties').withWriter {
+            it.println "dataDependencyName=$dataDependencyName"
+            it.println "dataDependency=$dataDependency"
         }
-
-        def dataDependencyName = "$dataDependencyName"
-        def dataDependency = "$dataDependency"
-
-        repositories {
-            ivy {
-                url 'https://dl.bintray.com/marytts/marytts'
-                layout 'pattern', {
-                    artifact '[organisation]/[module]/[artifact].[ext]'
-                }
-            }
-            ivy {
-                url 'http://festvox.org/examples'
-                layout 'pattern', {
-                    artifact '[module]_[classifier]/packed/[artifact].[ext]'
-                }
-            }
+        new File(projectDir, 'build.gradle').withWriter {
+            it << this.class.getResourceAsStream('dataPluginFunctionalTestBuildScript.gradle')
         }
-
-        dependencies {
-            data "\$dataDependency"
-        }
-
-        task testPlugins(group: 'Verification') << {
-            assert plugins.findPlugin('java')
-            assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
-            assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
-        }
-
-        task testConfigurations(group: 'Verification') << {
-            assert configurations.data
-            assert configurations.marytts
-        }
-
-        task testSourceSets(group: 'Verification') << {
-            assert sourceSets.data
-            assert sourceSets.marytts
-        }
-
-        task testDependencies(group: 'Verification') << {
-            assert configurations.data.dependencies.find { it.name == "\$dataDependencyName" }
-            assert configurations.maryttsCompile.dependencies.find { it.name == "marytts-lang-\$voice.locale.language" }
-        }
-        
-        task testProcessDataResources {
-            group 'Verification'
-            dependsOn processDataResources
-            doLast {
-                assert fileTree(sourceSets.data.output.resourcesDir).include('*.wav').files
-                assert fileTree(sourceSets.data.output.resourcesDir).include('*.lab').files
-                assert fileTree(sourceSets.data.output.resourcesDir).include('*.data').files
-            }
-        }
-
-        text.srcFileName = 'time.data'
-
-        generateAllophones.dependsOn text
-
-        task testWav {
-            group 'Verification'
-            dependsOn wav
-            doLast {
-                assert fileTree("\$buildDir/wav").include('*.wav').files
-            }
-        }
-
-        task testPraatPitchmarker {
-            group 'Verification'
-            dependsOn praatPitchmarker
-            doLast {
-                assert fileTree("\$buildDir/pm").include('*.PointProcess').files
-                assert fileTree("\$buildDir/pm").include('*.pm').files
-            }
-        }
-
-        task testMcepMaker {
-            group 'Verification'
-            dependsOn mcepMaker
-            doLast {
-                assert fileTree("\$buildDir/mcep").include('*.mcep').files
-            }
-        }
-
-        task testText {
-            group 'Verification'
-            dependsOn text
-            doLast {
-                assert fileTree(buildDir).include('text/*.txt').files
-            }
-        }
-
-        task testGenerateAllophones {
-            group 'Verification'
-            dependsOn generateAllophones
-            doLast {
-                assert fileTree("\$buildDir/prompt_allophones").include('*.xml').files
-            }
-        }
-
-        task testGeneratePhoneFeatures {
-            group 'Verification'
-            dependsOn generatePhoneFeatures
-            doLast {
-                assert fileTree("\$buildDir/phonefeatures").include('*.pfeats').files
-            }
-        }
-
-        task testGenerateHalfPhoneFeatures {
-            group 'Verification'
-            dependsOn generateHalfPhoneFeatures
-            doLast {
-                assert fileTree("\$buildDir/halfphonefeatures").include('*.hpfeats').files
-            }
-        }
-        """
     }
 
     @Test
