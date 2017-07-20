@@ -20,8 +20,7 @@ class LegacyPluginFunctionalTest {
 
     @BeforeSuite
     void setup() {
-        def projectDir = new File("${System.properties.testProjectDir}/legacyPlugin")
-        projectDir.mkdirs()
+        def projectDir = File.createTempDir()
 
         gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath()
 

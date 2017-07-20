@@ -11,8 +11,7 @@ class FestvoxPluginFunctionalTest {
 
     @BeforeSuite
     void setup() {
-        def projectDir = new File("${System.properties.testProjectDir}/festvoxPlugin")
-        projectDir.mkdirs()
+        def projectDir = File.createTempDir()
 
         gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath()
 

@@ -14,8 +14,7 @@ class DataPluginFunctionalTest {
 
     @BeforeSuite
     void setup() {
-        def projectDir = new File("${System.properties.testProjectDir}/dataPlugin")
-        projectDir.mkdirs()
+        def projectDir = File.createTempDir()
 
         gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath()
 

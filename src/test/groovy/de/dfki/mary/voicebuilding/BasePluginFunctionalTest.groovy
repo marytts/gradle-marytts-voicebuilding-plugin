@@ -22,8 +22,7 @@ class BasePluginFunctionalTest {
 
     @BeforeSuite
     void setup() {
-        def projectDir = new File("${System.properties.testProjectDir}/basePlugin")
-        projectDir.mkdirs()
+        def projectDir = File.createTempDir()
 
         gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath()
 
