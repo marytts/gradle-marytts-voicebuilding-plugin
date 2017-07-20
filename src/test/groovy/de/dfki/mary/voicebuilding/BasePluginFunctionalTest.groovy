@@ -9,17 +9,6 @@ class BasePluginFunctionalTest {
 
     def gradle
 
-    def maryVersion = System.properties.maryVersion
-    def group = 'de.dfki.mary'
-    def version = '1.2.3'
-    def voiceName = 'cmu-slt'
-    def voiceNameCamelCase = 'CmuSlt'
-    def voiceGender = 'female'
-    def voiceLocale = Locale.US
-    def voiceDescription = "A $voiceGender ${voiceLocale.getDisplayLanguage(Locale.ENGLISH)} unit selection voice"
-    def voiceLicenseName = 'Arctic'
-    def voiceLicenseUrl = 'http://festvox.org/cmu_arctic/cmu_arctic/cmu_us_slt_arctic/COPYING'
-
     @BeforeSuite
     void setup() {
         def projectDir = File.createTempDir()
@@ -28,17 +17,19 @@ class BasePluginFunctionalTest {
 
         // Add the logic under test to the test build
         new File(projectDir, 'gradle.properties').withWriter {
-            it.println "maryVersion=$maryVersion"
-            it.println "voiceName=$voiceName"
-            it.println "voiceNameCamelCase=$voiceNameCamelCase"
+            it.println "group=de.dfki.mary"
+            it.println "maryVersion=$System.properties.maryVersion"
+            it.println "version=1.2.3"
+            def voiceLocale = Locale.US
+            def voiceGender = 'female'
+            it.println "voiceDescription=A $voiceGender ${voiceLocale.getDisplayLanguage(Locale.ENGLISH)} unit selection voice"
             it.println "voiceGender=$voiceGender"
+            it.println "voiceName=cmu-slt"
+            it.println "voiceNameCamelCase=CmuSlt"
+            it.println "voiceLicenseName=Arctic"
+            it.println "voiceLicenseUrl=http://festvox.org/cmu_arctic/cmu_arctic/cmu_us_slt_arctic/COPYING"
             it.println "voiceLocaleLanguage=$voiceLocale.language"
             it.println "voiceLocaleRegion=$voiceLocale.country"
-            it.println "voiceDescription=$voiceDescription"
-            it.println "voiceLicenseName=$voiceLicenseName"
-            it.println "voiceLicenseUrl=$voiceLicenseUrl"
-            it.println "group=$group"
-            it.println "version=$version"
         }
         new File(projectDir, 'build.gradle').withWriter {
             it << this.class.getResourceAsStream('basePluginFunctionalTestBuildScript.gradle')

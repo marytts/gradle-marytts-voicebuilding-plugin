@@ -9,9 +9,6 @@ class DataPluginFunctionalTest {
 
     def gradle
 
-    def dataDependencyName = 'cmu_time_awb'
-    def dataDependency = "org.festvox:$dataDependencyName::ldom@tar.bz2"
-
     @BeforeSuite
     void setup() {
         def projectDir = File.createTempDir()
@@ -20,8 +17,9 @@ class DataPluginFunctionalTest {
 
         // Add the logic under test to the test build
         new File(projectDir, 'gradle.properties').withWriter {
+            def dataDependencyName = 'cmu_time_awb'
             it.println "dataDependencyName=$dataDependencyName"
-            it.println "dataDependency=$dataDependency"
+            it.println "dataDependency=org.festvox:$dataDependencyName::ldom@tar.bz2"
         }
         new File(projectDir, 'build.gradle').withWriter {
             it << this.class.getResourceAsStream('dataPluginFunctionalTestBuildScript.gradle')
