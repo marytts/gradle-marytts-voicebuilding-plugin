@@ -361,7 +361,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                     exclude module: 'mwdumper'
                     exclude module: 'sgt'
                 }
-                testCompile "junit:junit:4.11"
+                testCompile "junit:junit:4.12"
             }
         }
     }
