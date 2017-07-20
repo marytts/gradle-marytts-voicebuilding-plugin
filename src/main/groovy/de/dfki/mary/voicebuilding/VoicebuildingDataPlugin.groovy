@@ -18,15 +18,13 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.sourceSets {
             create 'data'
-            create 'marytts'
         }
 
         project.dependencies {
-            maryttsCompile localGroovy()
             project.afterEvaluate {
-                maryttsCompile group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion
+                marytts group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion
             }
-            maryttsRuntime group: 'de.dfki.mary', name: "marytts-voicebuilding", version: '0.1'
+            marytts group: 'de.dfki.mary', name: "marytts-voicebuilding", version: '0.1'
         }
 
         project.task('wav', type: AudioConverterTask) {
@@ -36,7 +34,6 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         project.task('generateAllophones', type: MaryInterfaceBatchTask) {
-            inputs.files project.maryttsClasses
             srcDir = project.file("$project.buildDir/text")
             destDir = project.file("$project.buildDir/prompt_allophones")
             inputType = 'TEXT'

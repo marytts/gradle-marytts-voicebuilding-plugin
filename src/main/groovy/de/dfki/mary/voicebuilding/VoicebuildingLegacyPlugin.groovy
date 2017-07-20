@@ -80,7 +80,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('featureLister', type: FeatureListerTask) {
-            dependsOn project.maryttsClasses
             destFile = project.file("$project.legacyBuildDir/features.txt")
         }
 

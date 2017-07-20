@@ -11,7 +11,7 @@ class FeatureListerTask extends DefaultTask {
     @TaskAction
     void generate() {
         project.javaexec {
-            classpath project.sourceSets.marytts.runtimeClasspath
+            classpath project.configurations.marytts
             main 'marytts.FeatureLister'
             systemProperties = [
                     locale    : project.voice.maryLocale,

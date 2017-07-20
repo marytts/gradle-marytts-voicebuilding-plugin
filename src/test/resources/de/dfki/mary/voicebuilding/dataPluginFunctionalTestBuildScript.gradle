@@ -34,12 +34,11 @@ task testConfigurations(group: 'Verification') << {
 
 task testSourceSets(group: 'Verification') << {
     assert sourceSets.data
-    assert sourceSets.marytts
 }
 
 task testDependencies(group: 'Verification') << {
     assert configurations.data.dependencies.find { it.name == dataDependencyName }
-    assert configurations.maryttsCompile.dependencies.find { it.name == "marytts-lang-$voice.locale.language" }
+    assert configurations.marytts.dependencies.find { it.name == "marytts-lang-$voice.locale.language" }
 }
 
 task testProcessDataResources {
