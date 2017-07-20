@@ -42,7 +42,7 @@ class BasePluginFunctionalTest {
             it.println "version=$version"
         }
         new File(projectDir, 'build.gradle').withWriter {
-            it << this.class.getResourceAsStream('build.gradle')
+            it << this.class.getResourceAsStream('basePluginFunctionalTestBuildScript.gradle')
         }
     }
 
