@@ -45,137 +45,38 @@ class BasePluginFunctionalTest {
         }
     }
 
-    @Test
-    void testHelp() {
-        def result = gradle.withArguments().build()
-        println result.output
-        assert result.task(':help').outcome == SUCCESS
+    @DataProvider
+    Object[][] taskNames() {
+        // task name to run, and whether to chase it with a test task named "testName"
+        [
+                ['help', false],
+                ['testPlugins', false],
+                ['testVoiceProps', false],
+                ['testJavaCompatibility', false],
+                ['generateSource', true],
+                ['compileTestJava', true],
+                ['compileJava', true],
+                ['compileIntegrationTestGroovy', true],
+                ['generateVoiceConfig', true],
+                ['generateServiceLoader', true],
+                ['generatePom', true],
+                ['generatePomProperties', true],
+                ['jar', true],
+                ['test', false]
+        ]
     }
 
-    @Test
-    void testPlugins() {
-        def result = gradle.withArguments('testPlugins').build()
+    @Test(dataProvider = 'taskNames')
+    void testTasks(String taskName, boolean runTestTask) {
+        def result = gradle.withArguments(taskName).build()
         println result.output
-        assert result.task(':testPlugins').outcome == SUCCESS
-    }
-
-    @Test
-    void testVoiceProps() {
-        def result = gradle.withArguments('testVoiceProps').build()
-        println result.output
-        assert result.task(':testVoiceProps').outcome == SUCCESS
-    }
-
-    @Test
-    void testJavaCompatibility() {
-        def result = gradle.withArguments('testJavaCompatibility').build()
-        println result.output
-        assert result.task(':testJavaCompatibility').outcome == SUCCESS
-    }
-
-    @Test
-    void testGenerateSource() {
-        def result = gradle.withArguments('generateSource').build()
-        println result.output
-        assert result.task(':generateSource').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testGenerateSource').build()
-        println result.output
-        assert result.task(':generateSource').outcome == UP_TO_DATE
-        assert result.task(':testGenerateSource').outcome == SUCCESS
-    }
-
-    @Test(dependsOnMethods = ['testGenerateSource'])
-    void testCompileJava() {
-        def result = gradle.withArguments('compileJava').build()
-        println result.output
-        assert result.task(':compileJava').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testCompileJava').build()
-        println result.output
-        assert result.task(':compileJava').outcome == UP_TO_DATE
-        assert result.task(':testCompileJava').outcome == SUCCESS
-    }
-
-    @Test(dependsOnMethods = ['testCompileJava'])
-    void testCompileTestJava() {
-        def result = gradle.withArguments('compileTestJava').build()
-        println result.output
-        assert result.task(':compileTestJava').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testCompileTestJava').build()
-        println result.output
-        assert result.task(':compileTestJava').outcome == UP_TO_DATE
-        assert result.task(':testCompileTestJava').outcome == SUCCESS
-    }
-
-    @Test(dependsOnMethods = ['testCompileTestJava'])
-    void testCompileIntegrationTestGroovy() {
-        def result = gradle.withArguments('compileIntegrationTestGroovy').build()
-        println result.output
-        assert result.task(':compileIntegrationTestGroovy').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testCompileIntegrationTestGroovy').build()
-        println result.output
-        assert result.task(':compileIntegrationTestGroovy').outcome == UP_TO_DATE
-        assert result.task(':testCompileIntegrationTestGroovy').outcome == SUCCESS
-    }
-
-    @Test
-    void testGenerateVoiceConfig() {
-        def result = gradle.withArguments('generateVoiceConfig').build()
-        println result.output
-        assert result.task(':generateVoiceConfig').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testGenerateVoiceConfig').build()
-        println result.output
-        assert result.task(':generateVoiceConfig').outcome == UP_TO_DATE
-        assert result.task(':testGenerateVoiceConfig').outcome == SUCCESS
-    }
-
-    @Test
-    void testGenerateServiceLoader() {
-        def result = gradle.withArguments('generateServiceLoader').build()
-        println result.output
-        assert result.task(':generateServiceLoader').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testGenerateServiceLoader').build()
-        println result.output
-        assert result.task(':generateServiceLoader').outcome == UP_TO_DATE
-        assert result.task(':testGenerateServiceLoader').outcome == SUCCESS
-    }
-
-    @Test
-    void testGeneratePom() {
-        def result = gradle.withArguments('generatePom').build()
-        println result.output
-        assert result.task(':generatePom').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testGeneratePom').build()
-        println result.output
-        assert result.task(':generatePom').outcome == UP_TO_DATE
-        assert result.task(':testGeneratePom').outcome == SUCCESS
-    }
-
-    @Test
-    void testGeneratePomProperties() {
-        def result = gradle.withArguments('generatePomProperties').build()
-        println result.output
-        assert result.task(':generatePomProperties').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testGeneratePomProperties').build()
-        println result.output
-        assert result.task(':generatePomProperties').outcome == UP_TO_DATE
-        assert result.task(':testGeneratePomProperties').outcome == SUCCESS
-    }
-
-    @Test(dependsOnMethods = ['testCompileJava', 'testGeneratePom', 'testGeneratePomProperties'])
-    void testJar() {
-        def result = gradle.withArguments('jar').build()
-        println result.output
-        assert result.task(':jar').outcome in [SUCCESS, UP_TO_DATE]
-        result = gradle.withArguments('testJar').build()
-        println result.output
-        assert result.task(':jar').outcome == UP_TO_DATE
-        assert result.task(':testJar').outcome == SUCCESS
-    }
-
-    @Test(dependsOnMethods = ['testCompileTestJava'])
-    void testTest() {
-        def result = gradle.withArguments('test').build()
-        println result.output
-        assert result.task(':test').outcome in [SUCCESS, UP_TO_DATE]
+        assert result.task(":$taskName").outcome in [SUCCESS, UP_TO_DATE]
+        if (runTestTask) {
+            def testTaskName = 'test' + taskName.capitalize()
+            result = gradle.withArguments(testTaskName).build()
+            println result.output
+            assert result.task(":$taskName").outcome == UP_TO_DATE
+            assert result.task(":$testTaskName").outcome == SUCCESS
+        }
     }
 }
