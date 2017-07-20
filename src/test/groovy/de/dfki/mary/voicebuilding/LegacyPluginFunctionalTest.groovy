@@ -39,6 +39,7 @@ class LegacyPluginFunctionalTest {
         [
                 ['help', false],
                 ['testPlugins', false],
+                ['dependencies', false],
                 ['templates', true],
                 ['legacyInit', true],
                 ['legacyPraatPitchmarker', true],
