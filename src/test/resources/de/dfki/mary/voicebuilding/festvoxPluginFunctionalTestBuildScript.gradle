@@ -1,0 +1,69 @@
+plugins {
+    id 'de.dfki.mary.voicebuilding-festvox'
+}
+
+repositories {
+    ivy {
+        url 'https://dl.bintray.com/marytts/marytts'
+        layout 'pattern', {
+            artifact '[organisation]/[module]/[artifact].[ext]'
+        }
+    }
+    ivy {
+        url 'http://festvox.org/examples'
+        layout 'pattern', {
+            artifact '[module]_[classifier]/packed/[artifact].[ext]'
+        }
+    }
+}
+
+task testPlugins(group: 'Verification') << {
+    assert plugins.findPlugin('java')
+    assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
+    assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
+    assert plugins.findPlugin('de.dfki.mary.voicebuilding-festvox')
+}
+
+dependencies {
+    data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
+}
+
+task testDataDependencies(group: 'Verification') << {
+    assert configurations.data.dependencies.find { it.name == 'cmu_time_awb' }
+}
+
+task testProcessDataResources {
+    group 'Verification'
+    dependsOn processDataResources
+    doLast {
+        assert fileTree(sourceSets.data.output.resourcesDir).include('*.wav').files
+        assert fileTree(sourceSets.data.output.resourcesDir).include('*.lab').files
+        assert fileTree(sourceSets.data.output.resourcesDir).include('*.data').files
+    }
+}
+
+task testWav {
+    group 'Verification'
+    dependsOn wav
+    doLast {
+        assert fileTree(buildDir).include('wav/*.wav').files
+    }
+}
+
+text.srcFileName = 'time.data'
+
+task testText {
+    group 'Verification'
+    dependsOn text
+    doLast {
+        assert fileTree(buildDir).include('text/*.txt').files
+    }
+}
+
+task testLab {
+    group 'Verification'
+    dependsOn lab
+    doLast {
+        assert fileTree(buildDir).include('lab/*.lab').files
+    }
+}

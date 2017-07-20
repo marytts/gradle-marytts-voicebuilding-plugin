@@ -1,0 +1,114 @@
+plugins {
+    id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
+}
+
+repositories {
+    ivy {
+        url 'https://dl.bintray.com/marytts/marytts'
+        layout 'pattern', {
+            artifact '[organisation]/[module]/[artifact].[ext]'
+        }
+    }
+    ivy {
+        url 'http://festvox.org/examples'
+        layout 'pattern', {
+            artifact '[module]_[classifier]/packed/[artifact].[ext]'
+        }
+    }
+}
+
+dependencies {
+    data dataDependency
+}
+
+task testPlugins(group: 'Verification') << {
+    assert plugins.findPlugin('java')
+    assert plugins.findPlugin('de.dfki.mary.voicebuilding-base')
+    assert plugins.findPlugin('de.dfki.mary.voicebuilding-data')
+}
+
+task testConfigurations(group: 'Verification') << {
+    assert configurations.data
+    assert configurations.marytts
+}
+
+task testSourceSets(group: 'Verification') << {
+    assert sourceSets.data
+    assert sourceSets.marytts
+}
+
+task testDependencies(group: 'Verification') << {
+    assert configurations.data.dependencies.find { it.name == dataDependencyName }
+    assert configurations.maryttsCompile.dependencies.find { it.name == "marytts-lang-$voice.locale.language" }
+}
+
+task testProcessDataResources {
+    group 'Verification'
+    dependsOn processDataResources
+    doLast {
+        assert fileTree(sourceSets.data.output.resourcesDir).include('*.wav').files
+        assert fileTree(sourceSets.data.output.resourcesDir).include('*.lab').files
+        assert fileTree(sourceSets.data.output.resourcesDir).include('*.data').files
+    }
+}
+
+text.srcFileName = 'time.data'
+
+generateAllophones.dependsOn text
+
+task testWav {
+    group 'Verification'
+    dependsOn wav
+    doLast {
+        assert fileTree(buildDir).include('wav/*.wav').files
+    }
+}
+
+task testPraatPitchmarker {
+    group 'Verification'
+    dependsOn praatPitchmarker
+    doLast {
+        assert fileTree(buildDir).include('pm/*.PointProcess').files
+        assert fileTree(buildDir).include('pm/*.pm').files
+    }
+}
+
+task testMcepMaker {
+    group 'Verification'
+    dependsOn mcepMaker
+    doLast {
+        assert fileTree(buildDir).include('mcep/*.mcep').files
+    }
+}
+
+task testText {
+    group 'Verification'
+    dependsOn text
+    doLast {
+        assert fileTree(buildDir).include('text/*.txt').files
+    }
+}
+
+task testGenerateAllophones {
+    group 'Verification'
+    dependsOn generateAllophones
+    doLast {
+        assert fileTree(buildDir).include('prompt_allophones/*.xml').files
+    }
+}
+
+task testGeneratePhoneFeatures {
+    group 'Verification'
+    dependsOn generatePhoneFeatures
+    doLast {
+        assert fileTree(buildDir).include('phonefeatures/*.pfeats').files
+    }
+}
+
+task testGenerateHalfPhoneFeatures {
+    group 'Verification'
+    dependsOn generateHalfPhoneFeatures
+    doLast {
+        assert fileTree(buildDir).include('halfphonefeatures/*.hpfeats').files
+    }
+}
