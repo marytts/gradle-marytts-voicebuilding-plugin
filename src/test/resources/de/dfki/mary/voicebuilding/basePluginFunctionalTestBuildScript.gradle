@@ -144,12 +144,24 @@ task testGeneratePom(group: 'Verification') {
                         artifactId 'marytts-runtime'
                         delegate.version maryVersion
                         scope 'compile'
+                        exclusions {
+                            exclusion {
+                                artifactId 'groovy-all'
+                                groupId '*'
+                            }
+                        }
                     }
                     dependency {
                         groupId 'de.dfki.mary'
                         artifactId "marytts-lang-$voiceLocale.language"
                         delegate.version maryVersion
                         scope 'runtime'
+                        exclusions {
+                            exclusion {
+                                artifactId 'groovy-all'
+                                groupId '*'
+                            }
+                        }
                     }
                 }
             }
