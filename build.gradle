@@ -68,8 +68,10 @@ dependencies {
     testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
 }
 
-processResources << {
-    file("$destinationDir/maryttsVersion.txt").text = maryttsVersion
+processResources {
+    doLast {
+        file("$destinationDir/maryttsVersion.txt").text = maryttsVersion
+    }
 }
 
 test {
