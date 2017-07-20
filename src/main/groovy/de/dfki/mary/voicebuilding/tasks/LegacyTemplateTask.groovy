@@ -8,7 +8,8 @@ class LegacyTemplateTask extends DefaultTask {
     @OutputDirectory
     File destDir
 
-    def resources = ['database.config']
+    @Input
+    List resources = ['database.config']
 
     @TaskAction
     void unpack() {
