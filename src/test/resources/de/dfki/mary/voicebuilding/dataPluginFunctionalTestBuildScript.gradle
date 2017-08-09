@@ -49,6 +49,12 @@ task testDependencies(group: 'Verification') {
     }
 }
 
+task testVoicebuildingExtension(group: 'Verification') {
+    doLast {
+        assert voicebuilding instanceof de.dfki.mary.voicebuilding.VoicebuildingExtension
+    }
+}
+
 task testProcessDataResources {
     group 'Verification'
     dependsOn processDataResources
@@ -60,6 +66,13 @@ task testProcessDataResources {
 }
 
 text.srcFileName = 'time.data'
+
+task testBasenames(group: 'Verification') {
+    dependsOn text
+    doLast {
+        assert voicebuilding.basenames == fileTree(buildDir).include('text/*.txt').collect { it.name - '.txt' }
+    }
+}
 
 generateAllophones.dependsOn text
 

@@ -29,6 +29,8 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             marytts group: 'de.dfki.mary', name: "marytts-voicebuilding", version: '0.1'
         }
 
+        project.extensions.create 'voicebuilding', VoicebuildingExtension, project
+
         project.task('wav', type: AudioConverterTask) {
             dependsOn project.processDataResources
             srcDir = project.file("$project.sourceSets.data.output.resourcesDir")

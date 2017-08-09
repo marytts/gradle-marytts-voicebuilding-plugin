@@ -34,6 +34,8 @@ class DataPluginFunctionalTest {
                 ['testConfigurations', false],
                 ['testSourceSets', false],
                 ['testDependencies', false],
+                ['testVoicebuildingExtension', false],
+                ['testBasenames', false],
                 ['praatPitchmarker', true],
                 ['mcepMaker', true],
                 ['generateAllophones', true],
