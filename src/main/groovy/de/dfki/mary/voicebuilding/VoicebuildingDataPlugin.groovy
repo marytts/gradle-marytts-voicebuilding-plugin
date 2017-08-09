@@ -31,10 +31,16 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.extensions.create 'voicebuilding', VoicebuildingExtension, project
 
-        project.task('wav', type: AudioConverterTask) {
-            dependsOn project.processDataResources
-            srcDir = project.file("$project.sourceSets.data.output.resourcesDir")
-            destDir = project.file("$project.buildDir/wav")
+        project.task('wav')
+
+        project.voicebuilding.basenames.each { basename ->
+            project.task("${basename}_wav", type: SoxExec) {
+                dependsOn project.processDataResources
+                srcFile = project.file("$project.sourceSets.data.output.resourcesDir/${basename}.wav")
+                destFile = project.file("$project.buildDir/wav/${basename}.wav")
+                args = ['rate', project.voice.samplingRate]
+                project.wav.dependsOn it
+            }
         }
 
         project.task('generateAllophones', type: MaryInterfaceBatchTask) {
