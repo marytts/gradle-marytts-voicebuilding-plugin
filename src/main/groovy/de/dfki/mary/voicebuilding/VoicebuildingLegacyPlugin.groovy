@@ -25,8 +25,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             speechToolsDir = new File(proc.in.text)?.parentFile?.parent
         }
 
-        project.task('templates', type: CopyClasspathResources) {
-            destDir = project.file("$project.buildDir/templates")
+        project.templates {
             resources = ['/de/dfki/mary/voicebuilding/templates/database.config']
         }
 

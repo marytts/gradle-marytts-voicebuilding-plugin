@@ -31,6 +31,10 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.extensions.create 'voicebuilding', VoicebuildingExtension, project
 
+        project.task('templates', type: CopyClasspathResources) {
+            destDir = project.file("$project.buildDir/templates")
+        }
+
         project.task('wav')
 
         project.voicebuilding.basenames.each { basename ->

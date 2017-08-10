@@ -1,5 +1,3 @@
-import de.dfki.mary.voicebuilding.tasks.CopyClasspathResources
-
 plugins {
     id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
 }
@@ -69,8 +67,7 @@ task testProcessDataResources {
 
 text.srcFileName = 'time.data'
 
-task templates(type: CopyClasspathResources) {
-    destDir = file("$buildDir/templates")
+templates {
     resources = ['/de/dfki/mary/voicebuilding/templates/database.config']
 }
 
