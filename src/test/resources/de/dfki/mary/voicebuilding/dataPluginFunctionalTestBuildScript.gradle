@@ -2,6 +2,10 @@ plugins {
     id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
 }
 
+voice {
+    gender = voiceGender
+}
+
 repositories {
     ivy {
         url 'https://dl.bintray.com/marytts/marytts'

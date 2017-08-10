@@ -60,11 +60,13 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
                 srcFiles << wavTask.destFile
                 destFile = project.file("$project.buildDir/pm/${basename}.Pitch")
                 scriptFile = project.file("$project.templates.destDir/extractPitch.praat")
-                props = [wavFile  : wavTask.destFile,
-                         pitchFile: destFile,
-                         minPitch : (project.voice.gender == 'female') ? 100 : 75,
-                         maxPitch : (project.voice.gender == 'female') ? 500 : 300]
                 project.praatPitchExtractor.dependsOn it
+                project.afterEvaluate {
+                    props = [wavFile  : wavTask.destFile,
+                             pitchFile: destFile,
+                             minPitch : (project.voice.gender == 'female') ? 100 : 75,
+                             maxPitch : (project.voice.gender == 'female') ? 500 : 300]
+                }
             }
 
             project.task("${basename}_extractPitchmarks", type: PraatExec) {

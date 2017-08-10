@@ -20,6 +20,7 @@ class DataPluginFunctionalTest {
             def dataDependencyName = 'cmu_time_awb'
             it.println "dataDependencyName=$dataDependencyName"
             it.println "dataDependency=org.festvox:$dataDependencyName::ldom@tar.bz2"
+            it.println "voiceGender=male"
         }
         new File(projectDir, 'build.gradle').withWriter {
             it << this.class.getResourceAsStream('dataPluginFunctionalTestBuildScript.gradle')
