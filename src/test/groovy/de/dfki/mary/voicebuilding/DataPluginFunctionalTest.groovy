@@ -40,6 +40,7 @@ class DataPluginFunctionalTest {
                 ['wav', true],
                 ['praatPitchExtractor', true],
                 ['praatPitchmarker', true],
+                ['pitchmarkConverter', true],
                 ['mcepMaker', true],
                 ['generateAllophones', true],
                 ['generatePhoneFeatures', true],

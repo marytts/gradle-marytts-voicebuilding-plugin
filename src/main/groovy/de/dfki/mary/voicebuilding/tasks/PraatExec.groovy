@@ -17,8 +17,8 @@ class PraatExec extends DefaultTask {
     Map props = [:]
 
     @Optional
-    @InputFile
-    File srcFile
+    @InputFiles
+    List<File> srcFiles = []
 
     @Optional
     @OutputFile

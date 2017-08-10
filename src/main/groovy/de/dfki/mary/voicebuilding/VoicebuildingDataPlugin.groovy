@@ -33,12 +33,17 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.task('templates', type: CopyClasspathResources) {
             destDir = project.file("$project.buildDir/templates")
-            resources = ['/de/dfki/mary/voicebuilding/templates/extractPitch.praat']
+            resources = ['/de/dfki/mary/voicebuilding/templates/extractPitch.praat',
+                         '/de/dfki/mary/voicebuilding/templates/pitchmarks.praat']
         }
 
         project.task('wav')
 
         project.task('praatPitchExtractor')
+
+        project.task('praatPitchmarker')
+
+        project.task('pitchmarkConverter')
 
         project.voicebuilding.basenames.each { basename ->
             project.task("${basename}_wav", type: SoxExec) {
@@ -52,14 +57,35 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             project.task("${basename}_extractPitch", type: PraatExec) {
                 def wavTask = project.tasks.getByName("${basename}_wav")
                 dependsOn project.templates, wavTask
-                srcFile = wavTask.destFile
+                srcFiles << wavTask.destFile
                 destFile = project.file("$project.buildDir/pm/${basename}.Pitch")
                 scriptFile = project.file("$project.templates.destDir/extractPitch.praat")
-                props = [wavFile  : srcFile,
+                props = [wavFile  : wavTask.destFile,
                          pitchFile: destFile,
                          minPitch : (project.voice.gender == 'female') ? 100 : 75,
                          maxPitch : (project.voice.gender == 'female') ? 500 : 300]
                 project.praatPitchExtractor.dependsOn it
+            }
+
+            project.task("${basename}_extractPitchmarks", type: PraatExec) {
+                def wavTask = project.tasks.getByName("${basename}_wav")
+                def pitchTask = project.tasks.getByName("${basename}_extractPitch")
+                dependsOn project.templates, wavTask, pitchTask
+                srcFiles << [wavTask.destFile, pitchTask.destFile]
+                destFile = project.file("$project.buildDir/pm/${basename}.PointProcess")
+                scriptFile = project.file("$project.templates.destDir/pitchmarks.praat")
+                props = [wavFile   : wavTask.destFile,
+                         pitchFile : pitchTask.destFile,
+                         pointpFile: destFile]
+                project.praatPitchmarker.dependsOn it
+            }
+
+            project.task("${basename}_convertPitchmarks", type: PitchmarkConverter) {
+                def pitchmarkTask = project.tasks.getByName("${basename}_extractPitchmarks")
+                dependsOn pitchmarkTask
+                srcFile = pitchmarkTask.destFile
+                destFile = project.file("$project.buildDir/pm/${basename}.pm")
+                project.pitchmarkConverter.dependsOn it
             }
         }
 
@@ -90,12 +116,6 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             inputExt = 'xml'
             outputType = 'HALFPHONE_TARGETFEATURES'
             outputExt = 'hpfeats'
-        }
-
-        project.task('praatPitchmarker', type: PraatPitchmarkerTask) {
-            dependsOn project.wav
-            srcDir = project.file("$project.buildDir/wav")
-            destDir = project.file("$project.buildDir/pm")
         }
 
         project.task('mcepMaker', type: MCEPMakerTask) {

@@ -106,6 +106,13 @@ task testPraatPitchmarker {
     dependsOn praatPitchmarker
     doLast {
         assert fileTree(buildDir).include('pm/*.PointProcess').files
+    }
+}
+
+task testPitchmarkConverter {
+    group 'Verification'
+    dependsOn pitchmarkConverter
+    doLast {
         assert fileTree(buildDir).include('pm/*.pm').files
     }
 }
