@@ -33,6 +33,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.task('templates', type: CopyClasspathResources) {
             destDir = project.file("$project.buildDir/templates")
+            resources = ['/de/dfki/mary/voicebuilding/templates/extractPitch.praat']
         }
 
         project.task('wav')

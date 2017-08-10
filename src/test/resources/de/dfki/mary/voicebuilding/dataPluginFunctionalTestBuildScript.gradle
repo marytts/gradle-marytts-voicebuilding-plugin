@@ -67,15 +67,11 @@ task testProcessDataResources {
 
 text.srcFileName = 'time.data'
 
-templates {
-    resources = ['/de/dfki/mary/voicebuilding/templates/database.config']
-}
-
 task testTemplates {
     group 'Verification'
     dependsOn templates
     doLast {
-        def resourceFile = file("$buildDir/templates/database.config")
+        def resourceFile = file("$buildDir/templates/extractPitch.praat")
         assert resourceFile.exists()
     }
 }
