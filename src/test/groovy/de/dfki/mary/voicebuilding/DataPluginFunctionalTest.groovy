@@ -42,7 +42,7 @@ class DataPluginFunctionalTest {
                 ['praatPitchExtractor', true],
                 ['praatPitchmarker', true],
                 ['pitchmarkConverter', true],
-                ['mcepMaker', true],
+                ['mcepExtractor', true],
                 ['generateAllophones', true],
                 ['generatePhoneFeatures', true],
                 ['generateHalfPhoneFeatures', true]

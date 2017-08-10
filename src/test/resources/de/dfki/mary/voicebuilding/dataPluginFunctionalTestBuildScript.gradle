@@ -121,9 +121,9 @@ task testPitchmarkConverter {
     }
 }
 
-task testMcepMaker {
+task testMcepExtractor {
     group 'Verification'
-    dependsOn mcepMaker
+    dependsOn mcepExtractor
     doLast {
         assert fileTree(buildDir).include('mcep/*.mcep').files
     }

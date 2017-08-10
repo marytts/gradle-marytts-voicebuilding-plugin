@@ -45,6 +45,8 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.task('pitchmarkConverter')
 
+        project.task('mcepExtractor')
+
         project.voicebuilding.basenames.each { basename ->
             project.task("${basename}_wav", type: ParallelizableExec) {
                 dependsOn project.processDataResources
@@ -90,6 +92,27 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
                 destFile = project.file("$project.buildDir/pm/${basename}.pm")
                 project.pitchmarkConverter.dependsOn it
             }
+
+            project.task("${basename}_mcep", type: ParallelizableExec) {
+                def wavTask = project.tasks.getByName("${basename}_wav")
+                def pitchmarkTask = project.tasks.getByName("${basename}_convertPitchmarks")
+                dependsOn wavTask, pitchmarkTask
+                srcFiles << [wavTask.destFile, pitchmarkTask.destFile]
+                destFile = project.file("$project.buildDir/mcep/${basename}.mcep")
+                cmd = ['sig2fv',
+                       '-window_type', 'hamming',
+                       '-factor', 2.5,
+                       '-otype', 'est_binary',
+                       '-coefs', 'melcep',
+                       '-melcep_order', 12,
+                       '-fbank_order', 24,
+                       '-shift', 0.01,
+                       '-preemph', 0.97,
+                       '-pm', pitchmarkTask.destFile,
+                       '-o', destFile,
+                       wavTask.destFile]
+                project.mcepExtractor.dependsOn it
+            }
         }
 
         project.task('generateAllophones', type: MaryInterfaceBatchTask) {
@@ -119,13 +142,6 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             inputExt = 'xml'
             outputType = 'HALFPHONE_TARGETFEATURES'
             outputExt = 'hpfeats'
-        }
-
-        project.task('mcepMaker', type: MCEPMakerTask) {
-            dependsOn project.praatPitchmarker
-            srcDir = project.file("$project.buildDir/wav")
-            pmDir = project.file("$project.buildDir/pm")
-            destDir = project.file("$project.buildDir/mcep")
         }
     }
 }
