@@ -46,11 +46,12 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         project.task('pitchmarkConverter')
 
         project.voicebuilding.basenames.each { basename ->
-            project.task("${basename}_wav", type: SoxExec) {
+            project.task("${basename}_wav", type: ParallelizableExec) {
                 dependsOn project.processDataResources
-                srcFile = project.file("$project.sourceSets.data.output.resourcesDir/${basename}.wav")
+                def srcFile = project.file("$project.sourceSets.data.output.resourcesDir/${basename}.wav")
+                srcFiles << srcFile
                 destFile = project.file("$project.buildDir/wav/${basename}.wav")
-                args = ['rate', project.voice.samplingRate]
+                cmd = ['sox', srcFile, destFile, 'rate', project.voice.samplingRate]
                 project.wav.dependsOn it
             }
 
