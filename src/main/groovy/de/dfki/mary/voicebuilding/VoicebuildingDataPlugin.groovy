@@ -38,6 +38,8 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.task('wav')
 
+        project.task('praatPitchExtractor')
+
         project.voicebuilding.basenames.each { basename ->
             project.task("${basename}_wav", type: SoxExec) {
                 dependsOn project.processDataResources
@@ -45,6 +47,19 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
                 destFile = project.file("$project.buildDir/wav/${basename}.wav")
                 args = ['rate', project.voice.samplingRate]
                 project.wav.dependsOn it
+            }
+
+            project.task("${basename}_extractPitch", type: PraatExec) {
+                def wavTask = project.tasks.getByName("${basename}_wav")
+                dependsOn project.templates, wavTask
+                srcFile = wavTask.destFile
+                destFile = project.file("$project.buildDir/pm/${basename}.Pitch")
+                scriptFile = project.file("$project.templates.destDir/extractPitch.praat")
+                props = [wavFile  : srcFile,
+                         pitchFile: destFile,
+                         minPitch : (project.voice.gender == 'female') ? 100 : 75,
+                         maxPitch : (project.voice.gender == 'female') ? 500 : 300]
+                project.praatPitchExtractor.dependsOn it
             }
         }
 

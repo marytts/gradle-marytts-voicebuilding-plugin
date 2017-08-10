@@ -93,6 +93,14 @@ task testWav {
     }
 }
 
+task testPraatPitchExtractor {
+    group 'Verification'
+    dependsOn praatPitchExtractor
+    doLast {
+        assert fileTree(buildDir).include('pm/*.Pitch').files
+    }
+}
+
 task testPraatPitchmarker {
     group 'Verification'
     dependsOn praatPitchmarker

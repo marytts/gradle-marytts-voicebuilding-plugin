@@ -38,6 +38,7 @@ class DataPluginFunctionalTest {
                 ['templates', true],
                 ['testBasenames', false],
                 ['wav', true],
+                ['praatPitchExtractor', true],
                 ['praatPitchmarker', true],
                 ['mcepMaker', true],
                 ['generateAllophones', true],
