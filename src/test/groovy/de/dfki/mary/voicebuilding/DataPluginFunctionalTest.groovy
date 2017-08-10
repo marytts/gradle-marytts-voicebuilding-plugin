@@ -35,6 +35,7 @@ class DataPluginFunctionalTest {
                 ['testSourceSets', false],
                 ['testDependencies', false],
                 ['testVoicebuildingExtension', false],
+                ['templates', true],
                 ['testBasenames', false],
                 ['wav', true],
                 ['praatPitchmarker', true],
