@@ -9,7 +9,7 @@ class CopyClasspathResources extends DefaultTask {
     File destDir
 
     @Input
-    List resources
+    List resources = []
 
     @TaskAction
     void copy() {

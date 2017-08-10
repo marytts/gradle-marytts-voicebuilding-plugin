@@ -26,7 +26,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.templates {
-            resources = ['/de/dfki/mary/voicebuilding/templates/database.config']
+            resources << '/de/dfki/mary/voicebuilding/templates/database.config'
         }
 
         project.task('legacyInit', type: LegacyInitTask) {
