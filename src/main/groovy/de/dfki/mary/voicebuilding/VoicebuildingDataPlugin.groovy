@@ -31,10 +31,13 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.extensions.create 'voicebuilding', VoicebuildingExtension, project
 
+        project.task('bootstrap')
+
         project.task('templates', type: CopyClasspathResources) {
             destDir = project.file("$project.buildDir/templates")
             resources += ['/de/dfki/mary/voicebuilding/templates/extractPitch.praat',
                           '/de/dfki/mary/voicebuilding/templates/pitchmarks.praat']
+            project.bootstrap.dependsOn it
         }
 
         project.task('wav')
