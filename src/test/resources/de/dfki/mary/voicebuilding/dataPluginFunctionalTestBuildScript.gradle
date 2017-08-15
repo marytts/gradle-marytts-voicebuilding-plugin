@@ -2,6 +2,10 @@ plugins {
     id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
 }
 
+voice {
+    gender = voiceGender
+}
+
 repositories {
     ivy {
         url 'https://dl.bintray.com/marytts/marytts'
@@ -49,6 +53,12 @@ task testDependencies(group: 'Verification') {
     }
 }
 
+task testVoicebuildingExtension(group: 'Verification') {
+    doLast {
+        assert voicebuilding instanceof de.dfki.mary.voicebuilding.VoicebuildingExtension
+    }
+}
+
 task testProcessDataResources {
     group 'Verification'
     dependsOn processDataResources
@@ -61,6 +71,22 @@ task testProcessDataResources {
 
 text.srcFileName = 'time.data'
 
+task testTemplates {
+    group 'Verification'
+    dependsOn templates
+    doLast {
+        def resourceFile = file("$buildDir/templates/extractPitch.praat")
+        assert resourceFile.exists()
+    }
+}
+
+task testBasenames(group: 'Verification') {
+    dependsOn text
+    doLast {
+        assert voicebuilding.basenames == fileTree(buildDir).include('text/*.txt').collect { it.name - '.txt' }
+    }
+}
+
 generateAllophones.dependsOn text
 
 task testWav {
@@ -71,18 +97,33 @@ task testWav {
     }
 }
 
+task testPraatPitchExtractor {
+    group 'Verification'
+    dependsOn praatPitchExtractor
+    doLast {
+        assert fileTree(buildDir).include('pm/*.Pitch').files
+    }
+}
+
 task testPraatPitchmarker {
     group 'Verification'
     dependsOn praatPitchmarker
     doLast {
         assert fileTree(buildDir).include('pm/*.PointProcess').files
+    }
+}
+
+task testPitchmarkConverter {
+    group 'Verification'
+    dependsOn pitchmarkConverter
+    doLast {
         assert fileTree(buildDir).include('pm/*.pm').files
     }
 }
 
-task testMcepMaker {
+task testMcepExtractor {
     group 'Verification'
-    dependsOn mcepMaker
+    dependsOn mcepExtractor
     doLast {
         assert fileTree(buildDir).include('mcep/*.mcep').files
     }
