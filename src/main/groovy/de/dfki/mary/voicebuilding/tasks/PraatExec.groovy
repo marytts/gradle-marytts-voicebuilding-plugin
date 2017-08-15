@@ -32,7 +32,13 @@ class PraatExec extends DefaultTask {
             expand props
         }
         project.exec {
-            commandLine command, '--run', scriptFile.name
+            def legacyPraat = "${System.env['LEGACY_PRAAT']}".toBoolean()
+            project.logger.debug "legacyPraat == $legacyPraat"
+            if (legacyPraat) {
+                commandLine command, scriptFile.name
+            } else {
+                commandLine command, '--run', scriptFile.name
+            }
             workingDir temporaryDir
         }
     }
