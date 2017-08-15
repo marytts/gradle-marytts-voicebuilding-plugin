@@ -19,6 +19,9 @@ addons:
 
 script: ./gradlew check --info
 
+env:
+  - LEGACY_PRAAT=1
+
 cache:
   directories:
     - $HOME/.gradle/caches/modules-2
