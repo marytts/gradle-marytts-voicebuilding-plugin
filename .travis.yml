@@ -7,7 +7,7 @@ branches:
 language: groovy
 jdk:
   - openjdk7
-  - oraclejdk7
+  - openjdk8
   - oraclejdk8
 
 addons:
@@ -16,6 +16,9 @@ addons:
     - praat
     - sox
     - speech-tools
+
+before_install:
+  - JAVA_HOME=$(jdk_switcher home openjdk8) ./gradlew
 
 script: ./gradlew check --info
 
