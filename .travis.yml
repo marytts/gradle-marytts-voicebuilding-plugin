@@ -17,6 +17,9 @@ addons:
     - sox
     - speech-tools
 
+before_install:
+  - JAVA_HOME=$(jdk_switcher home openjdk8) ./gradlew
+
 script: ./gradlew check --info
 
 env:
