@@ -10,24 +10,24 @@ Gradle MaryTTS voicebuilding plugin
 - New `bootstrap` task prepares project for `build`
 - Workaround for legacy Praat version (<6): set environment variable `LEGACY_PRAAT=1`.
 
-## Changed
+## Changes
 
 - Build with Gradle v4.3
 - Rewrote several task classes used by data plugin
-- Fixed Travis CI integration to work with trusty containers
+- Fixed Travis CI integration to work with "trusty" containers
 
 [v5.2.2] - 2017-07-21
 ---------------------
 
 ### Changes
 
-- Build with Gradle to v3.5
+- Build with Gradle v3.5
 - Parameterized functional tests via buildscript resources
 
 ### Removed
 
 - Excluded transitive `groovy-all` dependency
-- Bundled help library split into separate artifact on JCenter
+- Bundled helper library split into separate artifact on JCenter
 
 [v5.2.1] - 2017-04-13
 ---------------------
