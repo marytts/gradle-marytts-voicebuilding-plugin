@@ -60,21 +60,21 @@ task testGenerateSource(group: 'Verification') {
 task testCompileJava(group: 'Verification') {
     dependsOn compileJava
     doLast {
-        assert file("$buildDir/classes/main/marytts/voice/$voice.nameCamelCase/Config.class").exists()
+        assert file("$buildDir/classes/java/main/marytts/voice/$voice.nameCamelCase/Config.class").exists()
     }
 }
 
 task testCompileTestJava(group: 'Verification') {
     dependsOn compileTestJava
     doLast {
-        assert file("$buildDir/classes/test/marytts/voice/$voice.nameCamelCase/ConfigTest.class").exists()
+        assert file("$buildDir/classes/java/test/marytts/voice/$voice.nameCamelCase/ConfigTest.class").exists()
     }
 }
 
 task testCompileIntegrationTestGroovy(group: 'Verification') {
     dependsOn compileIntegrationTestGroovy
     doLast {
-        assert file("$buildDir/classes/integrationTest/marytts/voice/$voice.nameCamelCase/LoadVoiceIT.class").exists()
+        assert file("$buildDir/classes/groovy/integrationTest/marytts/voice/$voice.nameCamelCase/LoadVoiceIT.class").exists()
     }
 }
 
