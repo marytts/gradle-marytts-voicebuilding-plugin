@@ -40,7 +40,11 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             project.bootstrap.dependsOn it
         }
 
-        project.task('wav')
+        project.task('wav', type: ProcessWav) {
+            dependsOn project.processDataResources
+            srcFiles = project.fileTree(project.sourceSets.data.output.resourcesDir).include('*.wav')
+            destDir = project.file("$project.buildDir/wav")
+        }
 
         project.task('praatPitchExtractor')
 
@@ -51,24 +55,15 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         project.task('mcepExtractor')
 
         project.voicebuilding.basenames.each { basename ->
-            project.task("${basename}_wav", type: ParallelizableExec) {
-                dependsOn project.processDataResources
-                def srcFile = project.file("$project.sourceSets.data.output.resourcesDir/${basename}.wav")
-                srcFiles << srcFile
-                destFile = project.file("$project.buildDir/wav/${basename}.wav")
-                cmd = ['sox', srcFile, destFile, 'rate', project.voice.samplingRate]
-                project.wav.dependsOn it
-            }
-
             project.task("${basename}_extractPitch", type: PraatExec) {
-                def wavTask = project.tasks.getByName("${basename}_wav")
-                dependsOn project.templates, wavTask
-                srcFiles << wavTask.destFile
+                def wavFile = project.file("$project.wav.destDir/${basename}.wav")
+                dependsOn project.templates, project.wav
+                srcFiles << wavFile
                 destFile = project.file("$project.buildDir/pm/${basename}.Pitch")
                 scriptFile = project.file("$project.templates.destDir/extractPitch.praat")
                 project.praatPitchExtractor.dependsOn it
                 project.afterEvaluate {
-                    props = [wavFile  : wavTask.destFile,
+                    props = [wavFile  : wavFile,
                              pitchFile: destFile,
                              minPitch : (project.voice.gender == 'female') ? 100 : 75,
                              maxPitch : (project.voice.gender == 'female') ? 500 : 300]
@@ -76,13 +71,13 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             }
 
             project.task("${basename}_extractPitchmarks", type: PraatExec) {
-                def wavTask = project.tasks.getByName("${basename}_wav")
+                def wavFile = project.file("$project.wav.destDir/${basename}.wav")
                 def pitchTask = project.tasks.getByName("${basename}_extractPitch")
-                dependsOn project.templates, wavTask, pitchTask
-                srcFiles << [wavTask.destFile, pitchTask.destFile]
+                dependsOn project.templates, project.wav, pitchTask
+                srcFiles << [wavFile, pitchTask.destFile]
                 destFile = project.file("$project.buildDir/pm/${basename}.PointProcess")
                 scriptFile = project.file("$project.templates.destDir/pitchmarks.praat")
-                props = [wavFile   : wavTask.destFile,
+                props = [wavFile   : wavFile,
                          pitchFile : pitchTask.destFile,
                          pointpFile: destFile]
                 project.praatPitchmarker.dependsOn it
@@ -97,10 +92,10 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             }
 
             project.task("${basename}_mcep", type: ParallelizableExec) {
-                def wavTask = project.tasks.getByName("${basename}_wav")
+                def wavFile = project.file("$project.wav.destDir/${basename}.wav")
                 def pitchmarkTask = project.tasks.getByName("${basename}_convertPitchmarks")
-                dependsOn wavTask, pitchmarkTask
-                srcFiles << [wavTask.destFile, pitchmarkTask.destFile]
+                dependsOn project.wav, pitchmarkTask
+                srcFiles << [wavFile, pitchmarkTask.destFile]
                 destFile = project.file("$project.buildDir/mcep/${basename}.mcep")
                 cmd = ['sig2fv',
                        '-window_type', 'hamming',
@@ -113,7 +108,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
                        '-preemph', 0.97,
                        '-pm', pitchmarkTask.destFile,
                        '-o', destFile,
-                       wavTask.destFile]
+                       wavFile]
                 project.mcepExtractor.dependsOn it
             }
         }
