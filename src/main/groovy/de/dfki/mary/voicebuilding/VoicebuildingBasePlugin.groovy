@@ -103,7 +103,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         project.task('integrationTest', type: Test) {
             useTestNG()
             workingDir = project.buildDir
-            testClassesDir = project.sourceSets.integrationTest.output.classesDir
+            testClassesDirs = project.sourceSets.integrationTest.output.classesDirs
             classpath = project.sourceSets.integrationTest.runtimeClasspath
             systemProperty 'log4j.logger.marytts', 'INFO,stderr'
             testLogging.showStandardStreams = true
