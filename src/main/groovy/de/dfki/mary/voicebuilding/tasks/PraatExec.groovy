@@ -13,7 +13,7 @@ class PraatExec extends DefaultTask {
 
     @Optional
     @Input
-    Map props = [:]
+    List args = []
 
     @Optional
     @InputFiles
@@ -25,20 +25,15 @@ class PraatExec extends DefaultTask {
 
     @TaskAction
     void exec() {
-        project.copy {
-            from scriptFile
-            into temporaryDir
-            expand props
-        }
         project.exec {
             def legacyPraat = "${System.env['LEGACY_PRAAT']}".toBoolean()
             project.logger.debug "legacyPraat == $legacyPraat"
             if (legacyPraat) {
-                commandLine command, scriptFile.name
+                commandLine command, scriptFile
             } else {
-                commandLine command, '--run', scriptFile.name
+                commandLine command, '--run', scriptFile
             }
-            workingDir temporaryDir
+            commandLine += this.args
         }
     }
 }

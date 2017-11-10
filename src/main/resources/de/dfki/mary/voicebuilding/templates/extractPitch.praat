@@ -1,5 +1,12 @@
+form Extract pitch...
+  sentence wavFile
+  sentence pitchFile
+  natural minPitch
+  natural maxPitch
+endform
+
 # Read input file
-wav = Read from file... $wavFile
+wav = Read from file... 'wavFile$'
 
 # Remove DC offset, if present:
 Subtract mean
@@ -9,8 +16,8 @@ Subtract mean
 sound = Filter (pass Hann band)... 0 1000 100
 
 # determine pitch curve:
-noprogress To Pitch... 0 $minPitch $maxPitch
+noprogress To Pitch... 0 minPitch maxPitch
 pitch = selected()
 
 # Write output file
-Write to binary file... $pitchFile
+Write to binary file... 'pitchFile$'
