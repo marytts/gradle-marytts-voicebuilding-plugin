@@ -6,8 +6,7 @@ Gradle MaryTTS voicebuilding plugin
 
 ## Added
 
-- Dynamic task generation based on `build/basenames.lst` file (or `build/text/*.txt` files)
-- New `bootstrap` task prepares project for `build`
+- Parallel data processing using Gradle Worker API
 - Workaround for legacy Praat version (<6): set environment variable `LEGACY_PRAAT=1`.
 
 ## Changes
