@@ -61,23 +61,20 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.file("$project.buildDir/PointProcess")
         }
 
-        project.task('pitchmarkConverter')
+        project.task('pitchmarkConverter', type: PitchmarkConverter) {
+            dependsOn project.praatPitchmarker
+            srcFiles = project.fileTree(project.praatPitchmarker.destDir).include('*.PointProcess')
+            destDir = project.file("$project.buildDir/pm")
+        }
 
         project.task('mcepExtractor')
 
         project.voicebuilding.basenames.each { basename ->
-            project.task("${basename}_convertPitchmarks", type: PitchmarkConverter) {
-                dependsOn project.praatPitchmarker
-                srcFile = project.file("$project.praatPitchmarker.destDir/${basename}.PointProcess")
-                destFile = project.file("$project.buildDir/pm/${basename}.pm")
-                project.pitchmarkConverter.dependsOn it
-            }
-
             project.task("${basename}_mcep", type: ParallelizableExec) {
                 def wavFile = project.file("$project.wav.destDir/${basename}.wav")
-                def pitchmarkTask = project.tasks.getByName("${basename}_convertPitchmarks")
-                dependsOn project.wav, pitchmarkTask
-                srcFiles << [wavFile, pitchmarkTask.destFile]
+                def pmFile = project.file("$project.pitchmarkConverter.destDir/${basename}.pm")
+                dependsOn project.wav, project.pitchmarkConverter
+                srcFiles << [wavFile, pmFile]
                 destFile = project.file("$project.buildDir/mcep/${basename}.mcep")
                 cmd = ['sig2fv',
                        '-window_type', 'hamming',
@@ -88,7 +85,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
                        '-fbank_order', 24,
                        '-shift', 0.01,
                        '-preemph', 0.97,
-                       '-pm', pitchmarkTask.destFile,
+                       '-pm', pmFile,
                        '-o', destFile,
                        wavFile]
                 project.mcepExtractor.dependsOn it
