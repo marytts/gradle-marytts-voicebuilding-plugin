@@ -46,39 +46,31 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.file("$project.buildDir/wav")
         }
 
-        project.task('praatPitchExtractor')
+        project.task('praatPitchExtractor', type: PraatExtractPitch) {
+            dependsOn project.templates, project.wav
+            scriptFile = project.file("$project.templates.destDir/extractPitch.praat")
+            srcFiles = project.fileTree(project.wav.destDir).include('*.wav')
+            destDir = project.file("$project.buildDir/Pitch")
+        }
 
-        project.task('praatPitchmarker')
+        project.task('praatPitchmarker') {
+            dependsOn project.praatPitchExtractor
+        }
 
         project.task('pitchmarkConverter')
 
         project.task('mcepExtractor')
 
         project.voicebuilding.basenames.each { basename ->
-            project.task("${basename}_extractPitch", type: PraatExec) {
-                def wavFile = project.file("$project.wav.destDir/${basename}.wav")
-                dependsOn project.templates, project.wav
-                srcFiles << wavFile
-                destFile = project.file("$project.buildDir/pm/${basename}.Pitch")
-                scriptFile = project.file("$project.templates.destDir/extractPitch.praat")
-                project.praatPitchExtractor.dependsOn it
-                project.afterEvaluate {
-                    args = [wavFile,
-                            destFile,
-                            (project.voice.gender == 'female') ? 100 : 75,
-                            (project.voice.gender == 'female') ? 500 : 300]
-                }
-            }
-
             project.task("${basename}_extractPitchmarks", type: PraatExec) {
                 def wavFile = project.file("$project.wav.destDir/${basename}.wav")
-                def pitchTask = project.tasks.getByName("${basename}_extractPitch")
-                dependsOn project.templates, project.wav, pitchTask
-                srcFiles << [wavFile, pitchTask.destFile]
+                def pitchFile = project.file("$project.praatPitchExtractor.destDir/${basename}.Pitch")
+                dependsOn project.templates, project.wav, project.praatPitchExtractor
+                srcFiles << [wavFile, pitchFile]
                 destFile = project.file("$project.buildDir/pm/${basename}.PointProcess")
                 scriptFile = project.file("$project.templates.destDir/pitchmarks.praat")
                 args = [wavFile,
-                        pitchTask.destFile,
+                        pitchFile,
                         destFile]
                 project.praatPitchmarker.dependsOn it
             }

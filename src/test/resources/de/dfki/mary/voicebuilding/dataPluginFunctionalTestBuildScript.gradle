@@ -101,7 +101,7 @@ task testPraatPitchExtractor {
     group 'Verification'
     dependsOn praatPitchExtractor
     doLast {
-        assert fileTree(buildDir).include('pm/*.Pitch').files
+        assert fileTree(buildDir).include('Pitch/*.Pitch').files
     }
 }
 
