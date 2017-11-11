@@ -53,8 +53,12 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.file("$project.buildDir/Pitch")
         }
 
-        project.task('praatPitchmarker') {
+        project.task('praatPitchmarker', type: PraatExtractPitchmarks) {
             dependsOn project.praatPitchExtractor
+            scriptFile = project.file("$project.templates.destDir/pitchmarks.praat")
+            wavFiles = project.fileTree(project.wav.destDir).include('*.wav')
+            pitchFiles = project.fileTree(project.praatPitchExtractor.destDir).include('*.Pitch')
+            destDir = project.file("$project.buildDir/PointProcess")
         }
 
         project.task('pitchmarkConverter')
@@ -62,23 +66,9 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         project.task('mcepExtractor')
 
         project.voicebuilding.basenames.each { basename ->
-            project.task("${basename}_extractPitchmarks", type: PraatExec) {
-                def wavFile = project.file("$project.wav.destDir/${basename}.wav")
-                def pitchFile = project.file("$project.praatPitchExtractor.destDir/${basename}.Pitch")
-                dependsOn project.templates, project.wav, project.praatPitchExtractor
-                srcFiles << [wavFile, pitchFile]
-                destFile = project.file("$project.buildDir/pm/${basename}.PointProcess")
-                scriptFile = project.file("$project.templates.destDir/pitchmarks.praat")
-                args = [wavFile,
-                        pitchFile,
-                        destFile]
-                project.praatPitchmarker.dependsOn it
-            }
-
             project.task("${basename}_convertPitchmarks", type: PitchmarkConverter) {
-                def pitchmarkTask = project.tasks.getByName("${basename}_extractPitchmarks")
-                dependsOn pitchmarkTask
-                srcFile = pitchmarkTask.destFile
+                dependsOn project.praatPitchmarker
+                srcFile = project.file("$project.praatPitchmarker.destDir/${basename}.PointProcess")
                 destFile = project.file("$project.buildDir/pm/${basename}.pm")
                 project.pitchmarkConverter.dependsOn it
             }

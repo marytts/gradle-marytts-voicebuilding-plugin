@@ -109,7 +109,7 @@ task testPraatPitchmarker {
     group 'Verification'
     dependsOn praatPitchmarker
     doLast {
-        assert fileTree(buildDir).include('pm/*.PointProcess').files
+        assert fileTree(buildDir).include('PointProcess/*.PointProcess').files
     }
 }
 
