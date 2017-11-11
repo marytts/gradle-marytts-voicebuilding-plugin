@@ -35,6 +35,7 @@ class ProcessWav extends DefaultTask {
                 def cmd = [soxPath, wavFile, destFile, 'rate', project.voice.samplingRate]
                 def args = [commandLine: cmd]
                 config.params args
+                config.isolationMode = IsolationMode.PROCESS
             }
         }
     }

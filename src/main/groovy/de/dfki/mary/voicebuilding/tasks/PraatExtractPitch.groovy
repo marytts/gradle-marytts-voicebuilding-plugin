@@ -50,6 +50,7 @@ class PraatExtractPitch extends DefaultTask {
                             (project.voice.gender == 'female') ? 500 : 300]
                 def commandLine = [commandLine: cmd + args]
                 config.params commandLine
+                config.isolationMode = IsolationMode.PROCESS
             }
         }
     }

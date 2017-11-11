@@ -53,6 +53,7 @@ class PraatExtractPitchmarks extends DefaultTask {
                             destFile]
                 def commandLine = [commandLine: cmd + args]
                 config.params commandLine
+                config.isolationMode = IsolationMode.PROCESS
             }
         }
     }

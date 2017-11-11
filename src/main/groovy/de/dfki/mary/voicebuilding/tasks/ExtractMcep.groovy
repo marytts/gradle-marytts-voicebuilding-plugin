@@ -51,6 +51,7 @@ class ExtractMcep extends DefaultTask {
                            wavFile]
                 def args = [commandLine: cmd]
                 config.params args
+                config.isolationMode = IsolationMode.PROCESS
             }
         }
     }
