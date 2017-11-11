@@ -67,29 +67,11 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.file("$project.buildDir/pm")
         }
 
-        project.task('mcepExtractor')
-
-        project.voicebuilding.basenames.each { basename ->
-            project.task("${basename}_mcep", type: ParallelizableExec) {
-                def wavFile = project.file("$project.wav.destDir/${basename}.wav")
-                def pmFile = project.file("$project.pitchmarkConverter.destDir/${basename}.pm")
-                dependsOn project.wav, project.pitchmarkConverter
-                srcFiles << [wavFile, pmFile]
-                destFile = project.file("$project.buildDir/mcep/${basename}.mcep")
-                cmd = ['sig2fv',
-                       '-window_type', 'hamming',
-                       '-factor', 2.5,
-                       '-otype', 'est_binary',
-                       '-coefs', 'melcep',
-                       '-melcep_order', 12,
-                       '-fbank_order', 24,
-                       '-shift', 0.01,
-                       '-preemph', 0.97,
-                       '-pm', pmFile,
-                       '-o', destFile,
-                       wavFile]
-                project.mcepExtractor.dependsOn it
-            }
+        project.task('mcepExtractor', type: ExtractMcep) {
+            dependsOn project.wav, project.pitchmarkConverter
+            wavFiles = project.fileTree(project.wav.destDir).include('*.wav')
+            pmFiles = project.fileTree(project.praatPitchmarker.destDir).include('*.pm')
+            destDir = project.file("$project.buildDir/mcep")
         }
 
         project.task('generateAllophones', type: MaryInterfaceBatchTask) {
