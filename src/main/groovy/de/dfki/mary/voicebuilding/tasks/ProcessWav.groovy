@@ -25,10 +25,14 @@ class ProcessWav extends DefaultTask {
 
     @TaskAction
     void process() {
+        def soxPath = System.env['PATH'].split(':').collect { dir ->
+            new File(dir, 'sox')
+        }.find { it.exists() }
+        assert soxPath
         srcFiles.each { wavFile ->
             def destFile = project.file("$destDir/$wavFile.name")
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
-                def cmd = ['sox', wavFile, destFile, 'rate', project.voice.samplingRate]
+                def cmd = [soxPath, wavFile, destFile, 'rate', project.voice.samplingRate]
                 def args = [commandLine: cmd]
                 config.params args
             }

@@ -28,12 +28,16 @@ class ExtractMcep extends DefaultTask {
 
     @TaskAction
     void process() {
+        def sig2FvPath = System.env['PATH'].split(':').collect { dir ->
+            new File(dir, 'sig2fv')
+        }.find { it.exists() }
+        assert sig2FvPath
         wavFiles.each { wavFile ->
             def basename = wavFile.name - '.wav'
             def pmFile = project.file("$project.pitchmarkConverter.destDir/${basename}.pm")
             def destFile = project.file("$destDir/${basename}.mcep")
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
-                def cmd = ['sig2fv',
+                def cmd = [sig2FvPath,
                            '-window_type', 'hamming',
                            '-factor', 2.5,
                            '-otype', 'est_binary',
