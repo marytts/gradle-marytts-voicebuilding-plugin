@@ -14,6 +14,8 @@ class RunnableExec implements Runnable {
     @Override
     void run() {
         println args.commandLine.join(' ')
-        args.commandLine.execute().waitFor()
+        def proc = args.commandLine.execute()
+        proc.waitFor()
+        assert proc.exitValue() == 0: proc.errorStream.text
     }
 }
