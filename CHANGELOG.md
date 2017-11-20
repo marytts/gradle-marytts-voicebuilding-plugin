@@ -8,7 +8,7 @@ Gradle MaryTTS voicebuilding plugin
 
 - Dynamic task generation based on `build/basenames.lst` file (or `build/text/*.txt` files)
 - New `bootstrap` task prepares project for `build`
-- Workaround for legacy Praat version (<6): set environment variable `LEGACY_PRAAT=1`.
+- Use Praat binary provided by [Gradle plugin](https://github.com/m2ci-msp/gradle-praat-wrapper-plugin)
 
 ## Changes
 
