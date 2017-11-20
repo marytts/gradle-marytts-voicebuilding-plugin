@@ -58,7 +58,7 @@ pluginBundle {
 repositories {
     jcenter()
     maven {
-        url 'https://oss.jfrog.org/artifactory/oss-snapshot-local'
+        url 'https://dl.bintray.com/m2ci-msp/maven/'
     }
 }
 
@@ -67,7 +67,7 @@ dependencies {
     compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion, {
         exclude module: 'groovy-all'
     }
-    compile group: 'org.m2ci.msp', name: 'gradle-praat-wrapper-plugin', version: '0.5-SNAPSHOT'
+    compile group: 'org.m2ci.msp', name: 'gradle-praat-wrapper-plugin', version: '0.5'
     testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
     testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
 }
