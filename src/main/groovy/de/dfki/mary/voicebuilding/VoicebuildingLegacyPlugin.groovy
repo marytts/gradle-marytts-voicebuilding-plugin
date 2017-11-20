@@ -34,7 +34,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyInit
+            dependsOn project.legacyInit, project.praat
             srcDir = project.file("$project.buildDir/wav")
             destDir = project.file("$project.buildDir/pm")
         }
