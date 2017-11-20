@@ -5,9 +5,6 @@ import org.gradle.api.tasks.*
 
 class PraatExec extends DefaultTask {
 
-    @Input
-    String command = 'praat'
-
     @InputFile
     File scriptFile
 
@@ -31,13 +28,7 @@ class PraatExec extends DefaultTask {
             expand props
         }
         project.exec {
-            def legacyPraat = "${System.env['LEGACY_PRAAT']}".toBoolean()
-            project.logger.debug "legacyPraat == $legacyPraat"
-            if (legacyPraat) {
-                commandLine command, scriptFile.name
-            } else {
-                commandLine command, '--run', scriptFile.name
-            }
+            commandLine project.praat.binary, scriptFile.name
             workingDir temporaryDir
         }
     }

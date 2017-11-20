@@ -4,12 +4,14 @@ import de.dfki.mary.voicebuilding.tasks.*
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.m2ci.msp.praat.PraatWrapperPlugin
 
 class VoicebuildingDataPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
         project.plugins.apply VoicebuildingBasePlugin
+        project.pluginManager.apply PraatWrapperPlugin
 
         project.configurations {
             create 'data'
@@ -62,7 +64,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
             project.task("${basename}_extractPitch", type: PraatExec) {
                 def wavTask = project.tasks.getByName("${basename}_wav")
-                dependsOn project.templates, wavTask
+                dependsOn project.templates, wavTask, project.praat
                 srcFiles << wavTask.destFile
                 destFile = project.file("$project.buildDir/pm/${basename}.Pitch")
                 scriptFile = project.file("$project.templates.destDir/extractPitch.praat")
@@ -78,7 +80,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             project.task("${basename}_extractPitchmarks", type: PraatExec) {
                 def wavTask = project.tasks.getByName("${basename}_wav")
                 def pitchTask = project.tasks.getByName("${basename}_extractPitch")
-                dependsOn project.templates, wavTask, pitchTask
+                dependsOn project.templates, wavTask, pitchTask, project.praat
                 srcFiles << [wavTask.destFile, pitchTask.destFile]
                 destFile = project.file("$project.buildDir/pm/${basename}.PointProcess")
                 scriptFile = project.file("$project.templates.destDir/pitchmarks.praat")
