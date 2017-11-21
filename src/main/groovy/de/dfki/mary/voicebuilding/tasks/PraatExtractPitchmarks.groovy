@@ -31,22 +31,11 @@ class PraatExtractPitchmarks extends DefaultTask {
 
     @TaskAction
     void extract() {
-        def praatPath = System.env['PATH'].split(':').collect { dir ->
-            new File(dir, 'praat')
-        }.find { it.exists() }
-        assert praatPath
+        def cmd = [project.praat.binary, scriptFile]
         wavFiles.each { wavFile ->
             def basename = wavFile.name - '.wav'
             def pitchFile = project.file("$project.praatPitchExtractor.destDir/${basename}.Pitch")
             def destFile = project.file("$destDir/${basename}.PointProcess")
-            def cmd = [praatPath]
-            def legacyPraat = "${System.env['LEGACY_PRAAT']}".toBoolean()
-            project.logger.debug "legacyPraat == $legacyPraat"
-            if (legacyPraat) {
-                cmd += [scriptFile]
-            } else {
-                cmd += ['--run', scriptFile]
-            }
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
                 def args = [wavFile,
                             pitchFile,
