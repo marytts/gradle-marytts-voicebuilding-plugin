@@ -33,12 +33,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             dependsOn project.templates
         }
 
-        project.task('legacyMCEPMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPraatPitchmarker
-            srcDir = project.file("$project.buildDir/pm")
-            destDir = project.file("$project.buildDir/mcep")
-        }
-
         project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
             dependsOn project.legacyInit
             srcDir = project.file("$project.buildDir/lab")
@@ -118,7 +112,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyMCepTimelineMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyMCEPMaker
+            dependsOn project.mcepExtractor
             srcDir = project.file("$project.buildDir/wav")
             srcDir2 = project.file("$project.buildDir/mcep")
             destFile = project.file("$project.legacyBuildDir/timeline_mcep.mry")

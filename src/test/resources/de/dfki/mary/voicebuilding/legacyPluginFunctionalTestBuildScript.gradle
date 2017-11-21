@@ -74,13 +74,6 @@ task testLegacyInit(group: 'Verification') {
     }
 }
 
-task testLegacyMCEPMaker(group: 'Verification') {
-    dependsOn legacyMCEPMaker
-    doLast {
-        assert fileTree(buildDir).include('mcep/*.mcep').files
-    }
-}
-
 task testLegacyPhoneUnitLabelComputer(group: 'Verification') {
     dependsOn legacyPhoneUnitLabelComputer
     doLast {
