@@ -11,7 +11,7 @@ Gradle MaryTTS voicebuilding plugin
 
 ## Changes
 
-- Build with Gradle v4.3
+- Build with Gradle v4.3.1
 - Rewrote several task classes used by data plugin
 - Fixed Travis CI integration to work with "trusty" containers
 
