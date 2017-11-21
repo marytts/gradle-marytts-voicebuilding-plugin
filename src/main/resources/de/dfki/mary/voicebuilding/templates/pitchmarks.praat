@@ -1,6 +1,12 @@
+form Extract pitchmarks...
+  sentence wavFile
+  sentence pitchFile
+  sentence pointpFile
+endform
+
 # Read data files
-sound = Read from file... $wavFile
-pitch = Read from file... $pitchFile
+sound = Read from file... 'wavFile$'
+pitch = Read from file... 'pitchFile$'
 
 # And convert to pitch marks:
 plus sound
@@ -85,4 +91,4 @@ endfor
 
 # Write pitchmark file
 label writepp
-Write to short text file... $pointpFile
+Write to short text file... 'pointpFile$'
