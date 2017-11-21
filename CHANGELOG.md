@@ -8,6 +8,7 @@ Gradle MaryTTS voicebuilding plugin
 
 - Parallel data processing using Gradle Worker API
 - Use Praat binary provided by [Gradle plugin](https://github.com/m2ci-msp/gradle-praat-wrapper-plugin)
+- Snapshots published to [OJO](https://oss.jfrog.org/)
 
 ## Changes
 
