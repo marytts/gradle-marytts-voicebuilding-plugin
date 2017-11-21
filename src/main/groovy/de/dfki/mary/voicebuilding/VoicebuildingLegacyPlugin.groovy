@@ -33,18 +33,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             dependsOn project.templates
         }
 
-        project.task('legacyPraatPitchmarker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyInit, project.praat
-            srcDir = project.file("$project.buildDir/wav")
-            destDir = project.file("$project.buildDir/pm")
-        }
-
-        project.task('legacyMCEPMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPraatPitchmarker
-            srcDir = project.file("$project.buildDir/pm")
-            destDir = project.file("$project.buildDir/mcep")
-        }
-
         project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
             dependsOn project.legacyInit
             srcDir = project.file("$project.buildDir/lab")
@@ -110,21 +98,21 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyWaveTimelineMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPraatPitchmarker
+            dependsOn project.pitchmarkConverter
             srcDir = project.file("$project.buildDir/wav")
             srcDir2 = project.file("$project.buildDir/pm")
             destFile = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
         }
 
         project.task('legacyBasenameTimelineMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPraatPitchmarker
+            dependsOn project.pitchmarkConverter
             srcDir = project.file("$project.buildDir/wav")
             srcDir2 = project.file("$project.buildDir/pm")
             destFile = project.file("$project.legacyBuildDir/timeline_basenames.mry")
         }
 
         project.task('legacyMCepTimelineMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyMCEPMaker
+            dependsOn project.mcepExtractor
             srcDir = project.file("$project.buildDir/wav")
             srcDir2 = project.file("$project.buildDir/mcep")
             destFile = project.file("$project.legacyBuildDir/timeline_mcep.mry")
@@ -155,14 +143,14 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPraatPitchmarker, project.legacyPhoneUnitLabelComputer
+            dependsOn project.pitchmarkConverter, project.legacyPhoneUnitLabelComputer
             dependsOn project.legacyPhoneLabelFeatureAligner
             srcDir = project.file("$project.buildDir/pm")
             destFile = project.file("$project.legacyBuildDir/phoneUnits.mry")
         }
 
         project.task('legacyHalfPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPraatPitchmarker, project.legacyHalfPhoneUnitLabelComputer
+            dependsOn project.pitchmarkConverter, project.legacyHalfPhoneUnitLabelComputer
             dependsOn project.legacyHalfPhoneLabelFeatureAligner
             srcDir = project.file("$project.buildDir/pm")
             destFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")

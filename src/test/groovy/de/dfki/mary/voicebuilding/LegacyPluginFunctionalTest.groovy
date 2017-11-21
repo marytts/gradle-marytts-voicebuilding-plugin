@@ -41,8 +41,6 @@ class LegacyPluginFunctionalTest {
                 ['testPlugins', false],
                 ['templates', true],
                 ['legacyInit', true],
-                ['legacyPraatPitchmarker', true],
-                ['legacyMCEPMaker', true],
                 ['legacyPhoneUnitLabelComputer', true],
                 ['legacyHalfPhoneUnitLabelComputer', true],
                 ['legacyTranscriptionAligner', true],
