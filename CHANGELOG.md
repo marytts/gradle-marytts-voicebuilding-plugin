@@ -1,8 +1,8 @@
 Gradle MaryTTS voicebuilding plugin
 ===================================
 
-[Unreleased]
-------------
+[v5.3] - 2017-11-21
+-------------------
 
 ## Added
 
@@ -75,7 +75,7 @@ Gradle MaryTTS voicebuilding plugin
 
 - Initial version indexed on plugins.gradle.org, extracted from project used to build voices for MaryTTS v5.1
 
-[Unreleased]: https://github.com/marytts/gradle-marytts-voicebuilding-plugin/compare/v5.2.2...HEAD
+[v5.3]: https://github.com/marytts/gradle-marytts-voicebuilding-plugin/releases/tag/v5.3
 [v5.2.2]: https://github.com/marytts/gradle-marytts-voicebuilding-plugin/releases/tag/v5.2.2
 [v5.2.1]: https://github.com/marytts/gradle-marytts-voicebuilding-plugin/releases/tag/v5.2.1
 [v5.2.0]: https://github.com/marytts/gradle-marytts-voicebuilding-plugin/releases/tag/v5.2.0
