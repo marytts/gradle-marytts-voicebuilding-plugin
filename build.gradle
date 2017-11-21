@@ -103,7 +103,7 @@ publishing {
     }
     repositories {
         maven {
-            url "https://api.bintray.com/maven/marytts/marytts/$project.name"
+            url version.endsWith('-SNAPSHOT') ? 'https://oss.jfrog.org/artifactory/oss-snapshot-local' : 'https://api.bintray.com/maven/marytts/marytts/gradle-marytts-voicebuilding-plugin'
             credentials {
                 username = findProperty('bintrayUser')
                 password = findProperty('bintrayApiKey')
