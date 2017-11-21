@@ -31,7 +31,7 @@ class PraatExtractPitchmarks extends DefaultTask {
 
     @TaskAction
     void extract() {
-        def cmd = [project.praat.binary, scriptFile]
+        def cmd = [project.praat.binary, '--run', scriptFile]
         wavFiles.each { wavFile ->
             def basename = wavFile.name - '.wav'
             def pitchFile = project.file("$project.praatPitchExtractor.destDir/${basename}.Pitch")
