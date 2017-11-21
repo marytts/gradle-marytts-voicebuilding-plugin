@@ -4,12 +4,14 @@ import de.dfki.mary.voicebuilding.tasks.*
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.m2ci.msp.praat.PraatWrapperPlugin
 
 class VoicebuildingDataPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
         project.plugins.apply VoicebuildingBasePlugin
+        project.pluginManager.apply PraatWrapperPlugin
 
         project.configurations {
             create 'data'
@@ -47,14 +49,14 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         project.task('praatPitchExtractor', type: PraatExtractPitch) {
-            dependsOn project.templates, project.wav
+            dependsOn project.templates, project.wav, project.praat
             scriptFile = project.file("$project.templates.destDir/extractPitch.praat")
             srcFiles = project.fileTree(project.wav.destDir).include('*.wav')
             destDir = project.file("$project.buildDir/Pitch")
         }
 
         project.task('praatPitchmarker', type: PraatExtractPitchmarks) {
-            dependsOn project.praatPitchExtractor
+            dependsOn project.praatPitchExtractor, project.wav, project.praat
             scriptFile = project.file("$project.templates.destDir/pitchmarks.praat")
             wavFiles = project.fileTree(project.wav.destDir).include('*.wav')
             pitchFiles = project.fileTree(project.praatPitchExtractor.destDir).include('*.Pitch')

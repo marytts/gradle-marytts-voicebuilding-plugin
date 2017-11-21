@@ -7,7 +7,7 @@ Gradle MaryTTS voicebuilding plugin
 ## Added
 
 - Parallel data processing using Gradle Worker API
-- Workaround for legacy Praat version (<6): set environment variable `LEGACY_PRAAT=1`.
+- Use Praat binary provided by [Gradle plugin](https://github.com/m2ci-msp/gradle-praat-wrapper-plugin)
 
 ## Changes
 
