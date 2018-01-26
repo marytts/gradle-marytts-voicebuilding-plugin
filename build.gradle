@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'de.dfki.mary'
-version '5.4-SNAPSHOT'
+version '5.3.1'
 description 'A replacement (incubating) for the legacy VoiceImportTools in MaryTTS'
 
 gradlePlugin {
