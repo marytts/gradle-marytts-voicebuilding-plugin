@@ -64,9 +64,6 @@ dependencies {
     compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion, {
         exclude module: 'groovy-all'
     }
-    compile group: 'de.dfki.mary', name: 'marytts-common', version: maryttsVersion, {
-        exclude module: 'groovy-all'
-    }
     compile group: 'org.m2ci.msp', name: 'gradle-praat-wrapper-plugin', version: '0.5.1'
     testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
     testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
