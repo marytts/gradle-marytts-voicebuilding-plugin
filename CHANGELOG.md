@@ -4,12 +4,19 @@ Gradle MaryTTS voicebuilding plugin
 [Unreleased]
 ------------
 
+[v5.3.2] - 2018-01-26
+---------------------
+
+## Fixed
+
+- Prevent transitive Groovy dependency from leaking into classpath of consuming projects (properly this time!)
+
 [v5.3.1] - 2018-01-26
 ---------------------
 
 ## Fixed
 
-- Prevent transitive Groovy dependency from leaking into classpath of consuming projects
+- Prevent transitive Groovy dependency from leaking into classpath of consuming projects (turned out not to have been the proper solution...)
 
 [v5.3] - 2017-11-21
 -------------------
@@ -85,7 +92,8 @@ Gradle MaryTTS voicebuilding plugin
 
 - Initial version indexed on plugins.gradle.org, extracted from project used to build voices for MaryTTS v5.1
 
-[Unreleased]: https://github.com/marytts/gradle-marytts-voicebuilding-plugin/compare/v5.3.1...HEAD
+[Unreleased]: https://github.com/marytts/gradle-marytts-voicebuilding-plugin/compare/v5.3.2...HEAD
+[v5.3.2]: https://github.com/marytts/gradle-marytts-voicebuilding-plugin/releases/tag/v5.3.2
 [v5.3.1]: https://github.com/marytts/gradle-marytts-voicebuilding-plugin/releases/tag/v5.3.1
 [v5.3]: https://github.com/marytts/gradle-marytts-voicebuilding-plugin/releases/tag/v5.3
 [v5.2.2]: https://github.com/marytts/gradle-marytts-voicebuilding-plugin/releases/tag/v5.2.2
