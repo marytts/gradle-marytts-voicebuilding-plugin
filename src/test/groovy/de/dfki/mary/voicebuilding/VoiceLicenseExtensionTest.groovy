@@ -1,5 +1,6 @@
 package de.dfki.mary.voicebuilding
 
+import org.gradle.testfixtures.ProjectBuilder
 import org.testng.annotations.*
 
 class VoiceLicenseExtensionTest {
@@ -8,7 +9,7 @@ class VoiceLicenseExtensionTest {
 
     @BeforeMethod
     void setup() {
-        license = new VoiceLicenseExtension()
+        license = new VoiceLicenseExtension(ProjectBuilder.builder().build())
     }
 
     @Test

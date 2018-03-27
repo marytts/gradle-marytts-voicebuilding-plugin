@@ -24,8 +24,8 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             version = this.getClass().getResource('/maryttsVersion.txt')?.text
         }
 
-        project.marytts.extensions.create 'voice', VoiceExtension
-        project.marytts.voice.extensions.create 'license', VoiceLicenseExtension
+        project.marytts.extensions.create 'voice', VoiceExtension, project
+        project.marytts.voice.extensions.create 'license', VoiceLicenseExtension, project
 
         project.repositories {
             mavenCentral()

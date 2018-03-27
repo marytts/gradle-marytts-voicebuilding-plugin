@@ -43,6 +43,7 @@ task testVoiceProps(group: 'Verification') {
         assert marytts.voice.locale == voiceLocale
         assert marytts.voice.localeXml == voiceLocale.toLanguageTag()
         assert marytts.voice.description == voiceDescription
+        assert marytts.voice.samplingRate == voiceSamplingRate as int
         assert marytts.voice.license?.name == voiceLicenseName
     }
 }
@@ -98,7 +99,7 @@ task testGenerateVoiceConfig(group: 'Verification') {
                 "voice.${voiceName}.domain"      : 'general',
                 "voice.${voiceName}.gender"      : voiceGender,
                 "voice.${voiceName}.locale"      : "$voiceLocale",
-                "voice.${voiceName}.samplingRate": '16000'
+                "voice.${voiceName}.samplingRate": voiceSamplingRate
         ] as Properties
         assert actual == expected
     }
