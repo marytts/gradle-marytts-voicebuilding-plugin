@@ -4,6 +4,10 @@ Gradle MaryTTS voicebuilding plugin
 [Unreleased]
 ------------
 
+## Changes
+
+- Build with Gradle v4.6
+
 [v5.3.2] - 2018-01-26
 ---------------------
 
