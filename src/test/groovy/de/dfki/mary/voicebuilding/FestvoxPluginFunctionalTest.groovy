@@ -29,9 +29,9 @@ class FestvoxPluginFunctionalTest {
                 ['testPlugins', false],
                 ['testDataDependencies', false],
                 ['processDataResources', true],
+                ['wav', true],
                 ['text', true],
-                ['lab', true],
-                ['wav', true]
+                ['lab', true]
         ]
     }
 

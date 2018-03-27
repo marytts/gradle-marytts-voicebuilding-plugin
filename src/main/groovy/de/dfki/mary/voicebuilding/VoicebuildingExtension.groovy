@@ -15,9 +15,7 @@ class VoicebuildingExtension {
     List<String> getBasenames() {
         def basenamesListFile = project.file("$project.buildDir/basenames.lst")
         if (basenamesListFile.canRead()) {
-            return basenamesListFile.readLines().findAll {
-                !(it.trim().startsWith('#') || it.trim().startsWith('FROM: '))
-            }
+            return basenamesListFile.readLines().findAll { !it.trim().startsWith('#') }
         }
         return project.fileTree(project.buildDir).include('text/*.txt').collect { it.name - '.txt' }
     }
