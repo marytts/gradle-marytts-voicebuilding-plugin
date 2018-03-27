@@ -9,6 +9,8 @@ group 'de.dfki.mary'
 version '5.4-SNAPSHOT'
 description 'A replacement (incubating) for the legacy VoiceImportTools in MaryTTS'
 
+sourceCompatibility = '1.8'
+
 gradlePlugin {
     plugins {
         base {

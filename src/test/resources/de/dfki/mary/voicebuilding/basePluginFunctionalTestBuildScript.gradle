@@ -46,8 +46,8 @@ task testVoiceProps(group: 'Verification') {
 
 task testJavaCompatibility(group: 'Verification') {
     doLast {
-        assert "$sourceCompatibility" == '1.7'
-        assert "$targetCompatibility" == '1.7'
+        assert "$sourceCompatibility" == '1.8'
+        assert "$targetCompatibility" == '1.8'
     }
 }
 

@@ -16,7 +16,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         project.plugins.apply GroovyPlugin
         project.plugins.apply MavenPlugin
 
-        project.sourceCompatibility = '1.7'
+        project.sourceCompatibility = '1.8'
 
         project.extensions.create 'voice', VoiceExtension
         project.voice.extensions.create 'license', VoiceLicenseExtension
