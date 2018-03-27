@@ -57,6 +57,7 @@ pluginBundle {
 
 repositories {
     jcenter()
+    mavenCentral()
 }
 
 dependencies {

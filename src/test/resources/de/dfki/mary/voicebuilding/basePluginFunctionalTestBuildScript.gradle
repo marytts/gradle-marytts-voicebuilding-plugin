@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath group: 'xmlunit', name: 'xmlunit', version: '1.6'

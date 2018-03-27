@@ -27,6 +27,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.repositories {
             jcenter()
+            mavenCentral()
         }
 
         project.sourceSets {
