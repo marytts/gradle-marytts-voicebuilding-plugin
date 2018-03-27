@@ -1,5 +1,6 @@
 package de.dfki.mary.voicebuilding
 
+import de.dfki.mary.MaryttsExtension
 import de.dfki.mary.voicebuilding.tasks.*
 
 import org.gradle.api.Plugin
@@ -18,12 +19,13 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.sourceCompatibility = '1.8'
 
+        project.extensions.create 'marytts', MaryttsExtension, project
+        project.marytts {
+            version = this.getClass().getResource('/maryttsVersion.txt')?.text
+        }
+
         project.extensions.create 'voice', VoiceExtension
         project.voice.extensions.create 'license', VoiceLicenseExtension
-
-        project.ext {
-            maryttsVersion = this.getClass().getResource('/maryttsVersion.txt')?.text
-        }
 
         project.repositories {
             mavenCentral()
@@ -45,7 +47,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.dependencies {
-            compile group: 'de.dfki.mary', name: 'marytts-runtime', version: project.maryttsVersion, {
+            compile group: 'de.dfki.mary', name: 'marytts-runtime', version: project.marytts.version, {
                 exclude group: '*', module: 'groovy-all'
             }
             testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -55,7 +57,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             project.dependencies {
-                runtime "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion", {
+                runtime "de.dfki.mary:marytts-lang-$project.voice.language:$project.marytts.version", {
                     exclude group: '*', module: 'groovy-all'
                 }
             }

@@ -338,10 +338,10 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             project.dependencies {
-                compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion", {
+                compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.marytts.version", {
                     exclude group: '*', module: 'groovy-all'
                 }
-                legacy("de.dfki.mary:marytts-builder:$project.maryttsVersion") {
+                legacy("de.dfki.mary:marytts-builder:$project.marytts.version") {
                     exclude group: '*', module: 'mwdumper'
                     exclude group: '*', module: 'sgt'
                 }

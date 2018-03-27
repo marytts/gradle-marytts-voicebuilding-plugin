@@ -24,9 +24,9 @@ class LegacyDescriptorTask extends DefaultTask {
                     delegate.description project.voice.description
                     license(href: project.voice.license.url)
                     'package'(filename: srcFile.name, md5sum: project.ant.srcFileHash, size: srcFile.size()) {
-                        location(folder: true, href: "http://mary.dfki.de/download/$project.maryttsVersion/")
+                        location(folder: true, href: "http://mary.dfki.de/download/$project.marytts.version/")
                     }
-                    depends(language: project.voice.maryLocaleXml, version: project.maryttsVersion)
+                    depends(language: project.voice.maryLocaleXml, version: project.marytts.version)
                 }
             }
         }

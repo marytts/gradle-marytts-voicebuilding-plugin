@@ -24,7 +24,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.dependencies {
             project.afterEvaluate {
-                marytts group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion, {
+                marytts group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.marytts.version, {
                     exclude group: '*', module: 'groovy-all'
                 }
             }
