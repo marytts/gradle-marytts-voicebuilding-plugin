@@ -49,7 +49,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             }
             testCompile group: 'junit', name: 'junit', version: '4.12'
             integrationTestCompile localGroovy()
-            integrationTestCompile group: 'org.testng', name: 'testng', version: '6.9.4'
+            integrationTestCompile group: 'org.testng', name: 'testng', version: '6.14.3'
         }
 
         project.afterEvaluate {
