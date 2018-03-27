@@ -83,6 +83,7 @@ test {
     testLogging {
         exceptionFormat = 'full'
     }
+    failFast = true
     doFirst {
         // path to shared testkit gradle home
         systemProperty 'testProjectDir', temporaryDir
