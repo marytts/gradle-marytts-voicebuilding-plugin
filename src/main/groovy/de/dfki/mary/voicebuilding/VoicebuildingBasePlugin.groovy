@@ -16,7 +16,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         project.plugins.apply GroovyPlugin
         project.plugins.apply MavenPlugin
 
-        project.sourceCompatibility = '1.7'
+        project.sourceCompatibility = '1.8'
 
         project.extensions.create 'voice', VoiceExtension
         project.voice.extensions.create 'license', VoiceLicenseExtension
@@ -26,6 +26,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.repositories {
+            mavenCentral()
             jcenter()
         }
 
@@ -45,17 +46,17 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.dependencies {
             compile group: 'de.dfki.mary', name: 'marytts-runtime', version: project.maryttsVersion, {
-                exclude module: 'groovy-all'
+                exclude group: '*', module: 'groovy-all'
             }
             testCompile group: 'junit', name: 'junit', version: '4.12'
             integrationTestCompile localGroovy()
-            integrationTestCompile group: 'org.testng', name: 'testng', version: '6.9.4'
+            integrationTestCompile group: 'org.testng', name: 'testng', version: '6.14.3'
         }
 
         project.afterEvaluate {
             project.dependencies {
                 runtime "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion", {
-                    exclude module: 'groovy-all'
+                    exclude group: '*', module: 'groovy-all'
                 }
             }
         }

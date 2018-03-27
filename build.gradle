@@ -2,12 +2,14 @@ plugins {
     id 'groovy'
     id 'java-gradle-plugin'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version '0.9.9'
+    id 'com.gradle.plugin-publish' version '0.9.10'
 }
 
 group 'de.dfki.mary'
 version '5.4-SNAPSHOT'
 description 'A replacement (incubating) for the legacy VoiceImportTools in MaryTTS'
+
+sourceCompatibility = '1.8'
 
 gradlePlugin {
     plugins {
@@ -56,6 +58,7 @@ pluginBundle {
 }
 
 repositories {
+    mavenCentral()
     jcenter()
 }
 
@@ -65,7 +68,7 @@ dependencies {
         exclude group: '*', module: 'groovy-all'
     }
     compile group: 'org.m2ci.msp', name: 'gradle-praat-wrapper-plugin', version: '0.5.1'
-    testCompile group: 'org.testng', name: 'testng', version: '6.9.4'
+    testCompile group: 'org.testng', name: 'testng', version: '6.14.3'
     testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
 }
 
