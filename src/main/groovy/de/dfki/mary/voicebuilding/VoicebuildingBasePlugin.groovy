@@ -45,7 +45,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.dependencies {
             compile group: 'de.dfki.mary', name: 'marytts-runtime', version: project.maryttsVersion, {
-                exclude module: 'groovy-all'
+                exclude group: '*', module: 'groovy-all'
             }
             testCompile group: 'junit', name: 'junit', version: '4.12'
             integrationTestCompile localGroovy()
@@ -55,7 +55,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         project.afterEvaluate {
             project.dependencies {
                 runtime "de.dfki.mary:marytts-lang-$project.voice.language:$project.maryttsVersion", {
-                    exclude module: 'groovy-all'
+                    exclude group: '*', module: 'groovy-all'
                 }
             }
         }
