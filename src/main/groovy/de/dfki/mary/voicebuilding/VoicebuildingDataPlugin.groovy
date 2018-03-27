@@ -31,8 +31,6 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             marytts group: 'de.dfki.mary', name: "marytts-voicebuilding", version: '0.1'
         }
 
-        project.extensions.create 'voicebuilding', VoicebuildingExtension, project
-
         project.task('bootstrap')
 
         project.task('templates', type: CopyClasspathResources) {
