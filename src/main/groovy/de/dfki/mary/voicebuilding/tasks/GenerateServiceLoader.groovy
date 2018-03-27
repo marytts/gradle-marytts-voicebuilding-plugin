@@ -10,6 +10,6 @@ class GenerateServiceLoader extends DefaultTask {
 
     @TaskAction
     void generate() {
-        destFile.text = "marytts.voice.${project.voice.nameCamelCase}.Config"
+        destFile.text = "marytts.voice.${project.marytts.voice.nameCamelCase}.Config"
     }
 }

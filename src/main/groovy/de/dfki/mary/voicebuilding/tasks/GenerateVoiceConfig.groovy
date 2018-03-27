@@ -18,27 +18,27 @@ class GenerateVoiceConfig extends DefaultTask {
     void generate() {
         config << [
                 domain      : 'general',
-                gender      : project.voice.gender,
-                locale      : project.voice.locale,
-                samplingRate: project.voice.samplingRate
+                gender      : project.marytts.voice.gender,
+                locale      : project.marytts.voice.locale,
+                samplingRate: project.marytts.voice.samplingRate
         ]
         destFile <<
-                """|# Auto-generated config file for voice ${project.voice.name}
+                """|# Auto-generated config file for voice ${project.marytts.voice.name}
                    |
-                   |name = ${project.voice.name}
-                   |locale = ${project.voice.maryLocale}
+                   |name = ${project.marytts.voice.name}
+                   |locale = ${project.marytts.voice.maryLocale}
                    |
-                   |${getVoiceType()}.voices.list = ${project.voice.name}
+                   |${getVoiceType()}.voices.list = ${project.marytts.voice.name}
                    |
                    |""".stripMargin()
         destFile << config.collect { key, value ->
-            "voice.${project.voice.name}.$key = $value"
+            "voice.${project.marytts.voice.name}.$key = $value"
         }.join('\n')
     }
 
     String getVoiceType() {
         def type
-        switch (project.voice.type) {
+        switch (project.marytts.voice.type) {
             case ~/hs?mm/:
                 type = 'hmm'
                 break

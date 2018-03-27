@@ -14,7 +14,7 @@ class FeatureListerTask extends DefaultTask {
             classpath project.configurations.marytts
             main 'marytts.FeatureLister'
             systemProperties = [
-                    locale    : project.voice.maryLocale,
+                    locale    : project.marytts.voice.maryLocale,
                     outputFile: destFile
             ]
         }

@@ -32,7 +32,7 @@ class ProcessWav extends DefaultTask {
         srcFiles.each { wavFile ->
             def destFile = project.file("$destDir/$wavFile.name")
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
-                def cmd = [soxPath, wavFile, destFile, 'rate', project.voice.samplingRate]
+                def cmd = [soxPath, wavFile, destFile, 'rate', project.marytts.voice.samplingRate]
                 def args = [commandLine: cmd]
                 config.params args
                 config.isolationMode = IsolationMode.PROCESS

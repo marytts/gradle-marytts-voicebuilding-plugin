@@ -246,32 +246,32 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                         unitReaderClass           : 'marytts.unitselection.data.UnitFileReader',
                         cartReaderClass           : 'marytts.cart.io.MARYCartReader',
                         audioTimelineReaderClass  : 'marytts.unitselection.data.TimelineReader',
-                        featureFile               : "MARY_BASE/lib/voices/$project.voice.name/halfphoneFeatures_ac.mry",
-                        targetCostWeights         : "jar:/marytts/voice/$project.voice.nameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
-                        joinCostFile              : "MARY_BASE/lib/voices/$project.voice.name/joinCostFeatures.mry",
-                        joinCostWeights           : "jar:/marytts/voice/$project.voice.nameCamelCase/joinCostWeights.txt",
-                        unitsFile                 : "MARY_BASE/lib/voices/$project.voice.name/halfphoneUnits.mry",
-                        cartFile                  : "jar:/marytts/voice/$project.voice.nameCamelCase/cart.mry",
-                        audioTimelineFile         : "MARY_BASE/lib/voices/$project.voice.name/timeline_waveforms.mry",
-                        basenameTimeline          : "MARY_BASE/lib/voices/$project.voice.name/timeline_basenames.mry",
+                        featureFile               : "MARY_BASE/lib/voices/$project.marytts.voice.name/halfphoneFeatures_ac.mry",
+                        targetCostWeights         : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
+                        joinCostFile              : "MARY_BASE/lib/voices/$project.marytts.voice.name/joinCostFeatures.mry",
+                        joinCostWeights           : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/joinCostWeights.txt",
+                        unitsFile                 : "MARY_BASE/lib/voices/$project.marytts.voice.name/halfphoneUnits.mry",
+                        cartFile                  : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/cart.mry",
+                        audioTimelineFile         : "MARY_BASE/lib/voices/$project.marytts.voice.name/timeline_waveforms.mry",
+                        basenameTimeline          : "MARY_BASE/lib/voices/$project.marytts.voice.name/timeline_basenames.mry",
                         acousticModels            : 'duration F0 midF0 rightF0',
                         'duration.model'          : 'cart',
-                        'duration.data'           : "jar:/marytts/voice/$project.voice.nameCamelCase/dur.tree",
+                        'duration.data'           : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/dur.tree",
                         'duration.attribute'      : 'd',
                         'F0.model'                : 'cart',
-                        'F0.data'                 : "jar:/marytts/voice/$project.voice.nameCamelCase/f0.left.tree",
+                        'F0.data'                 : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/f0.left.tree",
                         'F0.attribute'            : 'f0',
                         'F0.attribute.format'     : '(0,%.0f)',
                         'F0.predictFrom'          : 'firstVowels',
                         'F0.applyTo'              : 'firstVoicedSegments',
                         'midF0.model'             : 'cart',
-                        'midF0.data'              : "jar:/marytts/voice/$project.voice.nameCamelCase/f0.mid.tree",
+                        'midF0.data'              : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/f0.mid.tree",
                         'midF0.attribute'         : 'f0',
                         'midF0.attribute.format'  : '(50,%.0f)',
                         'midF0.predictFrom'       : 'firstVowels',
                         'midF0.applyTo'           : 'firstVowels',
                         'rightF0.model'           : 'cart',
-                        'rightF0.data'            : "jar:/marytts/voice/$project.voice.nameCamelCase/f0.right.tree",
+                        'rightF0.data'            : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/f0.right.tree",
                         'rightF0.attribute'       : 'f0',
                         'rightF0.attribute.format': '(100,%.0f)',
                         'rightF0.predictFrom'     : 'firstVowels',
@@ -291,7 +291,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             from project.legacyDurationCARTTrainer
             from project.legacyF0CARTTrainer
             project.afterEvaluate {
-                rename { "marytts/voice/$project.voice.nameCamelCase/$it" }
+                rename { "marytts/voice/$project.marytts.voice.nameCamelCase/$it" }
             }
         }
 
@@ -306,7 +306,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 include 'joinCostFeatures.mry'
             }
             project.afterEvaluate {
-                rename { "lib/voices/$project.voice.name/$it" }
+                rename { "lib/voices/$project.marytts.voice.name/$it" }
             }
         }
 
@@ -338,7 +338,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             project.dependencies {
-                compile "de.dfki.mary:marytts-lang-$project.voice.language:$project.marytts.version", {
+                compile "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
                     exclude group: '*', module: 'groovy-all'
                 }
                 legacy("de.dfki.mary:marytts-builder:$project.marytts.version") {

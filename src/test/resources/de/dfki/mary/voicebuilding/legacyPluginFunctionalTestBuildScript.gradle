@@ -13,12 +13,14 @@ plugins {
     id 'de.dfki.mary.voicebuilding-festvox'
 }
 
-voice {
-    name = voiceName
-    gender = voiceGender
-    region = voiceLocaleRegion
-    license {
-        url = voiceLicenseUrl
+marytts {
+    voice {
+        name = voiceName
+        gender = voiceGender
+        region = voiceLocaleRegion
+        license {
+            url = voiceLicenseUrl
+        }
     }
 }
 

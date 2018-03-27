@@ -12,11 +12,11 @@ class GeneratePom extends DefaultTask {
     void generate() {
         project.pom { pom ->
             pom.project {
-                description project.voice.description
+                description project.marytts.voice.description
                 licenses {
                     license {
-                        name project.voice.license.name
-                        url project.voice.license.url
+                        name project.marytts.voice.license.name
+                        url project.marytts.voice.license.url
                     }
                 }
             }

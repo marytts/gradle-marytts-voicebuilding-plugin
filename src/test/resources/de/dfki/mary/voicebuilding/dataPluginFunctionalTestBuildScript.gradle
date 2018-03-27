@@ -2,8 +2,10 @@ plugins {
     id 'de.dfki.mary.voicebuilding-festvox' // transitively applies voicebuilding-data plugin
 }
 
-voice {
-    gender = voiceGender
+marytts {
+    voice {
+        gender = voiceGender
+    }
 }
 
 repositories {
@@ -49,7 +51,7 @@ task testSourceSets(group: 'Verification') {
 task testDependencies(group: 'Verification') {
     doLast {
         assert configurations.data.dependencies.find { it.name == dataDependencyName }
-        assert configurations.marytts.dependencies.find { it.name == "marytts-lang-$voice.locale.language" }
+        assert configurations.marytts.dependencies.find { it.name == "marytts-lang-$marytts.voice.locale.language" }
     }
 }
 

@@ -24,8 +24,8 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             version = this.getClass().getResource('/maryttsVersion.txt')?.text
         }
 
-        project.extensions.create 'voice', VoiceExtension
-        project.voice.extensions.create 'license', VoiceLicenseExtension
+        project.marytts.extensions.create 'voice', VoiceExtension
+        project.marytts.voice.extensions.create 'license', VoiceLicenseExtension
 
         project.repositories {
             mavenCentral()
@@ -57,7 +57,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             project.dependencies {
-                runtime "de.dfki.mary:marytts-lang-$project.voice.language:$project.marytts.version", {
+                runtime "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
                     exclude group: '*', module: 'groovy-all'
                 }
             }
@@ -79,7 +79,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.task('generateVoiceConfig', type: GenerateVoiceConfig) {
             project.afterEvaluate {
-                destFile = project.file("$project.sourceSets.main.output.resourcesDir/marytts/voice/$project.voice.nameCamelCase/voice.config")
+                destFile = project.file("$project.sourceSets.main.output.resourcesDir/marytts/voice/$project.marytts.voice.nameCamelCase/voice.config")
             }
             project.processResources.dependsOn it
         }
@@ -91,14 +91,14 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.task('generatePom', type: GeneratePom) {
             project.afterEvaluate {
-                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/$project.group/voice-$project.voice.name/pom.xml")
+                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.xml")
             }
             project.jar.dependsOn it
         }
 
         project.task('generatePomProperties', type: GeneratePomProperties) {
             project.afterEvaluate {
-                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/$project.group/voice-$project.voice.name/pom.properties")
+                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.properties")
             }
             project.jar.dependsOn it
         }

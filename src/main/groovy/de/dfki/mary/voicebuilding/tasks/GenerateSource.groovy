@@ -16,9 +16,9 @@ class GenerateSource extends DefaultTask {
                 java {
                     marytts {
                         voice {
-                            "${project.voice.nameCamelCase}" {
+                            "${project.marytts.voice.nameCamelCase}" {
                                 'Config.java'(
-                                        """|package marytts.voice.${project.voice.nameCamelCase};
+                                        """|package marytts.voice.${project.marytts.voice.nameCamelCase};
                                            |
                                            |import marytts.config.VoiceConfig;
                                            |import marytts.exceptions.MaryConfigurationException;
@@ -39,9 +39,9 @@ class GenerateSource extends DefaultTask {
                 java {
                     marytts {
                         voice {
-                            "${project.voice.nameCamelCase}" {
+                            "${project.marytts.voice.nameCamelCase}" {
                                 'ConfigTest.java'(
-                                        """|package marytts.voice.${project.voice.nameCamelCase};
+                                        """|package marytts.voice.${project.marytts.voice.nameCamelCase};
                                            |
                                            |import static org.junit.Assert.*;
                                            |
@@ -55,7 +55,7 @@ class GenerateSource extends DefaultTask {
                                            | * @author marc
                                            | */
                                            |public class ConfigTest {
-                                           |    private static final String voiceName = "${project.voice.name}";
+                                           |    private static final String voiceName = "${project.marytts.voice.name}";
                                            |
                                            |    @Test
                                            |    public void isNotMainConfig() throws MaryConfigurationException {
@@ -106,13 +106,13 @@ class GenerateSource extends DefaultTask {
                 groovy {
                     marytts {
                         voice {
-                            "${project.voice.nameCamelCase}" {
+                            "${project.marytts.voice.nameCamelCase}" {
                                 'LoadVoiceIT.groovy'(
-                                        """|package marytts.voice.${project.voice.nameCamelCase}
+                                        """|package marytts.voice.${project.marytts.voice.nameCamelCase}
                                            |
                                            |import marytts.LocalMaryInterface
                                            |import marytts.datatypes.MaryDataType
-                                           |import ${project.voice.type == 'hsmm' ? 'marytts.htsengine.HMMVoice' : 'marytts.unitselection.UnitSelectionVoice'}
+                                           |import ${project.marytts.voice.type == 'hsmm' ? 'marytts.htsengine.HMMVoice' : 'marytts.unitselection.UnitSelectionVoice'}
                                            |import marytts.util.dom.DomUtils
                                            |
                                            |import org.testng.annotations.*
@@ -130,7 +130,7 @@ class GenerateSource extends DefaultTask {
                                            |
                                            |    @Test
                                            |    void canLoadVoice() {
-                                           |        def voice = new ${project.voice.type == 'hsmm' ? 'HMM' : 'UnitSelection'}Voice(config.name, null)
+                                           |        def voice = new ${project.marytts.voice.type == 'hsmm' ? 'HMM' : 'UnitSelection'}Voice(config.name, null)
                                            |        assert voice
                                            |    }
                                            |

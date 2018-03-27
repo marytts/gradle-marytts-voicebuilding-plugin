@@ -39,7 +39,7 @@ class MaryInterfaceBatchTask extends DefaultTask {
         srcDir.eachFileMatch(FileType.FILES, ~/.+\.$inputExt/) { srcFile ->
             def destFile = new File(destDir, srcFile.name.replace(inputExt, outputExt))
             batch << [
-                    locale          : "$project.voice.maryLocale",
+                    locale          : "$project.marytts.voice.maryLocale",
                     inputType       : inputType,
                     inputFile       : "$srcFile",
                     outputType      : outputType,

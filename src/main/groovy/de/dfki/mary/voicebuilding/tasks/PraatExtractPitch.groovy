@@ -35,8 +35,8 @@ class PraatExtractPitch extends DefaultTask {
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
                 def args = [wavFile,
                             destFile,
-                            (project.voice.gender == 'female') ? 100 : 75,
-                            (project.voice.gender == 'female') ? 500 : 300]
+                            (project.marytts.voice.gender == 'female') ? 100 : 75,
+                            (project.marytts.voice.gender == 'female') ? 500 : 300]
                 def commandLine = [commandLine: cmd + args]
                 config.params commandLine
                 config.isolationMode = IsolationMode.PROCESS
