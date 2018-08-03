@@ -64,17 +64,13 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.task('generateSource', type: GenerateSource) {
-            destDir = project.file("$project.buildDir/generatedSrc")
-            project.sourceSets.main.java.srcDirs += "$destDir/main/java"
-            project.sourceSets.test.java.srcDirs += "$destDir/test/java"
-            project.sourceSets.integrationTest.groovy.srcDirs += "$destDir/integrationTest/groovy"
+            destDir = project.layout.buildDirectory.dir('generatedSrc')
+            project.sourceSets.main.java.srcDirs += "${destDir.get().asFile}/main/java"
+            project.sourceSets.test.java.srcDirs += "${destDir.get().asFile}/test/java"
+            project.sourceSets.integrationTest.groovy.srcDirs += "${destDir.get().asFile}/integrationTest/groovy"
             project.compileJava.dependsOn it
             project.compileTestJava.dependsOn it
             project.compileIntegrationTestGroovy.dependsOn it
-            doFirst {
-                assert destDir.path.startsWith(project.buildDir.path)
-                project.delete destDir
-            }
         }
 
         project.task('generateVoiceConfig', type: GenerateVoiceConfig) {

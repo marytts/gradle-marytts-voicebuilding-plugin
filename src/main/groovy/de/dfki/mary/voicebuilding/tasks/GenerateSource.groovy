@@ -1,16 +1,20 @@
 package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.*
 
 class GenerateSource extends DefaultTask {
 
     @OutputDirectory
-    File destDir
+    final DirectoryProperty destDir = newOutputDirectory()
 
     @TaskAction
     void generate() {
-        def tree = new FileTreeBuilder(destDir)
+        def destDirFile = destDir.get().asFile
+        assert destDirFile.path.startsWith(project.buildDir.path)
+        project.delete destDirFile
+        def tree = new FileTreeBuilder(destDirFile)
         tree {
             main {
                 java {
@@ -112,7 +116,9 @@ class GenerateSource extends DefaultTask {
                                            |
                                            |import marytts.LocalMaryInterface
                                            |import marytts.datatypes.MaryDataType
-                                           |import ${project.marytts.voice.type == 'hsmm' ? 'marytts.htsengine.HMMVoice' : 'marytts.unitselection.UnitSelectionVoice'}
+                                           |import ${
+                                            project.marytts.voice.type == 'hsmm' ? 'marytts.htsengine.HMMVoice' : 'marytts.unitselection.UnitSelectionVoice'
+                                        }
                                            |import marytts.util.dom.DomUtils
                                            |
                                            |import org.testng.annotations.*
@@ -130,7 +136,9 @@ class GenerateSource extends DefaultTask {
                                            |
                                            |    @Test
                                            |    void canLoadVoice() {
-                                           |        def voice = new ${project.marytts.voice.type == 'hsmm' ? 'HMM' : 'UnitSelection'}Voice(config.name, null)
+                                           |        def voice = new ${
+                                            project.marytts.voice.type == 'hsmm' ? 'HMM' : 'UnitSelection'
+                                        }Voice(config.name, null)
                                            |        assert voice
                                            |    }
                                            |
