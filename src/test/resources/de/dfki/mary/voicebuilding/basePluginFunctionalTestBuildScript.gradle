@@ -108,7 +108,7 @@ task testGenerateVoiceConfig(group: 'Verification') {
 task testGenerateServiceLoader(group: 'Verification') {
     dependsOn generateServiceLoader
     doLast {
-        def serviceLoaderFile = file("$buildDir/resources/main/META-INF/services/marytts.config.MaryConfig")
+        def serviceLoaderFile = file("$buildDir/serviceLoader.txt")
         assert serviceLoaderFile.exists()
         assert serviceLoaderFile.text == "marytts.voice.${marytts.voice.nameCamelCase}.Config"
     }
