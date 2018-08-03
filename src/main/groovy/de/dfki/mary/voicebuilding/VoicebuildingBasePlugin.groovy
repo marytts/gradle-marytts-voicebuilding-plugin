@@ -6,7 +6,8 @@ import de.dfki.mary.voicebuilding.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.GroovyPlugin
-import org.gradle.api.plugins.MavenPlugin
+import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.WriteProperties
 import org.gradle.api.tasks.testing.Test
@@ -16,7 +17,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.plugins.apply GroovyPlugin
-        project.plugins.apply MavenPlugin
+        project.plugins.apply MavenPublishPlugin
 
         project.sourceCompatibility = '1.8'
 
@@ -58,7 +59,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             project.dependencies {
-                runtime "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
+                runtimeOnly "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
                     exclude group: '*', module: 'groovy-all'
                 }
             }
@@ -82,6 +83,26 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             destFile = project.layout.buildDirectory.file('serviceLoader.txt')
         }
 
+        project.publishing {
+            publications {
+                mavenJava(MavenPublication) {
+                    from project.components.java
+                    pom {
+                        description = project.marytts.voice.description
+                        // TODO: Properties not being resolved lazily in nested license extension, so...
+                        project.afterEvaluate {
+                            licenses {
+                                license {
+                                    name = project.marytts.voice.license.name
+                                    url = project.marytts.voice.license.url
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         project.task('generatePomProperties', type: WriteProperties) {
             outputFile = project.layout.buildDirectory.file('pom.properties')
             properties = [
@@ -99,15 +120,11 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
                 rename { 'META-INF/services/marytts.config.MaryConfig' }
             }
             from project.generatePomProperties, {
+                rename { "META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.xml" }
+            }
+            from project.generatePomProperties, {
                 rename { "META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.properties" }
             }
-        }
-
-        project.task('generatePom', type: GeneratePom) {
-            project.afterEvaluate {
-                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.xml")
-            }
-            project.jar.dependsOn it
         }
 
         project.task('integrationTest', type: Test) {

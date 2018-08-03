@@ -35,6 +35,9 @@ class BasePluginFunctionalTest {
         new File(projectDir, 'build.gradle').withWriter {
             it << this.class.getResourceAsStream('basePluginFunctionalTestBuildScript.gradle')
         }
+        new File(projectDir, 'settings.gradle').withWriter {
+            it << "enableFeaturePreview('STABLE_PUBLISHING')"
+        }
     }
 
     @DataProvider
@@ -51,7 +54,7 @@ class BasePluginFunctionalTest {
                 ['compileIntegrationTestGroovy', true],
                 ['generateVoiceConfig', true],
                 ['generateServiceLoader', true],
-                ['generatePom', true],
+                ['testGeneratePomFileForMavenJavaPublication', false],
                 ['generatePomProperties', true],
                 ['jar', true],
                 ['test', false]

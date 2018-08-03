@@ -114,13 +114,14 @@ task testGenerateServiceLoader(group: 'Verification') {
     }
 }
 
+import groovy.xml.XmlUtil
 import org.custommonkey.xmlunit.XMLUnit
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier
 
-task testGeneratePom(group: 'Verification') {
-    dependsOn generatePom
+task testGeneratePomFileForMavenJavaPublication(group: 'Verification') {
+    dependsOn generatePomFileForMavenJavaPublication
     doLast {
-        def pomFile = file("$buildDir/resources/main/META-INF/maven/$project.group/voice-$voiceName/pom.xml")
+        def pomFile = file("$buildDir/publications/mavenJava/pom-default.xml")
         assert pomFile.exists()
         def pomXml = new groovy.xml.StreamingMarkupBuilder().bind {
             project(xmlns: "http://maven.apache.org/POM/4.0.0",
@@ -138,12 +139,6 @@ task testGeneratePom(group: 'Verification') {
                     }
                 }
                 delegate.dependencies {
-                    dependency {
-                        groupId 'junit'
-                        artifactId 'junit'
-                        delegate.version '4.12'
-                        scope 'test'
-                    }
                     dependency {
                         groupId 'de.dfki.mary'
                         artifactId 'marytts-runtime'
@@ -172,8 +167,11 @@ task testGeneratePom(group: 'Verification') {
             }
         } as String
         XMLUnit.ignoreWhitespace = true
-        def diff = XMLUnit.compareXML(pomFile.text, pomXml)
+        def diff = XMLUnit.compareXML(pomXml, pomFile.text)
         diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier())
+        if (!diff.similar()) {
+            println XmlUtil.serialize(pomXml)
+        }
         assert diff.similar()
     }
 }
