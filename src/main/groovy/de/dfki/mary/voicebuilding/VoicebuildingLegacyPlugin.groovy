@@ -235,7 +235,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.generateVoiceConfig {
             project.afterEvaluate {
-                config << [
+                config.get() << [
                         'viterbi.wTargetCosts'    : 0.7,
                         'viterbi.beamsize'        : 100,
                         databaseClass             : 'marytts.unitselection.data.DiphoneUnitDatabase',

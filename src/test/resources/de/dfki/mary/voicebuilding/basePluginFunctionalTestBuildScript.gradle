@@ -86,7 +86,7 @@ task testCompileIntegrationTestGroovy(group: 'Verification') {
 task testGenerateVoiceConfig(group: 'Verification') {
     dependsOn generateVoiceConfig
     doLast {
-        def configFile = file("$buildDir/resources/main/marytts/voice/$marytts.voice.nameCamelCase/voice.config")
+        def configFile = file("$buildDir/voice.config")
         assert configFile.exists()
         def actual = new Properties()
         configFile.withInputStream {

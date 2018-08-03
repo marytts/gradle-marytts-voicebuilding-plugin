@@ -74,15 +74,18 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.task('generateVoiceConfig', type: GenerateVoiceConfig) {
-            project.afterEvaluate {
-                destFile = project.file("$project.sourceSets.main.output.resourcesDir/marytts/voice/$project.marytts.voice.nameCamelCase/voice.config")
-            }
-            project.processResources.dependsOn it
+            destFile = project.layout.buildDirectory.file('voice.config')
         }
 
         project.task('generateServiceLoader', type: GenerateServiceLoader) {
             destFile = project.file("$project.sourceSets.main.output.resourcesDir/META-INF/services/marytts.config.MaryConfig")
             project.processResources.dependsOn it
+        }
+
+        project.processResources {
+            from project.generateVoiceConfig, {
+                rename { "marytts/voice/$project.marytts.voice.nameCamelCase/voice.config" }
+            }
         }
 
         project.task('generatePom', type: GeneratePom) {
