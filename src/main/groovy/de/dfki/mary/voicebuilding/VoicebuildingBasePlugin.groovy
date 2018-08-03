@@ -8,6 +8,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.GroovyPlugin
 import org.gradle.api.plugins.MavenPlugin
 import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.WriteProperties
 import org.gradle.api.tasks.testing.Test
 
 class VoicebuildingBasePlugin implements Plugin<Project> {
@@ -81,6 +82,15 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             destFile = project.layout.buildDirectory.file('serviceLoader.txt')
         }
 
+        project.task('generatePomProperties', type: WriteProperties) {
+            outputFile = project.layout.buildDirectory.file('pom.properties')
+            properties = [
+                    groupId   : project.group,
+                    artifactId: project.name,
+                    version   : project.version
+            ]
+        }
+
         project.processResources {
             from project.generateVoiceConfig, {
                 rename { "marytts/voice/$project.marytts.voice.nameCamelCase/voice.config" }
@@ -88,18 +98,14 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             from project.generateServiceLoader, {
                 rename { 'META-INF/services/marytts.config.MaryConfig' }
             }
+            from project.generatePomProperties, {
+                rename { "META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.properties" }
+            }
         }
 
         project.task('generatePom', type: GeneratePom) {
             project.afterEvaluate {
                 destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.xml")
-            }
-            project.jar.dependsOn it
-        }
-
-        project.task('generatePomProperties', type: GeneratePomProperties) {
-            project.afterEvaluate {
-                destFile = project.file("${project.sourceSets.main.output.resourcesDir}/META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.properties")
             }
             project.jar.dependsOn it
         }

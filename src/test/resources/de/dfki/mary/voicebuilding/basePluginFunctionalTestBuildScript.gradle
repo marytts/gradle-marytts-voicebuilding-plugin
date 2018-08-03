@@ -181,9 +181,18 @@ task testGeneratePom(group: 'Verification') {
 task testGeneratePomProperties(group: 'Verification') {
     dependsOn generatePomProperties
     doLast {
-        def pomPropertiesFile = file("$buildDir/resources/main/META-INF/maven/$project.group/voice-$voiceName/pom.properties")
+        def pomPropertiesFile = file("$buildDir/pom.properties")
         assert pomPropertiesFile.exists()
-        assert pomPropertiesFile.readLines() == ["version=$version", "groupId=$project.group", "artifactId=$projectDir.name"]
+        def actual = new Properties()
+        pomPropertiesFile.withInputStream {
+            actual.load it
+        }
+        def expected = [
+                groupId   : project.group,
+                artifactId: projectDir.name,
+                version   : version
+        ] as Properties
+        assert actual == expected
     }
 }
 
