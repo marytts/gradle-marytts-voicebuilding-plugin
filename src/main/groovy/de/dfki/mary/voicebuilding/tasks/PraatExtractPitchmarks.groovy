@@ -1,28 +1,33 @@
 package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.*
-import org.gradle.workers.*
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
+import org.gradle.workers.IsolationMode
+import org.gradle.workers.WorkerConfiguration
+import org.gradle.workers.WorkerExecutor
 
 import javax.inject.Inject
 
 class PraatExtractPitchmarks extends DefaultTask {
 
-    @Internal
     final WorkerExecutor workerExecutor
 
     @InputFile
-    File scriptFile
+    final RegularFileProperty scriptFile = newInputFile()
 
-    @InputFiles
-    FileCollection wavFiles
+    @InputDirectory
+    final DirectoryProperty wavDir = newInputDirectory()
 
-    @InputFiles
-    FileCollection pitchFiles
+    @InputDirectory
+    final DirectoryProperty pitchDir = newInputDirectory()
 
     @OutputDirectory
-    File destDir
+    final DirectoryProperty destDir = newOutputDirectory()
 
     @Inject
     PraatExtractPitchmarks(WorkerExecutor workerExecutor) {
@@ -31,11 +36,11 @@ class PraatExtractPitchmarks extends DefaultTask {
 
     @TaskAction
     void extract() {
-        def cmd = [project.praat.binary, '--run', scriptFile]
-        wavFiles.each { wavFile ->
+        def cmd = [project.praat.binary, '--run', scriptFile.get().asFile]
+        project.fileTree(wavDir).include('*.wav').each { wavFile ->
             def basename = wavFile.name - '.wav'
-            def pitchFile = project.file("$project.praatPitchExtractor.destDir/${basename}.Pitch")
-            def destFile = project.file("$destDir/${basename}.PointProcess")
+            def pitchFile = pitchDir.file("${basename}.Pitch").get().asFile
+            def destFile = destDir.file("${basename}.PointProcess").get().asFile
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
                 def args = [wavFile,
                             pitchFile,
