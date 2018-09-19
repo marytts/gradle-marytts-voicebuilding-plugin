@@ -34,9 +34,9 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         project.task('bootstrap')
 
         project.task('templates', type: CopyClasspathResources) {
-            destDir = project.file("$project.buildDir/templates")
-            resources += ['/de/dfki/mary/voicebuilding/templates/extractPitch.praat',
-                          '/de/dfki/mary/voicebuilding/templates/pitchmarks.praat']
+            destDir = project.layout.buildDirectory.dir('templates')
+            resources.add '/de/dfki/mary/voicebuilding/templates/extractPitch.praat'
+            resources.add '/de/dfki/mary/voicebuilding/templates/pitchmarks.praat'
             project.bootstrap.dependsOn it
         }
 
@@ -48,14 +48,14 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.task('praatPitchExtractor', type: PraatExtractPitch) {
             dependsOn project.templates, project.wav, project.praat
-            scriptFile = project.file("$project.templates.destDir/extractPitch.praat")
+            scriptFile = project.file("${project.templates.destDir.get().asFile}/extractPitch.praat")
             srcFiles = project.fileTree(project.wav.destDir).include('*.wav')
             destDir = project.file("$project.buildDir/Pitch")
         }
 
         project.task('praatPitchmarker', type: PraatExtractPitchmarks) {
             dependsOn project.praatPitchExtractor, project.wav, project.praat
-            scriptFile = project.file("$project.templates.destDir/pitchmarks.praat")
+            scriptFile = project.file("${project.templates.destDir.get().asFile}/pitchmarks.praat")
             wavFiles = project.fileTree(project.wav.destDir).include('*.wav')
             pitchFiles = project.fileTree(project.praatPitchExtractor.destDir).include('*.Pitch')
             destDir = project.file("$project.buildDir/PointProcess")

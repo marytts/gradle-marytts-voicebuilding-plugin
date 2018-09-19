@@ -1,23 +1,27 @@
 package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.*
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 
 class CopyClasspathResources extends DefaultTask {
 
-    @OutputDirectory
-    File destDir
-
     @Input
-    List resources = []
+    ListProperty<String> resources = project.objects.listProperty(String)
+
+    @OutputDirectory
+    final DirectoryProperty destDir = newOutputDirectory()
 
     @TaskAction
     void copy() {
-        resources.each { resourcePath ->
+        resources.get().each { resourcePath ->
             def stream = this.class.getResourceAsStream(resourcePath)
             if (stream) {
                 def resourceName = resourcePath.split('/').last()
-                project.file("$destDir/$resourceName").withWriter { writer ->
+                destDir.file(resourceName).get().asFile.withWriter { writer ->
                     writer << stream
                 }
             } else {
