@@ -34,8 +34,37 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
         }
 
         project.task('lab', type: FestvoxLabTask) {
-            from project.processDataResources
-            into "$project.buildDir/lab"
+            srcFiles = project.files(project.tasks.getByName('processDataResources'))
+            destDir = project.layout.buildDirectory.dir('lab')
+            mapping = [
+                    aa  : 'A',
+                    ae  : '{',
+                    ah  : 'V',
+                    ao  : 'O',
+                    aw  : 'aU',
+                    ax  : '@',
+                    ay  : 'AI',
+                    ch  : 'tS',
+                    dh  : 'D',
+                    eh  : 'E',
+                    er  : 'r=',
+                    ey  : 'EI',
+                    hh  : 'h',
+                    ih  : 'I',
+                    iy  : 'i',
+                    jh  : 'dZ',
+                    ng  : 'N',
+                    ow  : '@U',
+                    oy  : 'OI',
+                    pau : '_',
+                    sh  : 'S',
+                    ssil: '_',
+                    th  : 'T',
+                    uh  : 'U',
+                    uw  : 'u',
+                    y   : 'j',
+                    zh  : 'Z'
+            ]
             project.bootstrap.dependsOn it
         }
     }
