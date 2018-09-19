@@ -27,14 +27,14 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('text', type: FestvoxTextTask) {
+        project.task('text', type: FestvoxExtractText) {
             dependsOn project.tasks.findByName('processDataResources')
             srcFile = project.file("$project.sourceSets.data.output.resourcesDir/txt.done.data")
             destDir = project.layout.buildDirectory.dir('text')
             project.bootstrap.dependsOn it
         }
 
-        project.task('lab', type: FestvoxLabTask) {
+        project.task('lab', type: FestvoxExtractLab) {
             srcFiles = project.files(project.tasks.getByName('processDataResources'))
             destDir = project.layout.buildDirectory.dir('lab')
             mapping = [

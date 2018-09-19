@@ -9,7 +9,7 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
-class FestvoxLabTask extends DefaultTask {
+class FestvoxExtractLab extends DefaultTask {
 
     @InputFiles
     FileCollection srcFiles = project.files()
