@@ -28,8 +28,9 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
         }
 
         project.task('text', type: FestvoxTextTask) {
-            dependsOn project.processDataResources
-            destDir = project.file("$project.buildDir/text")
+            dependsOn project.tasks.findByName('processDataResources')
+            srcFile = project.file("$project.sourceSets.data.output.resourcesDir/txt.done.data")
+            destDir = project.layout.buildDirectory.dir('text')
             project.bootstrap.dependsOn it
         }
 

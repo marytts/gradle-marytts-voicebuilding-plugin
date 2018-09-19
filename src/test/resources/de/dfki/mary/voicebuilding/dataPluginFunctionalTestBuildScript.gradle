@@ -65,7 +65,7 @@ task testProcessDataResources {
     }
 }
 
-text.srcFileName = 'time.data'
+text.srcFile = file("$sourceSets.data.output.resourcesDir/time.data")
 
 task testTemplates {
     group 'Verification'

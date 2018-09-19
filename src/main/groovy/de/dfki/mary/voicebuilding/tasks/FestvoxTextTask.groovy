@@ -2,27 +2,27 @@ package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
-import org.gradle.api.tasks.*
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 
 class FestvoxTextTask extends DefaultTask {
-    @Input
-    String srcFileName
+
+    @InputFile
+    final RegularFileProperty srcFile = newInputFile()
 
     @OutputDirectory
-    File destDir
-
-    FestvoxTextTask() {
-        srcFileName = 'txt.done.data'
-    }
+    final DirectoryProperty destDir = newOutputDirectory()
 
     @TaskAction
     void extract() {
-        def srcFile = project.file("$project.sourceSets.data.output.resourcesDir/$srcFileName")
         def processed = 0
-        srcFile.eachLine { line ->
+        srcFile.get().asFile.eachLine { line ->
             def m = line =~ /\( ?(?<utt>.+) "(?<text>.+)" ?\)/
             if (m.matches()) {
-                def destFile = new File("$destDir/${m.group('utt')}.txt")
+                def destFile = destDir.file("${m.group('utt')}.txt").get().asFile
                 project.logger.debug "Wrote $destFile"
                 destFile.text = m.group('text').trim()
                 processed += 1
@@ -33,6 +33,6 @@ class FestvoxTextTask extends DefaultTask {
         if (processed < 1) {
             throw new GradleException("Could not extract any utterances from $srcFile")
         }
-        project.logger.info "Extracted $processed utterances into $destDir"
+        project.logger.info "Extracted $processed utterances into ${destDir.get().asFile}"
     }
 }
