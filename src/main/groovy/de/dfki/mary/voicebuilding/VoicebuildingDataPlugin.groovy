@@ -42,8 +42,8 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.task('wav', type: ProcessWav) {
             dependsOn project.processDataResources
-            srcFiles = project.fileTree(project.sourceSets.data.output.resourcesDir).include('*.wav')
-            destDir = project.file("$project.buildDir/wav")
+            srcDir = project.processDataResources.destinationDir
+            destDir = project.layout.buildDirectory.dir('wav')
         }
 
         project.task('praatPitchExtractor', type: PraatExtractPitch) {
