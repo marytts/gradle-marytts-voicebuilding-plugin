@@ -72,33 +72,34 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.layout.buildDirectory.dir('mcep')
         }
 
-        project.task('generateAllophones', type: MaryInterfaceBatchTask) {
-            srcDir = project.file("$project.buildDir/text")
-            destDir = project.file("$project.buildDir/prompt_allophones")
+        def generateAllophonesTask = project.task('generateAllophones', type: MaryInterfaceBatchTask) {
+            srcDir = project.layout.buildDirectory.dir('text')
+            destDir = project.layout.buildDirectory.dir('prompt_allophones')
             inputType = 'TEXT'
             inputExt = 'txt'
             outputType = 'ALLOPHONES'
             outputExt = 'xml'
+            maryttsProperties = ['mary.base': project.buildDir]
         }
 
         project.task('generatePhoneFeatures', type: MaryInterfaceBatchTask) {
-            dependsOn project.generateAllophones
-            srcDir = project.file("$project.buildDir/prompt_allophones")
-            destDir = project.file("$project.buildDir/phonefeatures")
+            srcDir = generateAllophonesTask.destDir
+            destDir = project.layout.buildDirectory.dir('phonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
             outputType = 'TARGETFEATURES'
             outputExt = 'pfeats'
+            maryttsProperties = ['mary.base': project.buildDir]
         }
 
         project.task('generateHalfPhoneFeatures', type: MaryInterfaceBatchTask) {
-            dependsOn project.generateAllophones
-            srcDir = project.file("$project.buildDir/prompt_allophones")
-            destDir = project.file("$project.buildDir/halfphonefeatures")
+            srcDir = generateAllophonesTask.destDir
+            destDir = project.layout.buildDirectory.dir('halfphonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
             outputType = 'HALFPHONE_TARGETFEATURES'
             outputExt = 'hpfeats'
+            maryttsProperties = ['mary.base': project.buildDir]
         }
     }
 }
