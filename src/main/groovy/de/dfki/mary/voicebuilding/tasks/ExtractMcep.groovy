@@ -34,7 +34,7 @@ class ExtractMcep extends DefaultTask {
         assert sig2FvPath
         wavFiles.each { wavFile ->
             def basename = wavFile.name - '.wav'
-            def pmFile = project.file("$project.pitchmarkConverter.destDir/${basename}.pm")
+            def pmFile = project.file("${project.pitchmarkConverter.destDir.get().asFile}/${basename}.pm")
             def destFile = project.file("$destDir/${basename}.mcep")
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
                 def cmd = [sig2FvPath,

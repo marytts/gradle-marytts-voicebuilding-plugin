@@ -53,7 +53,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.layout.buildDirectory.dir('Pitch')
         }
 
-        project.task('praatPitchmarker', type: PraatExtractPitchmarks) {
+        def praatPitchmarkerTask = project.task('praatPitchmarker', type: PraatExtractPitchmarks) {
             dependsOn project.praat
             scriptFile = project.templates.destDir.file('pitchmarks.praat')
             wavDir = wavTask.destDir
@@ -62,9 +62,8 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         project.task('pitchmarkConverter', type: PitchmarkConverter) {
-            dependsOn project.praatPitchmarker
-            srcFiles = project.fileTree(project.praatPitchmarker.destDir).include('*.PointProcess')
-            destDir = project.file("$project.buildDir/pm")
+            srcDir = praatPitchmarkerTask.destDir
+            destDir = project.layout.buildDirectory.dir('pm')
         }
 
         project.task('mcepExtractor', type: ExtractMcep) {
