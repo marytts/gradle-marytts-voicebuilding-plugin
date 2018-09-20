@@ -30,9 +30,13 @@ class BasePluginFunctionalTest {
             it.println "voiceLicenseUrl=http://festvox.org/cmu_arctic/cmu_arctic/cmu_us_slt_arctic/COPYING"
             it.println "voiceLocaleLanguage=$voiceLocale.language"
             it.println "voiceLocaleRegion=$voiceLocale.country"
+            it.println "voiceSamplingRate=16000"
         }
         new File(projectDir, 'build.gradle').withWriter {
             it << this.class.getResourceAsStream('basePluginFunctionalTestBuildScript.gradle')
+        }
+        new File(projectDir, 'settings.gradle').withWriter {
+            it << "enableFeaturePreview('STABLE_PUBLISHING')"
         }
     }
 
@@ -50,7 +54,7 @@ class BasePluginFunctionalTest {
                 ['compileIntegrationTestGroovy', true],
                 ['generateVoiceConfig', true],
                 ['generateServiceLoader', true],
-                ['generatePom', true],
+                ['testGeneratePomFileForMavenJavaPublication', false],
                 ['generatePomProperties', true],
                 ['jar', true],
                 ['test', false]

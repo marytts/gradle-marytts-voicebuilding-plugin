@@ -1,22 +1,25 @@
 package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.*
-import org.gradle.workers.*
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
+import org.gradle.workers.IsolationMode
+import org.gradle.workers.WorkerConfiguration
+import org.gradle.workers.WorkerExecutor
 
 import javax.inject.Inject
 
 class ProcessWav extends DefaultTask {
 
-    @Internal
     final WorkerExecutor workerExecutor
 
-    @InputFiles
-    FileCollection srcFiles
+    @InputDirectory
+    final DirectoryProperty srcDir = newInputDirectory()
 
     @OutputDirectory
-    File destDir
+    final DirectoryProperty destDir = newOutputDirectory()
 
     @Inject
     ProcessWav(WorkerExecutor workerExecutor) {
@@ -29,10 +32,10 @@ class ProcessWav extends DefaultTask {
             new File(dir, 'sox')
         }.find { it.exists() }
         assert soxPath
-        srcFiles.each { wavFile ->
-            def destFile = project.file("$destDir/$wavFile.name")
+        project.fileTree(srcDir).include('**/*.wav').each { wavFile ->
+            def destFile = destDir.file("$wavFile.name").get().asFile
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
-                def cmd = [soxPath, wavFile, destFile, 'rate', project.voice.samplingRate]
+                def cmd = [soxPath, wavFile, destFile, 'rate', project.marytts.voice.samplingRate]
                 def args = [commandLine: cmd]
                 config.params args
                 config.isolationMode = IsolationMode.PROCESS

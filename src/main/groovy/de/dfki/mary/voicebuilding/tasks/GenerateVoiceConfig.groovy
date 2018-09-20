@@ -1,51 +1,51 @@
 package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 
 class GenerateVoiceConfig extends DefaultTask {
 
     @Input
-    Map config = [:]
+    Property<Map> config = project.objects.property(Map)
 
     @OutputFile
-    File destFile
+    final RegularFileProperty destFile = newOutputFile()
 
-    @Internal
-    String voiceType
+    GenerateVoiceConfig() {
+        this.config.set([:])
+    }
 
     @TaskAction
     void generate() {
-        config << [
+        config.get() << [
                 domain      : 'general',
-                gender      : project.voice.gender,
-                locale      : project.voice.locale,
-                samplingRate: project.voice.samplingRate
+                gender      : project.marytts.voice.gender,
+                locale      : project.marytts.voice.locale,
+                samplingRate: project.marytts.voice.samplingRate
         ]
-        destFile <<
-                """|# Auto-generated config file for voice ${project.voice.name}
-                   |
-                   |name = ${project.voice.name}
-                   |locale = ${project.voice.maryLocale}
-                   |
-                   |${getVoiceType()}.voices.list = ${project.voice.name}
-                   |
-                   |""".stripMargin()
-        destFile << config.collect { key, value ->
-            "voice.${project.voice.name}.$key = $value"
-        }.join('\n')
+        destFile.get().asFile.withWriter 'UTF-8', { writer ->
+            writer.println """|# Auto-generated config file for voice ${project.marytts.voice.name}
+                              |
+                              |name = ${project.marytts.voice.name}
+                              |locale = ${project.marytts.voice.maryLocale}
+                              |
+                              |${voiceType()}.voices.list = ${project.marytts.voice.name}
+                              |
+                              |""".stripMargin()
+            writer.println config.get().collect { key, value ->
+                "voice.${project.marytts.voice.name}.$key = $value"
+            }.join('\n')
+        }
     }
 
-    String getVoiceType() {
-        def type
-        switch (project.voice.type) {
+    String voiceType() {
+        switch (project.marytts.voice.type) {
             case ~/hs?mm/:
-                type = 'hmm'
-                break
+                return 'hmm'
             default:
-                type = 'unitselection'
-                break
+                return 'unitselection'
         }
-        type
     }
 }

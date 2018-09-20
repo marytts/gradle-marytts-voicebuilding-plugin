@@ -24,85 +24,82 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.dependencies {
             project.afterEvaluate {
-                marytts group: 'de.dfki.mary', name: "marytts-lang-$project.voice.locale.language", version: project.maryttsVersion, {
+                marytts group: 'de.dfki.mary', name: "marytts-lang-$project.marytts.voice.locale.language", version: project.marytts.version, {
                     exclude group: '*', module: 'groovy-all'
                 }
             }
             marytts group: 'de.dfki.mary', name: "marytts-voicebuilding", version: '0.1'
         }
 
-        project.extensions.create 'voicebuilding', VoicebuildingExtension, project
-
         project.task('bootstrap')
 
         project.task('templates', type: CopyClasspathResources) {
-            destDir = project.file("$project.buildDir/templates")
-            resources += ['/de/dfki/mary/voicebuilding/templates/extractPitch.praat',
-                          '/de/dfki/mary/voicebuilding/templates/pitchmarks.praat']
+            destDir = project.layout.buildDirectory.dir('templates')
+            resources.add '/de/dfki/mary/voicebuilding/templates/extractPitch.praat'
+            resources.add '/de/dfki/mary/voicebuilding/templates/pitchmarks.praat'
             project.bootstrap.dependsOn it
         }
 
-        project.task('wav', type: ProcessWav) {
+        def wavTask = project.task('wav', type: ProcessWav) {
             dependsOn project.processDataResources
-            srcFiles = project.fileTree(project.sourceSets.data.output.resourcesDir).include('*.wav')
-            destDir = project.file("$project.buildDir/wav")
+            srcDir = project.processDataResources.destinationDir
+            destDir = project.layout.buildDirectory.dir('wav')
         }
 
-        project.task('praatPitchExtractor', type: PraatExtractPitch) {
-            dependsOn project.templates, project.wav, project.praat
-            scriptFile = project.file("$project.templates.destDir/extractPitch.praat")
-            srcFiles = project.fileTree(project.wav.destDir).include('*.wav')
-            destDir = project.file("$project.buildDir/Pitch")
+        def praatPitchExtractorTask = project.task('praatPitchExtractor', type: PraatExtractPitch) {
+            dependsOn project.praat
+            scriptFile = project.templates.destDir.file('extractPitch.praat')
+            srcDir = wavTask.destDir
+            destDir = project.layout.buildDirectory.dir('Pitch')
         }
 
-        project.task('praatPitchmarker', type: PraatExtractPitchmarks) {
-            dependsOn project.praatPitchExtractor, project.wav, project.praat
-            scriptFile = project.file("$project.templates.destDir/pitchmarks.praat")
-            wavFiles = project.fileTree(project.wav.destDir).include('*.wav')
-            pitchFiles = project.fileTree(project.praatPitchExtractor.destDir).include('*.Pitch')
-            destDir = project.file("$project.buildDir/PointProcess")
+        def praatPitchmarkerTask = project.task('praatPitchmarker', type: PraatExtractPitchmarks) {
+            dependsOn project.praat
+            scriptFile = project.templates.destDir.file('pitchmarks.praat')
+            wavDir = wavTask.destDir
+            pitchDir = praatPitchExtractorTask.destDir
+            destDir = project.layout.buildDirectory.dir('PointProcess')
         }
 
-        project.task('pitchmarkConverter', type: PitchmarkConverter) {
-            dependsOn project.praatPitchmarker
-            srcFiles = project.fileTree(project.praatPitchmarker.destDir).include('*.PointProcess')
-            destDir = project.file("$project.buildDir/pm")
+        def pitchmarkConverterTask = project.task('pitchmarkConverter', type: PitchmarkConverter) {
+            srcDir = praatPitchmarkerTask.destDir
+            destDir = project.layout.buildDirectory.dir('pm')
         }
 
         project.task('mcepExtractor', type: ExtractMcep) {
-            dependsOn project.wav, project.pitchmarkConverter
-            wavFiles = project.fileTree(project.wav.destDir).include('*.wav')
-            pmFiles = project.fileTree(project.praatPitchmarker.destDir).include('*.pm')
-            destDir = project.file("$project.buildDir/mcep")
+            wavDir = wavTask.destDir
+            pmDir = pitchmarkConverterTask.destDir
+            destDir = project.layout.buildDirectory.dir('mcep')
         }
 
-        project.task('generateAllophones', type: MaryInterfaceBatchTask) {
-            srcDir = project.file("$project.buildDir/text")
-            destDir = project.file("$project.buildDir/prompt_allophones")
+        def generateAllophonesTask = project.task('generateAllophones', type: MaryInterfaceBatchTask) {
+            srcDir = project.layout.buildDirectory.dir('text')
+            destDir = project.layout.buildDirectory.dir('prompt_allophones')
             inputType = 'TEXT'
             inputExt = 'txt'
             outputType = 'ALLOPHONES'
             outputExt = 'xml'
+            maryttsProperties = ['mary.base': project.buildDir]
         }
 
         project.task('generatePhoneFeatures', type: MaryInterfaceBatchTask) {
-            dependsOn project.generateAllophones
-            srcDir = project.file("$project.buildDir/prompt_allophones")
-            destDir = project.file("$project.buildDir/phonefeatures")
+            srcDir = generateAllophonesTask.destDir
+            destDir = project.layout.buildDirectory.dir('phonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
             outputType = 'TARGETFEATURES'
             outputExt = 'pfeats'
+            maryttsProperties = ['mary.base': project.buildDir]
         }
 
         project.task('generateHalfPhoneFeatures', type: MaryInterfaceBatchTask) {
-            dependsOn project.generateAllophones
-            srcDir = project.file("$project.buildDir/prompt_allophones")
-            destDir = project.file("$project.buildDir/halfphonefeatures")
+            srcDir = generateAllophonesTask.destDir
+            destDir = project.layout.buildDirectory.dir('halfphonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
             outputType = 'HALFPHONE_TARGETFEATURES'
             outputExt = 'hpfeats'
+            maryttsProperties = ['mary.base': project.buildDir]
         }
     }
 }

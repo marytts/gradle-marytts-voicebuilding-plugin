@@ -20,13 +20,13 @@ class LegacyDescriptorTask extends DefaultTask {
         def builder = new StreamingMarkupBuilder()
         def xml = builder.bind {
             'marytts-install'(xmlns: 'http://mary.dfki.de/installer') {
-                voice(gender: project.voice.gender, locale: project.voice.maryLocale, name: project.voice.name, type: project.voice.type, version: project.version) {
-                    delegate.description project.voice.description
-                    license(href: project.voice.license.url)
+                voice(gender: project.marytts.voice.gender, locale: project.marytts.voice.maryLocale, name: project.marytts.voice.name, type: project.marytts.voice.type, version: project.version) {
+                    delegate.description project.marytts.voice.description
+                    license(href: project.marytts.voice.license.url)
                     'package'(filename: srcFile.name, md5sum: project.ant.srcFileHash, size: srcFile.size()) {
-                        location(folder: true, href: "http://mary.dfki.de/download/$project.maryttsVersion/")
+                        location(folder: true, href: "http://mary.dfki.de/download/$project.marytts.version/")
                     }
-                    depends(language: project.voice.maryLocaleXml, version: project.maryttsVersion)
+                    depends(language: project.marytts.voice.maryLocaleXml, version: project.marytts.version)
                 }
             }
         }

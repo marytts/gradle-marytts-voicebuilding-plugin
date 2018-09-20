@@ -1,5 +1,6 @@
 package de.dfki.mary.voicebuilding
 
+import org.gradle.testfixtures.ProjectBuilder
 import org.testng.annotations.*
 
 class VoiceExtensionTest {
@@ -8,7 +9,7 @@ class VoiceExtensionTest {
 
     @BeforeMethod
     void setup() {
-        voice = new VoiceExtension()
+        voice = new VoiceExtension(ProjectBuilder.builder().build())
     }
 
     @Test
@@ -33,7 +34,7 @@ class VoiceExtensionTest {
     }
 
     @Test
-    void testGermanLocal() {
+    void testGermanLocale() {
         voice.language = 'de'
         assert !voice.region
         assert voice.locale == Locale.forLanguageTag('de')

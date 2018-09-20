@@ -1,15 +1,16 @@
 package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.*
 
 class GenerateServiceLoader extends DefaultTask {
 
     @OutputFile
-    File destFile
+    final RegularFileProperty destFile = newOutputFile()
 
     @TaskAction
     void generate() {
-        destFile.text = "marytts.voice.${project.voice.nameCamelCase}.Config"
+        destFile.get().asFile.text = "marytts.voice.${project.marytts.voice.nameCamelCase}.Config"
     }
 }

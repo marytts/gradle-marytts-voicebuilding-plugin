@@ -1,25 +1,28 @@
 package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.*
-import org.gradle.workers.*
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
+import org.gradle.workers.IsolationMode
+import org.gradle.workers.WorkerConfiguration
+import org.gradle.workers.WorkerExecutor
 
 import javax.inject.Inject
 
 class ExtractMcep extends DefaultTask {
 
-    @Internal
     final WorkerExecutor workerExecutor
 
-    @InputFiles
-    FileCollection wavFiles
+    @InputDirectory
+    final DirectoryProperty wavDir = newInputDirectory()
 
-    @InputFiles
-    FileCollection pmFiles
+    @InputDirectory
+    final DirectoryProperty pmDir = newInputDirectory()
 
     @OutputDirectory
-    File destDir
+    final DirectoryProperty destDir = newOutputDirectory()
 
     @Inject
     ExtractMcep(WorkerExecutor workerExecutor) {
@@ -32,10 +35,10 @@ class ExtractMcep extends DefaultTask {
             new File(dir, 'sig2fv')
         }.find { it.exists() }
         assert sig2FvPath
-        wavFiles.each { wavFile ->
+        project.fileTree(wavDir).include('*.wav').each { wavFile ->
             def basename = wavFile.name - '.wav'
-            def pmFile = project.file("$project.pitchmarkConverter.destDir/${basename}.pm")
-            def destFile = project.file("$destDir/${basename}.mcep")
+            def pmFile = pmDir.file("${basename}.pm").get().asFile
+            def destFile = destDir.file("${basename}.mcep").get().asFile
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
                 def cmd = [sig2FvPath,
                            '-window_type', 'hamming',

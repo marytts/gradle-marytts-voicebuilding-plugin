@@ -1,19 +1,26 @@
 package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.*
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 
 class LegacyInitTask extends DefaultTask {
 
+    @InputDirectory
+    final DirectoryProperty srcDir = newInputDirectory()
+
     @OutputFile
-    File configFile = project.file("$project.buildDir/database.config")
+    final RegularFileProperty configFile = newOutputFile()
 
     @TaskAction
     void init() {
         project.copy {
-            from project.templates
+            from srcDir
             into project.buildDir
-            include configFile.name
+            include configFile.get().asFile.name
             expand project.properties
         }
     }

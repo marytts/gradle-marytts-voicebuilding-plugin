@@ -13,12 +13,14 @@ plugins {
     id 'de.dfki.mary.voicebuilding-festvox'
 }
 
-voice {
-    name = voiceName
-    gender = voiceGender
-    region = voiceLocaleRegion
-    license {
-        url = voiceLicenseUrl
+marytts {
+    voice {
+        name = voiceName
+        gender = voiceGender
+        region = voiceLocaleRegion
+        license {
+            url = voiceLicenseUrl
+        }
     }
 }
 
@@ -46,7 +48,7 @@ dependencies {
     data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
 }
 
-text.srcFileName = 'time.data'
+text.srcFile = file("$sourceSets.data.output.resourcesDir/time.data")
 
 legacyInit.dependsOn wav, text, lab
 
@@ -243,7 +245,7 @@ task testProcessLegacyResources(group: 'Verification') {
 task testGenerateVoiceConfig(group: 'Verification') {
     dependsOn generateVoiceConfig
     doLast {
-        def configFile = file("$buildDir/resources/main/marytts/voice/$voiceNameCamelCase/voice.config")
+        def configFile = file("$buildDir/voice.config")
         assert configFile.exists()
         def actual = new Properties()
         configFile.withInputStream {

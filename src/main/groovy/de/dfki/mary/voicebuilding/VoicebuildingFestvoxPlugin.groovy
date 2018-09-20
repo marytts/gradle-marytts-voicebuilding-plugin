@@ -27,15 +27,45 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('text', type: FestvoxTextTask) {
-            dependsOn project.processDataResources
-            destDir = project.file("$project.buildDir/text")
+        project.task('text', type: FestvoxExtractText) {
+            dependsOn project.tasks.findByName('processDataResources')
+            srcFile = project.file("$project.sourceSets.data.output.resourcesDir/txt.done.data")
+            destDir = project.layout.buildDirectory.dir('text')
             project.bootstrap.dependsOn it
         }
 
-        project.task('lab', type: FestvoxLabTask) {
-            from project.processDataResources
-            into "$project.buildDir/lab"
+        project.task('lab', type: FestvoxExtractLab) {
+            srcFiles = project.files(project.tasks.getByName('processDataResources'))
+            destDir = project.layout.buildDirectory.dir('lab')
+            mapping = [
+                    aa  : 'A',
+                    ae  : '{',
+                    ah  : 'V',
+                    ao  : 'O',
+                    aw  : 'aU',
+                    ax  : '@',
+                    ay  : 'AI',
+                    ch  : 'tS',
+                    dh  : 'D',
+                    eh  : 'E',
+                    er  : 'r=',
+                    ey  : 'EI',
+                    hh  : 'h',
+                    ih  : 'I',
+                    iy  : 'i',
+                    jh  : 'dZ',
+                    ng  : 'N',
+                    ow  : '@U',
+                    oy  : 'OI',
+                    pau : '_',
+                    sh  : 'S',
+                    ssil: '_',
+                    th  : 'T',
+                    uh  : 'U',
+                    uw  : 'u',
+                    y   : 'j',
+                    zh  : 'Z'
+            ]
             project.bootstrap.dependsOn it
         }
     }

@@ -12,13 +12,16 @@ plugins {
     id 'de.dfki.mary.voicebuilding-base'
 }
 
-voice {
-    name = voiceName
-    license {
-        name = voiceLicenseName
-        url = voiceLicenseUrl
+marytts {
+    voice {
+        name = voiceName
+        license {
+            name = voiceLicenseName
+            url = voiceLicenseUrl
+        }
     }
 }
+
 def voiceLocale = new Locale.Builder()
         .setLanguage(voiceLocaleLanguage)
         .setRegion(voiceLocaleRegion)
@@ -33,14 +36,15 @@ task testPlugins(group: 'Verification') {
 
 task testVoiceProps(group: 'Verification') {
     doLast {
-        assert voice.name == voiceName
-        assert voice.language == voiceLocale.language
-        assert voice.region == voiceLocale.country
-        assert voice.nameCamelCase == voiceNameCamelCase
-        assert voice.locale == voiceLocale
-        assert voice.localeXml == voiceLocale.toLanguageTag()
-        assert voice.description == voiceDescription
-        assert voice.license?.name == voiceLicenseName
+        assert marytts.voice.name == voiceName
+        assert marytts.voice.language == voiceLocale.language
+        assert marytts.voice.region == voiceLocale.country
+        assert marytts.voice.nameCamelCase == voiceNameCamelCase
+        assert marytts.voice.locale == voiceLocale
+        assert marytts.voice.localeXml == voiceLocale.toLanguageTag()
+        assert marytts.voice.description == voiceDescription
+        assert marytts.voice.samplingRate == voiceSamplingRate as int
+        assert marytts.voice.license?.name == voiceLicenseName
     }
 }
 
@@ -54,35 +58,35 @@ task testJavaCompatibility(group: 'Verification') {
 task testGenerateSource(group: 'Verification') {
     dependsOn generateSource
     doLast {
-        assert file("$buildDir/generatedSrc/main/java/marytts/voice/$voice.nameCamelCase/Config.java").exists()
+        assert file("$buildDir/generatedSrc/main/java/marytts/voice/$marytts.voice.nameCamelCase/Config.java").exists()
     }
 }
 
 task testCompileJava(group: 'Verification') {
     dependsOn compileJava
     doLast {
-        assert file("$buildDir/classes/java/main/marytts/voice/$voice.nameCamelCase/Config.class").exists()
+        assert file("$buildDir/classes/java/main/marytts/voice/$marytts.voice.nameCamelCase/Config.class").exists()
     }
 }
 
 task testCompileTestJava(group: 'Verification') {
     dependsOn compileTestJava
     doLast {
-        assert file("$buildDir/classes/java/test/marytts/voice/$voice.nameCamelCase/ConfigTest.class").exists()
+        assert file("$buildDir/classes/java/test/marytts/voice/$marytts.voice.nameCamelCase/ConfigTest.class").exists()
     }
 }
 
 task testCompileIntegrationTestGroovy(group: 'Verification') {
     dependsOn compileIntegrationTestGroovy
     doLast {
-        assert file("$buildDir/classes/groovy/integrationTest/marytts/voice/$voice.nameCamelCase/LoadVoiceIT.class").exists()
+        assert file("$buildDir/classes/groovy/integrationTest/marytts/voice/$marytts.voice.nameCamelCase/LoadVoiceIT.class").exists()
     }
 }
 
 task testGenerateVoiceConfig(group: 'Verification') {
     dependsOn generateVoiceConfig
     doLast {
-        def configFile = file("$buildDir/resources/main/marytts/voice/$voice.nameCamelCase/voice.config")
+        def configFile = file("$buildDir/voice.config")
         assert configFile.exists()
         def actual = new Properties()
         configFile.withInputStream {
@@ -95,7 +99,7 @@ task testGenerateVoiceConfig(group: 'Verification') {
                 "voice.${voiceName}.domain"      : 'general',
                 "voice.${voiceName}.gender"      : voiceGender,
                 "voice.${voiceName}.locale"      : "$voiceLocale",
-                "voice.${voiceName}.samplingRate": '16000'
+                "voice.${voiceName}.samplingRate": voiceSamplingRate
         ] as Properties
         assert actual == expected
     }
@@ -104,19 +108,20 @@ task testGenerateVoiceConfig(group: 'Verification') {
 task testGenerateServiceLoader(group: 'Verification') {
     dependsOn generateServiceLoader
     doLast {
-        def serviceLoaderFile = file("$buildDir/resources/main/META-INF/services/marytts.config.MaryConfig")
+        def serviceLoaderFile = file("$buildDir/serviceLoader.txt")
         assert serviceLoaderFile.exists()
-        assert serviceLoaderFile.text == "marytts.voice.${voice.nameCamelCase}.Config"
+        assert serviceLoaderFile.text == "marytts.voice.${marytts.voice.nameCamelCase}.Config"
     }
 }
 
+import groovy.xml.XmlUtil
 import org.custommonkey.xmlunit.XMLUnit
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier
 
-task testGeneratePom(group: 'Verification') {
-    dependsOn generatePom
+task testGeneratePomFileForMavenJavaPublication(group: 'Verification') {
+    dependsOn generatePomFileForMavenJavaPublication
     doLast {
-        def pomFile = file("$buildDir/resources/main/META-INF/maven/$project.group/voice-$voiceName/pom.xml")
+        def pomFile = file("$buildDir/publications/mavenJava/pom-default.xml")
         assert pomFile.exists()
         def pomXml = new groovy.xml.StreamingMarkupBuilder().bind {
             project(xmlns: "http://maven.apache.org/POM/4.0.0",
@@ -134,12 +139,6 @@ task testGeneratePom(group: 'Verification') {
                     }
                 }
                 delegate.dependencies {
-                    dependency {
-                        groupId 'junit'
-                        artifactId 'junit'
-                        delegate.version '4.12'
-                        scope 'test'
-                    }
                     dependency {
                         groupId 'de.dfki.mary'
                         artifactId 'marytts-runtime'
@@ -168,8 +167,11 @@ task testGeneratePom(group: 'Verification') {
             }
         } as String
         XMLUnit.ignoreWhitespace = true
-        def diff = XMLUnit.compareXML(pomFile.text, pomXml)
+        def diff = XMLUnit.compareXML(pomXml, pomFile.text)
         diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier())
+        if (!diff.similar()) {
+            println XmlUtil.serialize(pomXml)
+        }
         assert diff.similar()
     }
 }
@@ -177,9 +179,18 @@ task testGeneratePom(group: 'Verification') {
 task testGeneratePomProperties(group: 'Verification') {
     dependsOn generatePomProperties
     doLast {
-        def pomPropertiesFile = file("$buildDir/resources/main/META-INF/maven/$project.group/voice-$voiceName/pom.properties")
+        def pomPropertiesFile = file("$buildDir/pom.properties")
         assert pomPropertiesFile.exists()
-        assert pomPropertiesFile.readLines() == ["version=$version", "groupId=$project.group", "artifactId=$projectDir.name"]
+        def actual = new Properties()
+        pomPropertiesFile.withInputStream {
+            actual.load it
+        }
+        def expected = [
+                groupId   : project.group,
+                artifactId: projectDir.name,
+                version   : version
+        ] as Properties
+        assert actual == expected
     }
 }
 
@@ -194,8 +205,8 @@ task testJar(group: 'Verification') {
                 'META-INF/services/marytts.config.MaryConfig',
                 "META-INF/maven/$project.group/voice-$voiceName/pom.xml",
                 "META-INF/maven/$project.group/voice-$voiceName/pom.properties",
-                "marytts/voice/$voice.nameCamelCase/Config.class",
-                "marytts/voice/$voice.nameCamelCase/voice.config"
+                "marytts/voice/$voiceNameCamelCase/Config.class",
+                "marytts/voice/$voiceNameCamelCase/voice.config"
         ] as Set
         assert actual == expected
     }
