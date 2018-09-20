@@ -61,16 +61,15 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.layout.buildDirectory.dir('PointProcess')
         }
 
-        project.task('pitchmarkConverter', type: PitchmarkConverter) {
+        def pitchmarkConverterTask = project.task('pitchmarkConverter', type: PitchmarkConverter) {
             srcDir = praatPitchmarkerTask.destDir
             destDir = project.layout.buildDirectory.dir('pm')
         }
 
         project.task('mcepExtractor', type: ExtractMcep) {
-            dependsOn project.wav, project.pitchmarkConverter
-            wavFiles = project.fileTree(project.wav.destDir).include('*.wav')
-            pmFiles = project.fileTree(project.praatPitchmarker.destDir).include('*.pm')
-            destDir = project.file("$project.buildDir/mcep")
+            wavDir = wavTask.destDir
+            pmDir = pitchmarkConverterTask.destDir
+            destDir = project.layout.buildDirectory.dir('mcep')
         }
 
         project.task('generateAllophones', type: MaryInterfaceBatchTask) {
