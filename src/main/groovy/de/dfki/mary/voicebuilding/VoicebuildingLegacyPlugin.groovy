@@ -30,7 +30,8 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyInit', type: LegacyInitTask) {
-            dependsOn project.templates
+            srcDir = project.tasks.getByName('templates').destDir
+            configFile = project.layout.buildDirectory.file('database.config')
         }
 
         project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
