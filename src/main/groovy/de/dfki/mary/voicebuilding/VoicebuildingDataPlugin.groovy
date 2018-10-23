@@ -33,11 +33,10 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.task('bootstrap')
 
-        project.task('templates', type: CopyClasspathResources) {
+        def templateTask = project.task('templates', type: CopyClasspathResources) {
             destDir = project.layout.buildDirectory.dir('templates')
             resources.add '/de/dfki/mary/voicebuilding/templates/extractPitch.praat'
             resources.add '/de/dfki/mary/voicebuilding/templates/pitchmarks.praat'
-            project.bootstrap.dependsOn it
         }
 
         def wavTask = project.task('wav', type: ProcessWav) {
@@ -47,15 +46,15 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         def praatPitchExtractorTask = project.task('praatPitchExtractor', type: PraatExtractPitch) {
-            dependsOn project.praat
-            scriptFile = project.templates.destDir.file('extractPitch.praat')
+            dependsOn project.praat, templateTask
+            scriptFile = templateTask.destDir.file('extractPitch.praat')
             srcDir = wavTask.destDir
             destDir = project.layout.buildDirectory.dir('Pitch')
         }
 
         def praatPitchmarkerTask = project.task('praatPitchmarker', type: PraatExtractPitchmarks) {
-            dependsOn project.praat
-            scriptFile = project.templates.destDir.file('pitchmarks.praat')
+            dependsOn project.praat, templateTask
+            scriptFile = templateTask.destDir.file('pitchmarks.praat')
             wavDir = wavTask.destDir
             pitchDir = praatPitchExtractorTask.destDir
             destDir = project.layout.buildDirectory.dir('PointProcess')
