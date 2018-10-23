@@ -31,6 +31,9 @@ class LegacyPluginFunctionalTest {
         new File(projectDir, 'build.gradle').withWriter {
             it << this.class.getResourceAsStream('legacyPluginFunctionalTestBuildScript.gradle')
         }
+        new File(projectDir, 'settings.gradle').withWriter {
+            it << "enableFeaturePreview('STABLE_PUBLISHING')"
+        }
     }
 
     @DataProvider

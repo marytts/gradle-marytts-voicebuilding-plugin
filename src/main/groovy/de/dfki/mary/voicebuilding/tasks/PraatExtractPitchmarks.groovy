@@ -5,6 +5,7 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.workers.IsolationMode
@@ -15,6 +16,7 @@ import javax.inject.Inject
 
 class PraatExtractPitchmarks extends DefaultTask {
 
+    @Internal
     final WorkerExecutor workerExecutor
 
     @InputFile
