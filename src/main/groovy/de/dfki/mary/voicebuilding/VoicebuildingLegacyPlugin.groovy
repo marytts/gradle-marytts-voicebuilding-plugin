@@ -31,6 +31,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.task('legacyInit', type: LegacyInitTask) {
             srcDir = project.tasks.getByName('templates').destDir
+            wavDir = project.tasks.getByName('wav').destDir
             configFile = project.layout.buildDirectory.file('database.config')
         }
 

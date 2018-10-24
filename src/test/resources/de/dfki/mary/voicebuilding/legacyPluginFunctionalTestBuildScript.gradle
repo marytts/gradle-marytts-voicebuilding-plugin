@@ -50,7 +50,7 @@ dependencies {
 
 text.srcFile = file("$sourceSets.data.output.resourcesDir/time.data")
 
-legacyInit.dependsOn wav, text, lab
+legacyInit.dependsOn text, lab
 
 generateAllophones.dependsOn legacyInit
 
@@ -74,6 +74,7 @@ task testLegacyInit(group: 'Verification') {
     dependsOn legacyInit
     doLast {
         assert file("$buildDir/database.config").exists()
+        assert fileTree(buildDir).include('wav/*.wav').files
     }
 }
 

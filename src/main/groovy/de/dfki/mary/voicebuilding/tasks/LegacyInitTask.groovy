@@ -12,6 +12,9 @@ class LegacyInitTask extends DefaultTask {
     @InputDirectory
     final DirectoryProperty srcDir = newInputDirectory()
 
+    @InputDirectory
+    final DirectoryProperty wavDir = newInputDirectory()
+
     @OutputFile
     final RegularFileProperty configFile = newOutputFile()
 
