@@ -79,7 +79,9 @@ processResources {
 }
 
 test {
-    useTestNG()
+    useTestNG {
+        parallel = 'classes'
+    }
     testLogging {
         exceptionFormat = 'full'
     }

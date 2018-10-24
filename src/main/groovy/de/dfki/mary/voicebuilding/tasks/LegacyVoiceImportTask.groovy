@@ -1,45 +1,59 @@
 package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.*
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 
 class LegacyVoiceImportTask extends DefaultTask {
 
+    @InputFile
+    final RegularFileProperty configFile = newInputFile()
+
     @Optional
     @InputDirectory
-    File srcDir
+    final DirectoryProperty srcDir = newInputDirectory()
 
     @Optional
     @InputDirectory
-    File srcDir2
+    final DirectoryProperty srcDir2 = newInputDirectory()
+
+    @Optional
+    @InputDirectory
+    final DirectoryProperty srcDir3 = newInputDirectory()
 
     @Optional
     @InputFile
-    File srcFile
+    final RegularFileProperty srcFile = newInputFile()
 
     @Optional
     @InputFile
-    File srcFile2
+    final RegularFileProperty srcFile2 = newInputFile()
 
     @Optional
     @InputFile
-    File srcFile3
+    final RegularFileProperty srcFile3 = newInputFile()
 
     @Optional
     @OutputDirectory
-    File destDir
+    final DirectoryProperty destDir = newOutputDirectory()
 
     @Optional
     @OutputFile
-    File destFile
+    final RegularFileProperty destFile = newOutputFile()
 
     @Optional
     @OutputFile
-    File destFile2
+    final RegularFileProperty destFile2 = newOutputFile()
 
     @Optional
     @OutputFile
-    File destFile3
+    final RegularFileProperty destFile3 = newOutputFile()
 
     @TaskAction
     void run() {
@@ -51,5 +65,4 @@ class LegacyVoiceImportTask extends DefaultTask {
             systemProperties = ['java.awt.headless': true]
         }
     }
-
 }

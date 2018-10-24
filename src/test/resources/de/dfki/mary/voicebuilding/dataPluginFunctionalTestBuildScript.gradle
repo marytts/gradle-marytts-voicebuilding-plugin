@@ -71,8 +71,10 @@ task testTemplates {
     group 'Verification'
     dependsOn templates
     doLast {
-        def resourceFile = file("$buildDir/templates/extractPitch.praat")
-        assert resourceFile.exists()
+        ['extractPitch.praat', 'pitchmarks.praat'].each { resourceName ->
+            def resourceFile = file("$buildDir/templates/$resourceName")
+            assert resourceFile.exists()
+        }
     }
 }
 

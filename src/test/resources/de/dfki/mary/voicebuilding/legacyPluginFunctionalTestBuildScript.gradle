@@ -48,11 +48,18 @@ dependencies {
     data group: 'org.festvox', name: 'cmu_time_awb', classifier: 'ldom', ext: 'tar.bz2'
 }
 
-text.srcFile = file("$sourceSets.data.output.resourcesDir/time.data")
+text {
+    srcFile = file("$sourceSets.data.output.resourcesDir/time.data")
+}
 
-legacyInit.dependsOn wav, text, lab
+legacyInit {
+    textDir = text.destDir
+    labDir = lab.destDir
+}
 
-generateAllophones.dependsOn legacyInit
+generateAllophones {
+    srcDir = text.destDir
+}
 
 task testPlugins(group: 'Verification') {
     doLast {
@@ -74,6 +81,9 @@ task testLegacyInit(group: 'Verification') {
     dependsOn legacyInit
     doLast {
         assert file("$buildDir/database.config").exists()
+        assert fileTree(buildDir).include('wav/*.wav').files
+        assert fileTree(buildDir).include('text/*.txt').files
+        assert fileTree(buildDir).include('lab/*.lab').files
     }
 }
 

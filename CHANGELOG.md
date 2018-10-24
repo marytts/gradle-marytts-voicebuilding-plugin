@@ -6,6 +6,8 @@ Gradle MaryTTS voicebuilding plugin
 
 ## Changes
 
+- One-shot build via lazy configuration (no need to run `legacyInit` first)
+- Run functional tests in parallel
 - Build with Gradle v4.10.2
 - Drop support for Java 7
 

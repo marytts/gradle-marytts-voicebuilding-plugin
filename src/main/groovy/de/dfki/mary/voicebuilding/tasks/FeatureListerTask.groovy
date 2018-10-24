@@ -1,12 +1,14 @@
 package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.*
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 
 class FeatureListerTask extends DefaultTask {
 
     @OutputFile
-    File destFile
+    final RegularFileProperty destFile = newOutputFile()
 
     @TaskAction
     void generate() {
@@ -15,7 +17,7 @@ class FeatureListerTask extends DefaultTask {
             main 'marytts.FeatureLister'
             systemProperties = [
                     locale    : project.marytts.voice.maryLocale,
-                    outputFile: destFile
+                    outputFile: destFile.get().asFile
             ]
         }
     }

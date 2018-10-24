@@ -13,7 +13,7 @@ class BasePluginFunctionalTest {
     void setup() {
         def projectDir = File.createTempDir()
 
-        gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath()
+        gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath().forwardOutput()
 
         // Add the logic under test to the test build
         new File(projectDir, 'gradle.properties').withWriter {
@@ -64,12 +64,10 @@ class BasePluginFunctionalTest {
     @Test(dataProvider = 'taskNames')
     void testTasks(String taskName, boolean runTestTask) {
         def result = gradle.withArguments(taskName).build()
-        println result.output
         assert result.task(":$taskName").outcome in [SUCCESS, UP_TO_DATE]
         if (runTestTask) {
             def testTaskName = 'test' + taskName.capitalize()
             result = gradle.withArguments(testTaskName).build()
-            println result.output
             assert result.task(":$taskName").outcome == UP_TO_DATE
             assert result.task(":$testTaskName").outcome == SUCCESS
         }

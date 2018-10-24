@@ -17,7 +17,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         project.configurations.create 'legacy'
 
         project.ext {
-            legacyBuildDir = "$project.buildDir/mary"
+            legacyBuildDir = project.layout.buildDirectory.dir('mary')
 
             // configure speech-tools
             def proc = 'which ch_track'.execute()
@@ -29,15 +29,18 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             resources.add '/de/dfki/mary/voicebuilding/templates/database.config'
         }
 
-        project.task('legacyInit', type: LegacyInitTask) {
+        def legacyInitTask = project.task('legacyInit', type: LegacyInitTask) {
             srcDir = project.tasks.getByName('templates').destDir
+            wavDir = project.tasks.getByName('wav').destDir
+            textDir = project.layout.buildDirectory.dir('text')
+            labDir = project.layout.buildDirectory.dir('lab')
             configFile = project.layout.buildDirectory.file('database.config')
         }
 
-        project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyInit
-            srcDir = project.file("$project.buildDir/lab")
-            destDir = project.file("$project.buildDir/phonelab_unaligned")
+        def legacyPhoneUnitLabelComputerTask = project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcDir = project.layout.buildDirectory.dir('lab')
+            destDir = project.layout.buildDirectory.dir('phonelab_unaligned')
             doLast {
                 project.copy {
                     from "$project.buildDir/phonelab"
@@ -46,10 +49,10 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('legacyHalfPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyInit
-            srcDir = project.file("$project.buildDir/lab")
-            destDir = project.file("$project.buildDir/halfphonelab_unaligned")
+        def legacyHalfPhoneUnitLabelComputerTask = project.task('legacyHalfPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcDir = project.layout.buildDirectory.dir('lab')
+            destDir = project.layout.buildDirectory.dir('halfphonelab_unaligned')
             doLast {
                 project.copy {
                     from "$project.buildDir/halfphonelab"
@@ -58,71 +61,73 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('legacyTranscriptionAligner', type: LegacyVoiceImportTask) {
-            dependsOn project.generateAllophones
-            srcDir = project.file("$project.buildDir/lab")
-            destDir = project.file("$project.buildDir/allophones")
+        def legacyTranscriptionAlignerTask = project.task('legacyTranscriptionAligner', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcDir = project.layout.buildDirectory.dir('lab')
+            srcDir2 = project.tasks.getByName('generateAllophones').destDir
+            destDir = project.layout.buildDirectory.dir('allophones')
         }
 
         project.task('featureLister', type: FeatureListerTask) {
-            destFile = project.file("$project.legacyBuildDir/features.txt")
+            destFile = project.legacyBuildDir.get().file('features.txt')
         }
 
-        project.task('phoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
-            dependsOn project.legacyTranscriptionAligner, project.featureLister
-            srcDir = project.file("$project.buildDir/allophones")
-            destDir = project.file("$project.buildDir/phonefeatures")
+        def phoneUnitFeatureComputerTask = project.task('phoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
+            dependsOn project.featureLister
+            srcDir = legacyTranscriptionAlignerTask.destDir
+            destDir = project.layout.buildDirectory.dir('phonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
             outputType = 'TARGETFEATURES'
             outputExt = 'pfeats'
             doFirst {
-                outputTypeParams = ['phone'] + project.featureLister.destFile.readLines().findAll {
+                outputTypeParams = ['phone'] + project.featureLister.destFile.get().asFile.readLines().findAll {
                     it != 'phone' && !(it in ['halfphone_lr', 'halfphone_unitname'])
                 }
             }
         }
 
-        project.task('halfPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
-            dependsOn project.legacyTranscriptionAligner, project.featureLister
-            srcDir = project.file("$project.buildDir/allophones")
-            destDir = project.file("$project.buildDir/halfphonefeatures")
+        def halfPhoneUnitFeatureComputerTask = project.task('halfPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
+            dependsOn project.featureLister
+            srcDir = legacyTranscriptionAlignerTask.destDir
+            destDir = project.layout.buildDirectory.dir('halfphonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
             outputType = 'HALFPHONE_TARGETFEATURES'
             outputExt = 'hpfeats'
             doFirst {
-                outputTypeParams = ['halfphone_unitname'] + project.featureLister.destFile.readLines().findAll {
+                outputTypeParams = ['halfphone_unitname'] + project.featureLister.destFile.get().asFile.readLines().findAll {
                     it != 'halfphone_unitname'
                 }
             }
         }
 
-        project.task('legacyWaveTimelineMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.pitchmarkConverter
-            srcDir = project.file("$project.buildDir/wav")
-            srcDir2 = project.file("$project.buildDir/pm")
-            destFile = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
+        def legacyWaveTimelineMakerTask = project.task('legacyWaveTimelineMaker', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcDir = project.layout.buildDirectory.dir('wav')
+            srcDir2 = project.tasks.getByName('pitchmarkConverter').destDir
+            destFile = project.legacyBuildDir.get().file('timeline_waveforms.mry')
         }
 
         project.task('legacyBasenameTimelineMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.pitchmarkConverter
-            srcDir = project.file("$project.buildDir/wav")
-            srcDir2 = project.file("$project.buildDir/pm")
-            destFile = project.file("$project.legacyBuildDir/timeline_basenames.mry")
+            configFile = legacyInitTask.configFile
+            srcDir = project.layout.buildDirectory.dir('wav')
+            srcDir2 = project.tasks.getByName('pitchmarkConverter').destDir
+            destFile = project.legacyBuildDir.get().file('timeline_basenames.mry')
         }
 
-        project.task('legacyMCepTimelineMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.mcepExtractor
-            srcDir = project.file("$project.buildDir/wav")
-            srcDir2 = project.file("$project.buildDir/mcep")
-            destFile = project.file("$project.legacyBuildDir/timeline_mcep.mry")
+        def legacyMCepTimelineMakerTask = project.task('legacyMCepTimelineMaker', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcDir = project.layout.buildDirectory.dir('wav')
+            srcDir2 = project.tasks.getByName('mcepExtractor').destDir
+            destFile = project.legacyBuildDir.get().file('timeline_mcep.mry')
         }
 
-        project.task('legacyPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPhoneUnitLabelComputer, project.phoneUnitFeatureComputer
-            srcDir = project.file("$project.buildDir/phonelab_unaligned")
-            destDir = project.file("$project.buildDir/phonelab_aligned")
+        def legacyPhoneLabelFeatureAlignerTask = project.task('legacyPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcDir = legacyPhoneUnitLabelComputerTask.destDir
+            srcDir2 = phoneUnitFeatureComputerTask.destDir
+            destDir = project.layout.buildDirectory.dir('phonelab_aligned')
             doLast {
                 project.copy {
                     from "$project.buildDir/phonelab"
@@ -131,10 +136,11 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('legacyHalfPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyHalfPhoneUnitLabelComputer, project.halfPhoneUnitFeatureComputer
-            srcDir = project.file("$project.buildDir/halfphonelab_unaligned")
-            destDir = project.file("$project.buildDir/halfphonelab_aligned")
+        def legacyHalfPhoneLabelFeatureAlignerTask = project.task('legacyHalfPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcDir = legacyHalfPhoneUnitLabelComputerTask.destDir
+            srcDir2 = halfPhoneUnitFeatureComputerTask.destDir
+            destDir = project.layout.buildDirectory.dir('halfphonelab_aligned')
             doLast {
                 project.copy {
                     from "$project.buildDir/halfphonelab"
@@ -143,95 +149,86 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             }
         }
 
-        project.task('legacyPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.pitchmarkConverter, project.legacyPhoneUnitLabelComputer
-            dependsOn project.legacyPhoneLabelFeatureAligner
-            srcDir = project.file("$project.buildDir/pm")
-            destFile = project.file("$project.legacyBuildDir/phoneUnits.mry")
+        def legacyPhoneUnitfileWriterTask = project.task('legacyPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcDir = project.tasks.getByName('pitchmarkConverter').destDir
+            srcDir2 = legacyPhoneUnitLabelComputerTask.destDir
+            srcDir3 = legacyPhoneLabelFeatureAlignerTask.destDir
+            destFile = project.legacyBuildDir.get().file('phoneUnits.mry')
         }
 
-        project.task('legacyHalfPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.pitchmarkConverter, project.legacyHalfPhoneUnitLabelComputer
-            dependsOn project.legacyHalfPhoneLabelFeatureAligner
-            srcDir = project.file("$project.buildDir/pm")
-            destFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
+        def legacyHalfPhoneUnitfileWriterTask = project.task('legacyHalfPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcDir = project.tasks.getByName('pitchmarkConverter').destDir
+            srcDir2 = legacyHalfPhoneUnitLabelComputerTask.destDir
+            srcDir3 = legacyHalfPhoneLabelFeatureAlignerTask.destDir
+            destFile = project.legacyBuildDir.get().file('halfphoneUnits.mry')
         }
 
-        project.task('legacyPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPhoneUnitfileWriter, project.phoneUnitFeatureComputer
-            srcFile = project.file("$project.legacyBuildDir/phoneUnits.mry")
-            srcDir = project.file("$project.buildDir/phonefeatures")
-            destFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
-            destFile2 = project.file("$project.legacyBuildDir/phoneUnitFeatureDefinition.txt")
+        def legacyPhoneFeatureFileWriterTask = project.task('legacyPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcFile = legacyPhoneUnitfileWriterTask.destFile
+            srcDir = phoneUnitFeatureComputerTask.destDir
+            destFile = project.legacyBuildDir.get().file('phoneFeatures.mry')
+            destFile2 = project.legacyBuildDir.get().file('phoneUnitFeatureDefinition.txt')
         }
 
-        project.task('legacyHalfPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyHalfPhoneUnitfileWriter
-            dependsOn project.halfPhoneUnitFeatureComputer
-            srcFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
-            srcDir = project.file("$project.buildDir/halfphonefeatures")
-            destFile = project.file("$project.legacyBuildDir/halfphoneFeatures.mry")
-            destFile2 = project.file("$project.legacyBuildDir/halfphoneUnitFeatureDefinition.txt")
+        def legacyHalfPhoneFeatureFileWriterTask = project.task('legacyHalfPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcFile = legacyHalfPhoneUnitfileWriterTask.destFile
+            srcDir = halfPhoneUnitFeatureComputerTask.destDir
+            destFile = project.legacyBuildDir.get().file('halfphoneFeatures.mry')
+            destFile2 = project.legacyBuildDir.get().file('halfphoneUnitFeatureDefinition.txt')
         }
 
-        project.task('legacyF0PolynomialFeatureFileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyHalfPhoneUnitfileWriter
-            dependsOn project.legacyWaveTimelineMaker
-            dependsOn project.legacyHalfPhoneFeatureFileWriter
-            srcFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
-            srcFile2 = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
-            srcFile3 = project.file("$project.legacyBuildDir/halfphoneFeatures.mry")
-            destFile project.file("$project.legacyBuildDir/syllableF0Polynomials.mry")
+        def legacyF0PolynomialFeatureFileWriterTask = project.task('legacyF0PolynomialFeatureFileWriter', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcFile = legacyHalfPhoneUnitfileWriterTask.destFile
+            srcFile2 = legacyWaveTimelineMakerTask.destFile
+            srcFile3 = legacyHalfPhoneFeatureFileWriterTask.destFile
+            destFile = project.legacyBuildDir.get().file('syllableF0Polynomials.mry')
         }
 
-        project.task('legacyAcousticFeatureFileWriter', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyHalfPhoneUnitfileWriter
-            dependsOn project.legacyF0PolynomialFeatureFileWriter
-            dependsOn project.legacyHalfPhoneFeatureFileWriter
-            srcFile = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
-            srcFile2 = project.file("$project.legacyBuildDir/syllableF0Polynomials.mry")
-            srcFile3 = project.file("$project.legacyBuildDir/halfphoneFeatures.mry")
-            destFile = project.file("$project.legacyBuildDir/halfphoneFeatures_ac.mry")
-            destFile2 = project.file("$project.legacyBuildDir/halfphoneUnitFeatureDefinition_ac.txt")
+        def legacyAcousticFeatureFileWriterTask = project.task('legacyAcousticFeatureFileWriter', type: LegacyVoiceImportTask) {
+            configFile = legacyInitTask.configFile
+            srcFile = legacyHalfPhoneUnitfileWriterTask.destFile
+            srcFile2 = legacyF0PolynomialFeatureFileWriterTask.destFile
+            srcFile3 = legacyHalfPhoneFeatureFileWriterTask.destFile
+            destFile = project.legacyBuildDir.get().file('halfphoneFeatures_ac.mry')
+            destFile2 = project.legacyBuildDir.get().file('halfphoneUnitFeatureDefinition_ac.txt')
         }
 
         project.task('legacyJoinCostFileMaker', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyMCepTimelineMaker
-            dependsOn project.legacyHalfPhoneUnitfileWriter
-            dependsOn project.legacyAcousticFeatureFileWriter
-            srcFile = project.file("$project.legacyBuildDir/timeline_mcep.mry")
-            srcFile2 = project.file("$project.legacyBuildDir/halfphoneUnits.mry")
-            srcFile3 = project.file("$project.legacyBuildDir/halfphoneFeatures_ac.mry")
-            destFile = project.file("$project.legacyBuildDir/joinCostFeatures.mry")
-            destFile2 = project.file("$project.legacyBuildDir/joinCostWeights.txt")
+            configFile = legacyInitTask.configFile
+            srcFile = legacyMCepTimelineMakerTask.destFile
+            srcFile2 = legacyHalfPhoneUnitfileWriterTask.destFile
+            srcFile3 = legacyAcousticFeatureFileWriterTask.destFile
+            destFile = project.legacyBuildDir.get().file('joinCostFeatures.mry')
+            destFile2 = project.legacyBuildDir.get().file('joinCostWeights.txt')
         }
 
         project.task('legacyCARTBuilder', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyAcousticFeatureFileWriter
-            srcFile = project.file("$project.legacyBuildDir/halfphoneFeatures_ac.mry")
-            destFile = project.file("$project.legacyBuildDir/cart.mry")
+            configFile = legacyInitTask.configFile
+            srcFile = legacyAcousticFeatureFileWriterTask.destFile
+            destFile = project.legacyBuildDir.get().file('cart.mry')
         }
 
         project.task('legacyDurationCARTTrainer', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPhoneFeatureFileWriter
-            dependsOn project.legacyPhoneUnitfileWriter
-            dependsOn project.legacyWaveTimelineMaker
-            srcFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
-            srcFile2 = project.file("$project.legacyBuildDir/phoneUnits.mry")
-            srcFile3 = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
-            destFile = project.file("$project.legacyBuildDir/dur.tree")
+            configFile = legacyInitTask.configFile
+            srcFile = legacyPhoneFeatureFileWriterTask.destFile
+            srcFile2 = legacyPhoneUnitfileWriterTask.destFile
+            srcFile3 = legacyWaveTimelineMakerTask.destFile
+            destFile = project.legacyBuildDir.get().file('dur.tree')
         }
 
         project.task('legacyF0CARTTrainer', type: LegacyVoiceImportTask) {
-            dependsOn project.legacyPhoneFeatureFileWriter
-            dependsOn project.legacyPhoneUnitfileWriter
-            dependsOn project.legacyWaveTimelineMaker
-            srcFile = project.file("$project.legacyBuildDir/phoneFeatures.mry")
-            srcFile2 = project.file("$project.legacyBuildDir/phoneUnits.mry")
-            srcFile3 = project.file("$project.legacyBuildDir/timeline_waveforms.mry")
-            destFile = project.file("$project.legacyBuildDir/f0.left.tree")
-            destFile2 = project.file("$project.legacyBuildDir/f0.mid.tree")
-            destFile3 = project.file("$project.legacyBuildDir/f0.right.tree")
+            configFile = legacyInitTask.configFile
+            srcFile = legacyPhoneFeatureFileWriterTask.destFile
+            srcFile2 = legacyPhoneUnitfileWriterTask.destFile
+            srcFile3 = legacyWaveTimelineMakerTask.destFile
+            destFile = project.legacyBuildDir.get().file('f0.left.tree')
+            destFile2 = project.legacyBuildDir.get().file('f0.mid.tree')
+            destFile3 = project.legacyBuildDir.get().file('f0.right.tree')
         }
 
         project.generateVoiceConfig {
