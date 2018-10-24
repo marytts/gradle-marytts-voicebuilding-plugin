@@ -12,6 +12,9 @@ import org.gradle.api.tasks.TaskAction
 
 class LegacyVoiceImportTask extends DefaultTask {
 
+    @InputFile
+    final RegularFileProperty configFile = newInputFile()
+
     @Optional
     @InputDirectory
     final DirectoryProperty srcDir = newInputDirectory()
