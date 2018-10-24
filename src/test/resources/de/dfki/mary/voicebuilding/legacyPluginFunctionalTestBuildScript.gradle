@@ -57,6 +57,10 @@ legacyInit {
     labDir = lab.destDir
 }
 
+generateAllophones {
+    srcDir = text.destDir
+}
+
 task testPlugins(group: 'Verification') {
     doLast {
         assert plugins.findPlugin('de.dfki.mary.voicebuilding-legacy')

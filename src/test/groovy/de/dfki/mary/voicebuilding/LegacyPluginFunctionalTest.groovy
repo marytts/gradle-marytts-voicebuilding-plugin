@@ -1,15 +1,18 @@
 package de.dfki.mary.voicebuilding
 
 import org.gradle.testkit.runner.GradleRunner
-import org.testng.annotations.*
+import org.testng.annotations.BeforeGroups
+import org.testng.annotations.DataProvider
+import org.testng.annotations.Test
 
-import static org.gradle.testkit.runner.TaskOutcome.*
+import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
+import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE
 
 class LegacyPluginFunctionalTest {
 
     def gradle
 
-    @BeforeSuite
+    @BeforeGroups(groups = ['incremental', 'one-shot'])
     void setup() {
         def projectDir = File.createTempDir()
 
@@ -75,7 +78,7 @@ class LegacyPluginFunctionalTest {
         ]
     }
 
-    @Test(dataProvider = 'taskNames')
+    @Test(groups = 'incremental', dataProvider = 'taskNames')
     void testTasks(String taskName, boolean runTestTask) {
         def result = gradle.withArguments(taskName).build()
         println result.output
@@ -87,5 +90,12 @@ class LegacyPluginFunctionalTest {
             assert result.task(":$taskName").outcome == UP_TO_DATE
             assert result.task(":$testTaskName").outcome == SUCCESS
         }
+    }
+
+    @Test(groups = 'one-shot')
+    void testOneShotBuild() {
+        def result = gradle.withArguments('build').build()
+        println result.output
+        assert result.task(":build").outcome == SUCCESS
     }
 }
