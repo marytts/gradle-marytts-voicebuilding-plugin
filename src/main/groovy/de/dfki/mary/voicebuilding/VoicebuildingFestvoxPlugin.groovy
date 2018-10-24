@@ -31,7 +31,6 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
             dependsOn project.tasks.findByName('processDataResources')
             srcFile = project.file("$project.sourceSets.data.output.resourcesDir/txt.done.data")
             destDir = project.layout.buildDirectory.dir('text')
-            project.bootstrap.dependsOn it
         }
 
         project.task('lab', type: FestvoxExtractLab) {
@@ -66,7 +65,6 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
                     y   : 'j',
                     zh  : 'Z'
             ]
-            project.bootstrap.dependsOn it
         }
     }
 }

@@ -31,8 +31,6 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             marytts group: 'de.dfki.mary', name: "marytts-voicebuilding", version: '0.1'
         }
 
-        project.task('bootstrap')
-
         def templateTask = project.task('templates', type: CopyClasspathResources) {
             destDir = project.layout.buildDirectory.dir('templates')
             resources.add '/de/dfki/mary/voicebuilding/templates/extractPitch.praat'
