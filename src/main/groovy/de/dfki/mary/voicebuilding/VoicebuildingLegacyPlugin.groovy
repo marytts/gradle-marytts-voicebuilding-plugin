@@ -31,14 +31,13 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         def legacyInitTask = project.task('legacyInit', type: LegacyInitTask) {
             srcDir = project.tasks.getByName('templates').destDir
-            wavDir = project.tasks.getByName('wav').destDir
-            textDir = project.layout.buildDirectory.dir('text')
-            labDir = project.layout.buildDirectory.dir('lab')
             configFile = project.layout.buildDirectory.file('database.config')
         }
 
         def basenamesTask = project.task('basenames', type: GenerateBasenamesList) {
             wavDir = project.tasks.getByName('wav').destDir
+            textDir = project.layout.buildDirectory.dir('text')
+            labDir = project.layout.buildDirectory.dir('lab')
             destFile = project.layout.buildDirectory.file('basenames.lst')
         }
 
