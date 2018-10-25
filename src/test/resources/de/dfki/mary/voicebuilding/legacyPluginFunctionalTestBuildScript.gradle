@@ -52,9 +52,17 @@ text {
     srcFile = file("$sourceSets.data.output.resourcesDir/time.data")
 }
 
-legacyInit {
+wav {
+    doLast {
+        ant.copy file: "$buildDir/wav/time0001.wav", tofile: "$buildDir/wav/unused.wav"
+    }
+}
+
+basenames {
     textDir = text.destDir
     labDir = lab.destDir
+    include 'time*', 'unused'
+    exclude '*0023'
 }
 
 generateAllophones {
@@ -81,9 +89,19 @@ task testLegacyInit(group: 'Verification') {
     dependsOn legacyInit
     doLast {
         assert file("$buildDir/database.config").exists()
-        assert fileTree(buildDir).include('wav/*.wav').files
-        assert fileTree(buildDir).include('text/*.txt').files
-        assert fileTree(buildDir).include('lab/*.lab').files
+    }
+}
+
+task testBasenames(group: 'Verification') {
+    dependsOn basenames
+    doLast {
+        def basenamesFile = file("$buildDir/basenames.lst")
+        assert basenamesFile.exists()
+        def actual = basenamesFile.readLines() as Set
+        def expected = fileTree("$buildDir/wav").include('*.wav').exclude('time0023.wav', 'unused.wav').collect {
+            it.name - '.wav'
+        } as Set
+        assert actual == expected
     }
 }
 

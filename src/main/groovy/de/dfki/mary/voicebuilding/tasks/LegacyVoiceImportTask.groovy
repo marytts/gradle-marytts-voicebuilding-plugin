@@ -15,6 +15,9 @@ class LegacyVoiceImportTask extends DefaultTask {
     @InputFile
     final RegularFileProperty configFile = newInputFile()
 
+    @InputFile
+    final RegularFileProperty basenamesFile = newInputFile()
+
     @Optional
     @InputDirectory
     final DirectoryProperty srcDir = newInputDirectory()

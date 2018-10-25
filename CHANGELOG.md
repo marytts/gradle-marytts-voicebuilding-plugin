@@ -4,37 +4,45 @@ Gradle MaryTTS voicebuilding plugin
 [Unreleased]
 ------------
 
-## Changes
+### Added
+
+- Optionally specify utterances to include or exclude
+
+### Changes
 
 - One-shot build via lazy configuration (no need to run `legacyInit` first)
 - Run functional tests in parallel
 - Build with Gradle v4.10.2
 - Drop support for Java 7
 
+### Fixed
+
+- Exclude utterances with missing text/lab files
+
 [v5.3.2] - 2018-01-26
 ---------------------
 
-## Fixed
+### Fixed
 
 - Prevent transitive Groovy dependency from leaking into classpath of consuming projects (properly this time!)
 
 [v5.3.1] - 2018-01-26
 ---------------------
 
-## Fixed
+### Fixed
 
 - Prevent transitive Groovy dependency from leaking into classpath of consuming projects (turned out not to have been the proper solution...)
 
 [v5.3] - 2017-11-21
 -------------------
 
-## Added
+### Added
 
 - Parallel data processing using Gradle Worker API
 - Use Praat binary provided by [Gradle plugin](https://github.com/m2ci-msp/gradle-praat-wrapper-plugin)
 - Snapshots published to [OJO](https://oss.jfrog.org/)
 
-## Changes
+### Changes
 
 - Build with Gradle v4.3.1
 - Rewrote several task classes used by data plugin
