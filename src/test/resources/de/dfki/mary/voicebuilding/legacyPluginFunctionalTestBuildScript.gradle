@@ -52,6 +52,12 @@ text {
     srcFile = file("$sourceSets.data.output.resourcesDir/time.data")
 }
 
+wav {
+    doLast {
+        ant.copy file: "$buildDir/wav/time0001.wav", tofile: "$buildDir/wav/unused.wav"
+    }
+}
+
 basenames {
     textDir = text.destDir
     labDir = lab.destDir
