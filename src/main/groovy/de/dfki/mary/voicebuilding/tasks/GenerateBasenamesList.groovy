@@ -48,7 +48,17 @@ class GenerateBasenamesList extends DefaultTask {
                 exclude this.excludes.getOrElse([]).collect { it + '.wav' }
             }.each { wavFile ->
                 def basename = wavFile.name - '.wav'
-                writer.println basename
+                def textFile = textDir.file("${basename}.txt").get().asFile
+                if (!textFile.canRead()) {
+                    project.logger.warn "WARNING: Could not read from $textFile"
+                }
+                def labFile = labDir.file("${basename}.lab").get().asFile
+                if (!labFile.canRead()) {
+                    project.logger.warn "WARNING: Could not read from $labFile"
+                }
+                if (textFile.canRead() && labFile.canRead()) {
+                    writer.println basename
+                }
             }
         }
     }
