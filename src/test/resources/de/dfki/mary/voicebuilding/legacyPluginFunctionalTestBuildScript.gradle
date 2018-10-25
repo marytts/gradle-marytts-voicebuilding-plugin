@@ -61,6 +61,8 @@ wav {
 basenames {
     textDir = text.destDir
     labDir = lab.destDir
+    include '*0024', 'time*'
+    exclude 'unused', 'time0023'
 }
 
 generateAllophones {
@@ -96,7 +98,9 @@ task testBasenames(group: 'Verification') {
         def basenamesFile = file("$buildDir/basenames.lst")
         assert basenamesFile.exists()
         def actual = basenamesFile.readLines() as Set
-        def expected = fileTree(buildDir).include('wav/*.wav').files.collect { it.name - '.wav' } as Set
+        def expected = fileTree("$buildDir/wav").include('*.wav').exclude('time0023.wav', 'unused.wav').collect {
+            it.name - '.wav'
+        } as Set
         assert actual == expected
     }
 }
