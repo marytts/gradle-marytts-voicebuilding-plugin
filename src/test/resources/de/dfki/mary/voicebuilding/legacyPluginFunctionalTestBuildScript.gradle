@@ -87,6 +87,17 @@ task testLegacyInit(group: 'Verification') {
     }
 }
 
+task testBasenames(group: 'Verification') {
+    dependsOn basenames
+    doLast {
+        def basenamesFile = file("$buildDir/basenames.lst")
+        assert basenamesFile.exists()
+        def actual = basenamesFile.readLines() as Set
+        def expected = fileTree(buildDir).include('wav/*.wav').files.collect { it.name - '.wav' } as Set
+        assert actual == expected
+    }
+}
+
 task testLegacyPhoneUnitLabelComputer(group: 'Verification') {
     dependsOn legacyPhoneUnitLabelComputer
     doLast {
