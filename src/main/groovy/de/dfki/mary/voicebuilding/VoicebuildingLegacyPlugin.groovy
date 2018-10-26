@@ -34,12 +34,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             configFile = project.layout.buildDirectory.file('database.config')
         }
 
-        def basenamesTask = project.task('basenames', type: GenerateBasenamesList) {
-            wavDir = project.tasks.getByName('wav').destDir
-            textDir = project.layout.buildDirectory.dir('text')
-            labDir = project.layout.buildDirectory.dir('lab')
-            destFile = project.layout.buildDirectory.file('basenames.lst')
-        }
+        def basenamesTask = project.tasks.getByName('basenames')
 
         def legacyPhoneUnitLabelComputerTask = project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
             srcDir = project.layout.buildDirectory.dir('lab')

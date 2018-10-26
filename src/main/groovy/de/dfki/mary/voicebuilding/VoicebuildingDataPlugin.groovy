@@ -43,6 +43,13 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.layout.buildDirectory.dir('wav')
         }
 
+        def basenamesTask = project.task('basenames', type: GenerateBasenamesList) {
+            wavDir = wavTask.destDir
+            textDir = project.layout.buildDirectory.dir('text')
+            labDir = project.layout.buildDirectory.dir('lab')
+            destFile = project.layout.buildDirectory.file('basenames.lst')
+        }
+
         def praatPitchExtractorTask = project.task('praatPitchExtractor', type: PraatExtractPitch) {
             dependsOn project.praat, templateTask
             scriptFile = templateTask.destDir.file('extractPitch.praat')
