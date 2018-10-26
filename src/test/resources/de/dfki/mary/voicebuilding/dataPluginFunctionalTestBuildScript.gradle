@@ -80,6 +80,12 @@ task testTemplates {
 
 generateAllophones.dependsOn text
 
+wav {
+    doLast {
+        ant.copy file: "$buildDir/wav/time0001.wav", tofile: "$buildDir/wav/unused.wav"
+    }
+}
+
 task testWav {
     group 'Verification'
     dependsOn wav
@@ -88,11 +94,33 @@ task testWav {
     }
 }
 
+basenames {
+    textDir = text.destDir
+    labDir = lab.destDir
+    include 'time*', 'unused'
+    exclude '*0023'
+}
+
+task testBasenames(group: 'Verification') {
+    dependsOn basenames
+    doLast {
+        def basenamesFile = file("$buildDir/basenames.lst")
+        assert basenamesFile.exists()
+        def actual = basenamesFile.readLines() as Set
+        def expected = fileTree("$buildDir/wav").include('*.wav').exclude('time0023.wav', 'unused.wav').collect {
+            it.name - '.wav'
+        } as Set
+        assert actual == expected
+    }
+}
+
 task testPraatPitchExtractor {
     group 'Verification'
     dependsOn praatPitchExtractor
     doLast {
-        assert fileTree(buildDir).include('Pitch/*.Pitch').files
+        def actual = fileTree("$buildDir/Pitch").include('*.Pitch').collect { it.name - '.Pitch' } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }
 
@@ -100,7 +128,11 @@ task testPraatPitchmarker {
     group 'Verification'
     dependsOn praatPitchmarker
     doLast {
-        assert fileTree(buildDir).include('PointProcess/*.PointProcess').files
+        def actual = fileTree("$buildDir/PointProcess").include('*.PointProcess').collect {
+            it.name - '.PointProcess'
+        } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }
 
@@ -108,7 +140,9 @@ task testPitchmarkConverter {
     group 'Verification'
     dependsOn pitchmarkConverter
     doLast {
-        assert fileTree(buildDir).include('pm/*.pm').files
+        def actual = fileTree("$buildDir/pm").include('*.pm').collect { it.name - '.pm' } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }
 
@@ -116,7 +150,9 @@ task testMcepExtractor {
     group 'Verification'
     dependsOn mcepExtractor
     doLast {
-        assert fileTree(buildDir).include('mcep/*.mcep').files
+        def actual = fileTree("$buildDir/mcep").include('*.mcep').collect { it.name - '.mcep' } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }
 
@@ -132,7 +168,9 @@ task testGenerateAllophones {
     group 'Verification'
     dependsOn generateAllophones
     doLast {
-        assert fileTree(buildDir).include('prompt_allophones/*.xml').files
+        def actual = fileTree("$buildDir/prompt_allophones").include('*.xml').collect { it.name - '.xml' } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }
 
@@ -141,6 +179,9 @@ task testGeneratePhoneFeatures {
     dependsOn generatePhoneFeatures
     doLast {
         assert fileTree(buildDir).include('phonefeatures/*.pfeats').files
+        def actual = fileTree("$buildDir/phonefeatures").include('*.pfeats').collect { it.name - '.pfeats' } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }
 
@@ -148,6 +189,10 @@ task testGenerateHalfPhoneFeatures {
     group 'Verification'
     dependsOn generateHalfPhoneFeatures
     doLast {
-        assert fileTree(buildDir).include('halfphonefeatures/*.hpfeats').files
+        def actual = fileTree("$buildDir/halfphonefeatures").include('*.hpfeats').collect {
+            it.name - '.hpfeats'
+        } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }

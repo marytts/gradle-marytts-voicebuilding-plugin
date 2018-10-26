@@ -43,8 +43,16 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             destDir = project.layout.buildDirectory.dir('wav')
         }
 
+        def basenamesTask = project.task('basenames', type: GenerateBasenamesList) {
+            wavDir = wavTask.destDir
+            textDir = project.layout.buildDirectory.dir('text')
+            labDir = project.layout.buildDirectory.dir('lab')
+            destFile = project.layout.buildDirectory.file('basenames.lst')
+        }
+
         def praatPitchExtractorTask = project.task('praatPitchExtractor', type: PraatExtractPitch) {
             dependsOn project.praat, templateTask
+            basenamesFile = basenamesTask.destFile
             scriptFile = templateTask.destDir.file('extractPitch.praat')
             srcDir = wavTask.destDir
             destDir = project.layout.buildDirectory.dir('Pitch')
@@ -52,6 +60,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         def praatPitchmarkerTask = project.task('praatPitchmarker', type: PraatExtractPitchmarks) {
             dependsOn project.praat, templateTask
+            basenamesFile = basenamesTask.destFile
             scriptFile = templateTask.destDir.file('pitchmarks.praat')
             wavDir = wavTask.destDir
             pitchDir = praatPitchExtractorTask.destDir
@@ -59,11 +68,13 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         def pitchmarkConverterTask = project.task('pitchmarkConverter', type: PitchmarkConverter) {
+            basenamesFile = basenamesTask.destFile
             srcDir = praatPitchmarkerTask.destDir
             destDir = project.layout.buildDirectory.dir('pm')
         }
 
         project.task('mcepExtractor', type: ExtractMcep) {
+            basenamesFile = basenamesTask.destFile
             wavDir = wavTask.destDir
             pmDir = pitchmarkConverterTask.destDir
             destDir = project.layout.buildDirectory.dir('mcep')
@@ -97,6 +108,10 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             outputType = 'HALFPHONE_TARGETFEATURES'
             outputExt = 'hpfeats'
             maryttsProperties = ['mary.base': project.buildDir]
+        }
+
+        project.tasks.withType(MaryInterfaceBatchTask) {
+            basenamesFile = basenamesTask.destFile
         }
     }
 }

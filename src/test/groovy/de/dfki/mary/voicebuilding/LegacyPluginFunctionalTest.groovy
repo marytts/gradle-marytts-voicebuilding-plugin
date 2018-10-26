@@ -47,7 +47,6 @@ class LegacyPluginFunctionalTest {
                 ['testPlugins', false],
                 ['templates', true],
                 ['legacyInit', true],
-                ['basenames', true],
                 ['legacyPhoneUnitLabelComputer', true],
                 ['legacyHalfPhoneUnitLabelComputer', true],
                 ['legacyTranscriptionAligner', true],

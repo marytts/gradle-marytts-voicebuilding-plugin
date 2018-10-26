@@ -40,6 +40,7 @@ class DataPluginFunctionalTest {
                 ['testDependencies', false],
                 ['templates', true],
                 ['wav', true],
+                ['basenames', true],
                 ['praatPitchExtractor', true],
                 ['praatPitchmarker', true],
                 ['pitchmarkConverter', true],

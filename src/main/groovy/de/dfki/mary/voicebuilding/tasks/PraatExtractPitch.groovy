@@ -20,6 +20,9 @@ class PraatExtractPitch extends DefaultTask {
     final WorkerExecutor workerExecutor
 
     @InputFile
+    final RegularFileProperty basenamesFile = newInputFile()
+
+    @InputFile
     final RegularFileProperty scriptFile = newInputFile()
 
     @InputDirectory
@@ -36,8 +39,8 @@ class PraatExtractPitch extends DefaultTask {
     @TaskAction
     void extract() {
         def cmd = [project.praat.binary, '--run', scriptFile.get().asFile]
-        project.fileTree(srcDir).include('**/*.wav').each { wavFile ->
-            def basename = wavFile.name - '.wav'
+        basenamesFile.get().asFile.eachLine('UTF-8') { basename ->
+            def wavFile = srcDir.file("${basename}.wav").get().asFile
             def destFile = destDir.file("${basename}.Pitch").get().asFile
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
                 def args = [wavFile,

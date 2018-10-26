@@ -2,11 +2,16 @@ package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 class PitchmarkConverter extends DefaultTask {
+
+    @InputFile
+    final RegularFileProperty basenamesFile = newInputFile()
 
     @InputDirectory
     final DirectoryProperty srcDir = newInputDirectory()
@@ -16,8 +21,8 @@ class PitchmarkConverter extends DefaultTask {
 
     @TaskAction
     void convert() {
-        project.fileTree(srcDir).include('*.PointProcess').each { srcFile ->
-            def basename = srcFile.name - '.PointProcess'
+        basenamesFile.get().asFile.eachLine('UTF-8') { basename ->
+            def srcFile = srcDir.file("${basename}.PointProcess").get().asFile
             def destFile = destDir.file("${basename}.pm").get().asFile
             def nx
             def times = []
