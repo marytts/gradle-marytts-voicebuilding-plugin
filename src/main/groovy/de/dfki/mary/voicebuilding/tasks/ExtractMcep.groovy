@@ -2,7 +2,9 @@ package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
@@ -16,6 +18,9 @@ class ExtractMcep extends DefaultTask {
 
     @Internal
     final WorkerExecutor workerExecutor
+
+    @InputFile
+    final RegularFileProperty basenamesFile = newInputFile()
 
     @InputDirectory
     final DirectoryProperty wavDir = newInputDirectory()
@@ -37,8 +42,8 @@ class ExtractMcep extends DefaultTask {
             new File(dir, 'sig2fv')
         }.find { it.exists() }
         assert sig2FvPath
-        project.fileTree(wavDir).include('*.wav').each { wavFile ->
-            def basename = wavFile.name - '.wav'
+        basenamesFile.get().asFile.eachLine('UTF-8') { basename ->
+            def wavFile = wavDir.file("${basename}.wav").get().asFile
             def pmFile = pmDir.file("${basename}.pm").get().asFile
             def destFile = destDir.file("${basename}.mcep").get().asFile
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->

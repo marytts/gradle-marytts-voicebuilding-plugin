@@ -20,6 +20,9 @@ class PraatExtractPitchmarks extends DefaultTask {
     final WorkerExecutor workerExecutor
 
     @InputFile
+    final RegularFileProperty basenamesFile = newInputFile()
+
+    @InputFile
     final RegularFileProperty scriptFile = newInputFile()
 
     @InputDirectory
@@ -39,8 +42,8 @@ class PraatExtractPitchmarks extends DefaultTask {
     @TaskAction
     void extract() {
         def cmd = [project.praat.binary, '--run', scriptFile.get().asFile]
-        project.fileTree(wavDir).include('*.wav').each { wavFile ->
-            def basename = wavFile.name - '.wav'
+        basenamesFile.get().asFile.eachLine('UTF-8') { basename ->
+            def wavFile = wavDir.file("${basename}.wav").get().asFile
             def pitchFile = pitchDir.file("${basename}.Pitch").get().asFile
             def destFile = destDir.file("${basename}.PointProcess").get().asFile
             workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
