@@ -80,6 +80,12 @@ task testTemplates {
 
 generateAllophones.dependsOn text
 
+wav {
+    doLast {
+        ant.copy file: "$buildDir/wav/time0001.wav", tofile: "$buildDir/wav/unused.wav"
+    }
+}
+
 task testWav {
     group 'Verification'
     dependsOn wav
@@ -88,11 +94,35 @@ task testWav {
     }
 }
 
+basenames {
+    textDir = text.destDir
+    labDir = lab.destDir
+    include 'time*', 'unused'
+    exclude '*0023'
+}
+
+task testBasenames(group: 'Verification') {
+    dependsOn basenames
+    doLast {
+        def basenamesFile = file("$buildDir/basenames.lst")
+        assert basenamesFile.exists()
+        def actual = basenamesFile.readLines() as Set
+        def expected = fileTree("$buildDir/wav").include('*.wav').exclude('time0023.wav', 'unused.wav').collect {
+            it.name - '.wav'
+        } as Set
+        assert actual == expected
+    }
+}
+
 task testPraatPitchExtractor {
     group 'Verification'
     dependsOn praatPitchExtractor
     doLast {
-        assert fileTree(buildDir).include('Pitch/*.Pitch').files
+        def actual = file("$buildDir/basenames.lst").readLines() as Set
+        def expected = fileTree("$buildDir/Pitch").include('*.Pitch').exclude('time0023.Pitch', 'unused.Pitch').collect {
+            it.name - '.Pitch'
+        } as Set
+        assert actual == expected
     }
 }
 
