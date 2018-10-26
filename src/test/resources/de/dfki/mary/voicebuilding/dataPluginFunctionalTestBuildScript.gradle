@@ -118,10 +118,8 @@ task testPraatPitchExtractor {
     group 'Verification'
     dependsOn praatPitchExtractor
     doLast {
-        def actual = file("$buildDir/basenames.lst").readLines() as Set
-        def expected = fileTree("$buildDir/Pitch").include('*.Pitch').exclude('time0023.Pitch', 'unused.Pitch').collect {
-            it.name - '.Pitch'
-        } as Set
+        def actual = fileTree("$buildDir/Pitch").include('*.Pitch').collect { it.name - '.Pitch' } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
         assert actual == expected
     }
 }
@@ -130,7 +128,11 @@ task testPraatPitchmarker {
     group 'Verification'
     dependsOn praatPitchmarker
     doLast {
-        assert fileTree(buildDir).include('PointProcess/*.PointProcess').files
+        def actual = fileTree("$buildDir/PointProcess").include('*.PointProcess').collect {
+            it.name - '.PointProcess'
+        } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }
 
@@ -138,7 +140,9 @@ task testPitchmarkConverter {
     group 'Verification'
     dependsOn pitchmarkConverter
     doLast {
-        assert fileTree(buildDir).include('pm/*.pm').files
+        def actual = fileTree("$buildDir/pm").include('*.pm').collect { it.name - '.pm' } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }
 
@@ -146,7 +150,9 @@ task testMcepExtractor {
     group 'Verification'
     dependsOn mcepExtractor
     doLast {
-        assert fileTree(buildDir).include('mcep/*.mcep').files
+        def actual = fileTree("$buildDir/mcep").include('*.mcep').collect { it.name - '.mcep' } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }
 
