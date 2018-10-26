@@ -68,6 +68,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         def pitchmarkConverterTask = project.task('pitchmarkConverter', type: PitchmarkConverter) {
+            basenamesFile = basenamesTask.destFile
             srcDir = praatPitchmarkerTask.destDir
             destDir = project.layout.buildDirectory.dir('pm')
         }
