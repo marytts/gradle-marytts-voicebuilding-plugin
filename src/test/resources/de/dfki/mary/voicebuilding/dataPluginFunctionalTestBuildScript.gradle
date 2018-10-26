@@ -168,7 +168,9 @@ task testGenerateAllophones {
     group 'Verification'
     dependsOn generateAllophones
     doLast {
-        assert fileTree(buildDir).include('prompt_allophones/*.xml').files
+        def actual = fileTree("$buildDir/prompt_allophones").include('*.xml').collect { it.name - '.xml' } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }
 
@@ -177,6 +179,9 @@ task testGeneratePhoneFeatures {
     dependsOn generatePhoneFeatures
     doLast {
         assert fileTree(buildDir).include('phonefeatures/*.pfeats').files
+        def actual = fileTree("$buildDir/phonefeatures").include('*.pfeats').collect { it.name - '.pfeats' } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }
 
@@ -184,6 +189,10 @@ task testGenerateHalfPhoneFeatures {
     group 'Verification'
     dependsOn generateHalfPhoneFeatures
     doLast {
-        assert fileTree(buildDir).include('halfphonefeatures/*.hpfeats').files
+        def actual = fileTree("$buildDir/halfphonefeatures").include('*.hpfeats').collect {
+            it.name - '.hpfeats'
+        } as Set
+        def expected = file("$buildDir/basenames.lst").readLines() as Set
+        assert actual == expected
     }
 }

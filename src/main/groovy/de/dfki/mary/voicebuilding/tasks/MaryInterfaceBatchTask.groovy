@@ -3,15 +3,20 @@ package de.dfki.mary.voicebuilding.tasks
 import groovy.json.JsonBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 
 class MaryInterfaceBatchTask extends DefaultTask {
+
+    @InputFile
+    final RegularFileProperty basenamesFile = newInputFile()
 
     @InputDirectory
     final DirectoryProperty srcDir = newInputDirectory()
@@ -41,7 +46,8 @@ class MaryInterfaceBatchTask extends DefaultTask {
     @TaskAction
     void process() {
         def batch = []
-        project.fileTree(srcDir).include("*.${inputExt.get()}").each { srcFile ->
+        basenamesFile.get().asFile.eachLine('UTF-8') { basename ->
+            def srcFile = srcDir.file("${basename}.${inputExt.get()}").get().asFile
             def destFile = destDir.file(srcFile.name.replace(inputExt.get(), outputExt.get())).get().asFile
             batch << [
                     locale          : "$project.marytts.voice.maryLocale",

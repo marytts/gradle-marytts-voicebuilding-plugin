@@ -109,5 +109,9 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             outputExt = 'hpfeats'
             maryttsProperties = ['mary.base': project.buildDir]
         }
+
+        project.tasks.withType(MaryInterfaceBatchTask) {
+            basenamesFile = basenamesTask.destFile
+        }
     }
 }
