@@ -325,6 +325,14 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             'default' legacyZipTask
         }
 
+        project.publishing {
+            publications {
+                mavenJava {
+                    artifact legacyZipTask
+                }
+            }
+        }
+
         project.afterEvaluate {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
