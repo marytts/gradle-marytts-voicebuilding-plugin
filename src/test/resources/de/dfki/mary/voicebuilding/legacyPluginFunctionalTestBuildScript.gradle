@@ -377,7 +377,7 @@ task testLegacyDescriptor(group: 'Verification') {
                 }
             }
         } as String
-        def actual = legacyDescriptor.destFile.text
+        def actual = legacyDescriptor.destFile.get().asFile.text
         XMLUnit.ignoreWhitespace = true
         assert XMLUnit.compareXML(expected, actual).similar()
     }

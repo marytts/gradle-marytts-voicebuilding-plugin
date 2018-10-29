@@ -312,13 +312,10 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.layout.fileProperty()
         }
 
-        project.task('legacyDescriptor', type: LegacyDescriptorTask) {
-            dependsOn project.legacyZip
+        def legacyDescriptorTask = project.task('legacyDescriptor', type: LegacyDescriptorTask) {
             project.assemble.dependsOn it
-            project.afterEvaluate {
-                srcFile = project.legacyZip.archivePath
-                destFile = project.file("$project.distsDir/${project.legacyZip.archiveName.replace('.zip', '-component-descriptor.xml')}")
-            }
+            srcFile = legacyZipTask.destFile
+            destFile = project.layout.fileProperty()
         }
 
         project.artifacts {
@@ -348,6 +345,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             // TODO: legacyZip.archiveName is modified (version is infixed), so we need to update
             def distsDir = project.layout.buildDirectory.dir(project.distsDirName)
             legacyZipTask.destFile.set(distsDir.get().file(legacyZipTask.archiveName))
+            legacyDescriptorTask.destFile.set(distsDir.get().file(legacyZipTask.archiveName.replace('.zip', '-component-descriptor.xml')))
         }
     }
 }
