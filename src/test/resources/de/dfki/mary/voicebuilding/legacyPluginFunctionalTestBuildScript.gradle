@@ -343,7 +343,7 @@ task testLegacyZip(group: 'Verification') {
     doLast {
         def zipFileName = "$project.name-$version-legacy.zip"
         def zipFile = file("$distsDir/$zipFileName")
-        assert legacyZip.archivePath == zipFile
+        assert legacyZip.destFile.get().asFile == zipFile
         def actual = new ZipFile(zipFile).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
         def expected = [
                 "lib/voices/$voiceName/halfphoneFeatures_ac.mry",

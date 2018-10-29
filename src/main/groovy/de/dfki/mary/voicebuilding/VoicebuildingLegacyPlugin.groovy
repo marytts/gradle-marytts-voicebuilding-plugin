@@ -304,12 +304,12 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             systemProperty 'mary.base', project.sourceSets.legacy.output.resourcesDir
         }
 
-        def legacyZipTask = project.task('legacyZip', type: Zip) {
+        def legacyZipTask = project.task('legacyZip', type: LegacyZip) {
             from project.processLegacyResources
             from project.jar, {
                 rename { "lib/$it" }
             }
-            classifier 'legacy'
+            destFile = project.layout.fileProperty()
         }
 
         project.task('legacyDescriptor', type: LegacyDescriptorTask) {
@@ -344,6 +344,10 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 }
                 testCompile "junit:junit:4.12"
             }
+
+            // TODO: legacyZip.archiveName is modified (version is infixed), so we need to update
+            def distsDir = project.layout.buildDirectory.dir(project.distsDirName)
+            legacyZipTask.destFile.set(distsDir.get().file(legacyZipTask.archiveName))
         }
     }
 }
