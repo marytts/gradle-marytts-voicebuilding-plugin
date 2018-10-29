@@ -304,7 +304,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             systemProperty 'mary.base', project.sourceSets.legacy.output.resourcesDir
         }
 
-        project.task('legacyZip', type: Zip) {
+        def legacyZipTask = project.task('legacyZip', type: Zip) {
             from project.processLegacyResources
             from project.jar, {
                 rename { "lib/$it" }
@@ -319,6 +319,10 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 srcFile = project.legacyZip.archivePath
                 destFile = project.file("$project.distsDir/${project.legacyZip.archiveName.replace('.zip', '-component-descriptor.xml')}")
             }
+        }
+
+        project.artifacts {
+            'default' legacyZipTask
         }
 
         project.afterEvaluate {

@@ -382,3 +382,11 @@ task testLegacyDescriptor(group: 'Verification') {
         assert XMLUnit.compareXML(expected, actual).similar()
     }
 }
+
+task testArtifacts(group: 'Verification') {
+    doLast {
+        def actual = configurations.getByName('default').allArtifacts.files.collect() as Set
+        def expected = [jar.archivePath, legacyZip.archivePath] as Set
+        assert actual == expected
+    }
+}

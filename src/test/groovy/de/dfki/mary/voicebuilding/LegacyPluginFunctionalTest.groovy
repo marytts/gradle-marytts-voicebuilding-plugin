@@ -74,7 +74,8 @@ class LegacyPluginFunctionalTest {
                 ['integrationTest', false],
                 ['jar', true],
                 ['legacyZip', true],
-                ['legacyDescriptor', true]
+                ['legacyDescriptor', true],
+                ['testArtifacts', false]
         ]
     }
 
