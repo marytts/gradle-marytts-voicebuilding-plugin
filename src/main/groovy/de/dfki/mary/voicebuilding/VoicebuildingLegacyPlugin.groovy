@@ -304,19 +304,29 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             systemProperty 'mary.base', project.sourceSets.legacy.output.resourcesDir
         }
 
-        project.task('legacyZip', type: Zip) {
+        def legacyZipTask = project.task('legacyZip', type: LegacyZip) {
             from project.processLegacyResources
             from project.jar, {
                 rename { "lib/$it" }
             }
+            destFile = project.layout.fileProperty()
         }
 
-        project.task('legacyDescriptor', type: LegacyDescriptorTask) {
-            dependsOn project.legacyZip
+        def legacyDescriptorTask = project.task('legacyDescriptor', type: LegacyDescriptorTask) {
             project.assemble.dependsOn it
-            project.afterEvaluate {
-                srcFile = project.legacyZip.archivePath
-                destFile = project.file("$project.distsDir/${project.legacyZip.archiveName.replace('.zip', '-component-descriptor.xml')}")
+            srcFile = legacyZipTask.destFile
+            destFile = project.layout.fileProperty()
+        }
+
+        project.artifacts {
+            'default' legacyZipTask
+        }
+
+        project.publishing {
+            publications {
+                mavenJava {
+                    artifact legacyZipTask
+                }
             }
         }
 
@@ -331,6 +341,11 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 }
                 testCompile "junit:junit:4.12"
             }
+
+            // TODO: legacyZip.archiveName is modified (version is infixed), so we need to update
+            def distsDir = project.layout.buildDirectory.dir(project.distsDirName)
+            legacyZipTask.destFile.set(distsDir.get().file(legacyZipTask.archiveName))
+            legacyDescriptorTask.destFile.set(distsDir.get().file(legacyZipTask.archiveName.replace('.zip', '-component-descriptor.xml')))
         }
     }
 }

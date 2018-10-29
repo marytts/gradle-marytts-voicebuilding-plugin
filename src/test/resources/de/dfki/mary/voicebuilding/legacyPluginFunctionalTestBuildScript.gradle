@@ -341,9 +341,10 @@ task testJar(group: 'Verification') {
 task testLegacyZip(group: 'Verification') {
     dependsOn legacyZip
     doLast {
-        def actual = new ZipFile(legacyZip.archivePath).entries().findAll { !it.isDirectory() }.collect {
-            it.name
-        } as Set
+        def zipFileName = "$project.name-$version-legacy.zip"
+        def zipFile = file("$distsDir/$zipFileName")
+        assert legacyZip.destFile.get().asFile == zipFile
+        def actual = new ZipFile(zipFile).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
         def expected = [
                 "lib/voices/$voiceName/halfphoneFeatures_ac.mry",
                 "lib/voices/$voiceName/halfphoneUnits.mry",
@@ -361,21 +362,31 @@ import org.custommonkey.xmlunit.XMLUnit
 task testLegacyDescriptor(group: 'Verification') {
     dependsOn legacyDescriptor
     doLast {
-        ant.checksum file: legacyZip.archivePath, algorithm: 'MD5', property: 'md5Hash'
+        def zipFileName = "$project.name-$version-legacy.zip"
+        def zipFile = file("$distsDir/$zipFileName")
+        ant.checksum file: zipFile, algorithm: 'MD5', property: 'md5Hash'
         def expected = new groovy.xml.StreamingMarkupBuilder().bind {
             'marytts-install'(xmlns: "http://mary.dfki.de/installer") {
                 voice(locale: voiceLocale, name: voiceName, gender: voiceGender, type: 'unit selection', version: version) {
                     delegate.description "A $voiceGender English unit selection voice"
                     license(href: voiceLicenseUrl)
-                    delegate.package(md5sum: ant.md5Hash, filename: legacyZip.archiveName, size: legacyZip.archivePath.size()) {
+                    delegate.package(md5sum: ant.md5Hash, filename: zipFile.name, size: zipFile.size()) {
                         location(folder: true, href: "http://mary.dfki.de/download/$maryVersion/")
                     }
                     depends(language: voiceLocale.toLanguageTag(), version: maryVersion)
                 }
             }
         } as String
-        def actual = legacyDescriptor.destFile.text
+        def actual = legacyDescriptor.destFile.get().asFile.text
         XMLUnit.ignoreWhitespace = true
         assert XMLUnit.compareXML(expected, actual).similar()
+    }
+}
+
+task testArtifacts(group: 'Verification') {
+    doLast {
+        def actual = configurations.getByName('default').allArtifacts.files.collect() as Set
+        def expected = [jar.archivePath, legacyZip.archivePath] as Set
+        assert actual == expected
     }
 }
