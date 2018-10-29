@@ -12,6 +12,7 @@ Gradle MaryTTS voicebuilding plugin
 
 - One-shot build via lazy configuration (no need to run `legacyInit` first)
 - Data processing controlled by `basenames.lst`, not file globs
+- Legacy artifacts built (and published) by default
 - Run functional tests in parallel
 - Build with Gradle v4.10.2
 - Drop support for Java 7
