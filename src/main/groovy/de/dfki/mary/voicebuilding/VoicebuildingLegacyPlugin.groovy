@@ -309,6 +309,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             from project.jar, {
                 rename { "lib/$it" }
             }
+            classifier 'legacy'
         }
 
         project.task('legacyDescriptor', type: LegacyDescriptorTask) {

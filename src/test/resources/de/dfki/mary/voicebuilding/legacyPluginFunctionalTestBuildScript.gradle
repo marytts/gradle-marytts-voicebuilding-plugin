@@ -341,7 +341,7 @@ task testJar(group: 'Verification') {
 task testLegacyZip(group: 'Verification') {
     dependsOn legacyZip
     doLast {
-        def zipFileName = "$project.name-${version}.zip"
+        def zipFileName = "$project.name-$version-legacy.zip"
         def zipFile = file("$distsDir/$zipFileName")
         assert legacyZip.archivePath == zipFile
         def actual = new ZipFile(zipFile).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
@@ -362,7 +362,7 @@ import org.custommonkey.xmlunit.XMLUnit
 task testLegacyDescriptor(group: 'Verification') {
     dependsOn legacyDescriptor
     doLast {
-        def zipFileName = "$project.name-${version}.zip"
+        def zipFileName = "$project.name-$version-legacy.zip"
         def zipFile = file("$distsDir/$zipFileName")
         ant.checksum file: zipFile, algorithm: 'MD5', property: 'md5Hash'
         def expected = new groovy.xml.StreamingMarkupBuilder().bind {
