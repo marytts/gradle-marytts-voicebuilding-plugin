@@ -30,7 +30,6 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         project.marytts.voice.extensions.create 'license', VoiceLicenseExtension, project
 
         project.repositories {
-            mavenCentral()
             jcenter()
         }
 
