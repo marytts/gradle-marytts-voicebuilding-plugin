@@ -20,6 +20,7 @@ Gradle MaryTTS voicebuilding plugin
 ### Fixed
 
 - Exclude utterances with missing text/lab files
+- Concurrent Praat unpacking errors on Mac OSX by upgrading wrapper plugin
 
 [v5.3.2] - 2018-01-26
 ---------------------
