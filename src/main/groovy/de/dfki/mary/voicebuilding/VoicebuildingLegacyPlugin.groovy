@@ -98,21 +98,55 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             }
         }
 
-        def legacyWaveTimelineMakerTask = project.task('legacyWaveTimelineMaker', type: LegacyVoiceImportTask) {
-            srcDir = project.layout.buildDirectory.dir('wav')
-            srcDir2 = project.tasks.getByName('pitchmarkConverter').destDir
-            destFile = project.legacyBuildDir.get().file('timeline_waveforms.mry')
+        project.task('makeBasenameDatagrams', type: MakeBasenameDatagrams) {
+            basenamesFile = project.basenames.destFile
+            sampleRate = project.marytts.voice.samplingRate
+            pmDir = project.tasks.getByName('pitchmarkConverter').destDir
+            destDir = project.layout.buildDirectory.dir('basenameDatagrams')
         }
 
-        project.task('legacyBasenameTimelineMaker', type: LegacyVoiceImportTask) {
-            srcDir = project.layout.buildDirectory.dir('wav')
-            srcDir2 = project.tasks.getByName('pitchmarkConverter').destDir
+        project.task('basenameTimelineMaker', type: TimelineMaker) {
+            basenamesFile = project.basenames.destFile
+            sampleRate = project.marytts.voice.samplingRate
+            idxIntervalInSeconds = 2.0
+            srcDir = project.makeBasenameDatagrams.destDir
             destFile = project.legacyBuildDir.get().file('timeline_basenames.mry')
         }
 
-        def legacyMCepTimelineMakerTask = project.task('legacyMCepTimelineMaker', type: LegacyVoiceImportTask) {
-            srcDir = project.layout.buildDirectory.dir('wav')
-            srcDir2 = project.tasks.getByName('mcepExtractor').destDir
+        project.task('makeWaveDatagrams', type: MakeWaveDatagrams) {
+            basenamesFile = project.basenames.destFile
+            sampleRate = project.marytts.voice.samplingRate
+            wavDir = project.wav.destDir
+            pmDir = project.tasks.getByName('pitchmarkConverter').destDir
+            destDir = project.layout.buildDirectory.dir('waveDatagrams')
+        }
+
+        project.task('waveTimelineMaker', type: TimelineMaker) {
+            basenamesFile = project.basenames.destFile
+            sampleRate = project.marytts.voice.samplingRate
+            idxIntervalInSeconds = 0.1
+            srcDir = project.makeWaveDatagrams.destDir
+            destFile = project.legacyBuildDir.get().file('timeline_waveforms.mry')
+        }
+
+        project.task('makeMcepDatagrams', type: MakeMcepDatagrams) {
+            basenamesFile = project.basenames.destFile
+            sampleRate = project.marytts.voice.samplingRate
+            mcepDir = project.mcepExtractor.destDir
+            destDir = project.layout.buildDirectory.dir('mcepDatagrams')
+        }
+
+        project.task('generateMcepTimelineHeader', type: GenerateMcepTimelineHeader) {
+            srcDir = project.mcepExtractor.destDir
+            destFile = project.legacyBuildDir.get().file('timeline_mcep.properties')
+        }
+
+        project.task('mcepTimelineMaker', type: McepTimelineMaker) {
+            basenamesFile = project.basenames.destFile
+            headerFile = project.generateMcepTimelineHeader.destFile
+            sampleRate = project.marytts.voice.samplingRate
+            idxIntervalInSeconds = 0.1
+            srcDir = project.makeMcepDatagrams.destDir
             destFile = project.legacyBuildDir.get().file('timeline_mcep.mry')
         }
 
@@ -170,7 +204,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         def legacyF0PolynomialFeatureFileWriterTask = project.task('legacyF0PolynomialFeatureFileWriter', type: LegacyVoiceImportTask) {
             srcFile = legacyHalfPhoneUnitfileWriterTask.destFile
-            srcFile2 = legacyWaveTimelineMakerTask.destFile
+            srcFile2 = project.waveTimelineMaker.destFile
             srcFile3 = legacyHalfPhoneFeatureFileWriterTask.destFile
             destFile = project.legacyBuildDir.get().file('syllableF0Polynomials.mry')
         }
@@ -184,7 +218,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyJoinCostFileMaker', type: LegacyVoiceImportTask) {
-            srcFile = legacyMCepTimelineMakerTask.destFile
+            srcFile = project.mcepTimelineMaker.destFile
             srcFile2 = legacyHalfPhoneUnitfileWriterTask.destFile
             srcFile3 = legacyAcousticFeatureFileWriterTask.destFile
             destFile = project.legacyBuildDir.get().file('joinCostFeatures.mry')
@@ -217,7 +251,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         project.task('extractF0Features', type: ExtractF0Features) {
             unitFile = legacyPhoneUnitfileWriterTask.destFile
             featureFile = legacyPhoneFeatureFileWriterTask.destFile
-            timelineFile = legacyWaveTimelineMakerTask.destFile
+            timelineFile = project.waveTimelineMaker.destFile
             destFile = project.layout.buildDirectory.dir('prosody').get().file('f0.feats')
         }
 
@@ -346,8 +380,8 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.processLegacyResources {
-            from project.legacyWaveTimelineMaker
-            from project.legacyBasenameTimelineMaker
+            from project.waveTimelineMaker
+            from project.basenameTimelineMaker
             from project.legacyHalfPhoneUnitfileWriter
             from project.legacyAcousticFeatureFileWriter, {
                 include 'halfphoneFeatures_ac.mry'

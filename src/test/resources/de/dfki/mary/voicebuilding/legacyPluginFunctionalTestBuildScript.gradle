@@ -127,22 +127,50 @@ task testHalfPhoneUnitFeatureComputer(group: 'Verification') {
     }
 }
 
-task testLegacyWaveTimelineMaker(group: 'Verification') {
-    dependsOn legacyWaveTimelineMaker
+task testMakeBasenameDatagrams(group: 'Verification') {
+    dependsOn makeBasenameDatagrams
     doLast {
-        assert file("$buildDir/mary/timeline_waveforms.mry").exists()
+        assert fileTree(buildDir).include('basenameDatagrams/*.json').files
     }
 }
 
-task testLegacyBasenameTimelineMaker(group: 'Verification') {
-    dependsOn legacyBasenameTimelineMaker
+task testBasenameTimelineMaker(group: 'Verification') {
+    dependsOn basenameTimelineMaker
     doLast {
         assert file("$buildDir/mary/timeline_basenames.mry").exists()
     }
 }
 
-task testLegacyMCepTimelineMaker(group: 'Verification') {
-    dependsOn legacyMCepTimelineMaker
+task testMakeWaveDatagrams(group: 'Verification') {
+    dependsOn makeWaveDatagrams
+    doLast {
+        assert fileTree(buildDir).include('waveDatagrams/*.json').files
+    }
+}
+
+task testWaveTimelineMaker(group: 'Verification') {
+    dependsOn waveTimelineMaker
+    doLast {
+        assert file("$buildDir/mary/timeline_waveforms.mry").exists()
+    }
+}
+
+task testMakeMcepDatagrams(group: 'Verification') {
+    dependsOn makeMcepDatagrams
+    doLast {
+        assert fileTree(buildDir).include('mcepDatagrams/*.json').files
+    }
+}
+
+task testGenerateMcepTimelineHeader(group: 'Verification') {
+    dependsOn generateMcepTimelineHeader
+    doLast {
+        assert file("$buildDir/mary/timeline_mcep.properties").exists()
+    }
+}
+
+task testMcepTimelineMaker(group: 'Verification') {
+    dependsOn mcepTimelineMaker
     doLast {
         assert file("$buildDir/mary/timeline_mcep.mry").exists()
     }

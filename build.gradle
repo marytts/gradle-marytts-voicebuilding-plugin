@@ -63,8 +63,10 @@ repositories {
 
 dependencies {
     compile localGroovy()
-    compile group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion, {
+    compile group: 'de.dfki.mary', name: 'marytts-builder', version: maryttsVersion, {
         exclude group: '*', module: 'groovy-all'
+        exclude group: '*', module: 'mwdumper'
+        exclude group: '*', module: 'sgt'
     }
     compile group: 'org.m2ci.msp', name: 'gradle-praat-wrapper-plugin', version: '0.5.2'
     testCompile group: 'org.testng', name: 'testng', version: '6.14.3'
