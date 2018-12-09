@@ -196,20 +196,84 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('cart.mry')
         }
 
-        project.task('legacyDurationCARTTrainer', type: LegacyVoiceImportTask) {
+        project.task('generateDurationFeatureDescription', type: GenerateProsodyFeatureDescription) {
             srcFile = legacyPhoneFeatureFileWriterTask.destFile
-            srcFile2 = legacyPhoneUnitfileWriterTask.destFile
-            srcFile3 = legacyWaveTimelineMakerTask.destFile
+            targetFeatures = ['segment_duration']
+            destFile = project.layout.buildDirectory.dir('prosody').get().file('dur.desc')
+        }
+
+        project.task('generateF0FeatureDescription', type: GenerateProsodyFeatureDescription) {
+            srcFile = legacyPhoneFeatureFileWriterTask.destFile
+            targetFeatures = ['leftF0', 'midF0', 'rightF0']
+            destFile = project.layout.buildDirectory.dir('prosody').get().file('f0.desc')
+        }
+
+        project.task('extractDurationFeatures', type: ExtractDurationFeatures) {
+            unitFile = legacyPhoneUnitfileWriterTask.destFile
+            featureFile = legacyPhoneFeatureFileWriterTask.destFile
+            destFile = project.layout.buildDirectory.dir('prosody').get().file('dur.feats')
+        }
+
+        project.task('extractF0Features', type: ExtractF0Features) {
+            unitFile = legacyPhoneUnitfileWriterTask.destFile
+            featureFile = legacyPhoneFeatureFileWriterTask.destFile
+            timelineFile = legacyWaveTimelineMakerTask.destFile
+            destFile = project.layout.buildDirectory.dir('prosody').get().file('f0.feats')
+        }
+
+        project.task('trainDurationCart', type: TrainProsodyCart) {
+            dataFile = project.extractDurationFeatures.destFile
+            descriptionFile = project.generateDurationFeatureDescription.destFile
+            predictee = 'segment_duration'
+            destFile = project.layout.buildDirectory.dir('prosody').get().file('dur.tree')
+        }
+
+        project.task('trainF0LeftCart', type: TrainProsodyCart) {
+            dataFile = project.extractF0Features.destFile
+            descriptionFile = project.generateF0FeatureDescription.destFile
+            predictee = 'leftF0'
+            ignoreFields = ['midF0', 'rightF0']
+            destFile = project.layout.buildDirectory.dir('prosody').get().file('f0.left.tree')
+        }
+
+        project.task('trainF0MidCart', type: TrainProsodyCart) {
+            dataFile = project.extractF0Features.destFile
+            descriptionFile = project.generateF0FeatureDescription.destFile
+            predictee = 'midF0'
+            ignoreFields = ['leftF0', 'rightF0']
+            destFile = project.layout.buildDirectory.dir('prosody').get().file('f0.mid.tree')
+        }
+
+        project.task('trainF0RightCart', type: TrainProsodyCart) {
+            dataFile = project.extractF0Features.destFile
+            descriptionFile = project.generateF0FeatureDescription.destFile
+            predictee = 'rightF0'
+            ignoreFields = ['leftF0', 'midF0']
+            destFile = project.layout.buildDirectory.dir('prosody').get().file('f0.right.tree')
+        }
+
+        project.task('convertDurationCart', type: ConvertProsodyCart) {
+            srcFile = project.trainDurationCart.destFile
+            featureFile = legacyPhoneFeatureFileWriterTask.destFile
             destFile = project.legacyBuildDir.get().file('dur.tree')
         }
 
-        project.task('legacyF0CARTTrainer', type: LegacyVoiceImportTask) {
-            srcFile = legacyPhoneFeatureFileWriterTask.destFile
-            srcFile2 = legacyPhoneUnitfileWriterTask.destFile
-            srcFile3 = legacyWaveTimelineMakerTask.destFile
+        project.task('convertF0LeftCart', type: ConvertProsodyCart) {
+            srcFile = project.trainF0LeftCart.destFile
+            featureFile = legacyPhoneFeatureFileWriterTask.destFile
             destFile = project.legacyBuildDir.get().file('f0.left.tree')
-            destFile2 = project.legacyBuildDir.get().file('f0.mid.tree')
-            destFile3 = project.legacyBuildDir.get().file('f0.right.tree')
+        }
+
+        project.task('convertF0MidCart', type: ConvertProsodyCart) {
+            srcFile = project.trainF0MidCart.destFile
+            featureFile = legacyPhoneFeatureFileWriterTask.destFile
+            destFile = project.legacyBuildDir.get().file('f0.mid.tree')
+        }
+
+        project.task('convertF0RightCart', type: ConvertProsodyCart) {
+            srcFile = project.trainF0RightCart.destFile
+            featureFile = legacyPhoneFeatureFileWriterTask.destFile
+            destFile = project.legacyBuildDir.get().file('f0.right.tree')
         }
 
         project.tasks.withType(LegacyVoiceImportTask) {
@@ -272,8 +336,10 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 include 'joinCostWeights.txt'
             }
             from project.legacyCARTBuilder
-            from project.legacyDurationCARTTrainer
-            from project.legacyF0CARTTrainer
+            from project.convertDurationCart
+            from project.convertF0LeftCart
+            from project.convertF0MidCart
+            from project.convertF0RightCart
             project.afterEvaluate {
                 rename { "marytts/voice/$project.marytts.voice.nameCamelCase/$it" }
             }

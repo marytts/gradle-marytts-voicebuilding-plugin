@@ -208,18 +208,86 @@ task testLegacyCARTBuilder(group: 'Verification') {
     }
 }
 
-task testLegacyDurationCARTTrainer(group: 'Verification') {
-    dependsOn legacyDurationCARTTrainer
+task testGenerateDurationFeatureDescription(group: 'Verification') {
+    dependsOn generateDurationFeatureDescription
+    doLast {
+        assert file("$buildDir/prosody/dur.desc").exists()
+    }
+}
+
+task testGenerateF0FeatureDescription(group: 'Verification') {
+    dependsOn generateF0FeatureDescription
+    doLast {
+        assert file("$buildDir/prosody/f0.desc").exists()
+    }
+}
+
+task testExtractDurationFeatures(group: 'Verification') {
+    dependsOn extractDurationFeatures
+    doLast {
+        assert file("$buildDir/prosody/dur.feats").exists()
+    }
+}
+
+task testExtractF0Features(group: 'Verification') {
+    dependsOn extractF0Features
+    doLast {
+        assert file("$buildDir/prosody/f0.feats").exists()
+    }
+}
+
+task testTrainDurationCart(group: 'Verification') {
+    dependsOn trainDurationCart
+    doLast {
+        assert file("$buildDir/prosody/dur.tree").exists()
+    }
+}
+
+task testTrainF0LeftCart(group: 'Verification') {
+    dependsOn trainF0LeftCart
+    doLast {
+        assert file("$buildDir/prosody/f0.left.tree").exists()
+    }
+}
+
+task testTrainF0MidCart(group: 'Verification') {
+    dependsOn trainF0MidCart
+    doLast {
+        assert file("$buildDir/prosody/f0.mid.tree").exists()
+    }
+}
+
+task testTrainF0RightCart(group: 'Verification') {
+    dependsOn trainF0RightCart
+    doLast {
+        assert file("$buildDir/prosody/f0.right.tree").exists()
+    }
+}
+
+task testConvertDurationCart(group: 'Verification') {
+    dependsOn convertDurationCart
     doLast {
         assert file("$buildDir/mary/dur.tree").exists()
     }
 }
 
-task testLegacyF0CARTTrainer(group: 'Verification') {
-    dependsOn legacyF0CARTTrainer
+task testConvertF0LeftCart(group: 'Verification') {
+    dependsOn convertF0LeftCart
     doLast {
         assert file("$buildDir/mary/f0.left.tree").exists()
+    }
+}
+
+task testConvertF0MidCart(group: 'Verification') {
+    dependsOn convertF0MidCart
+    doLast {
         assert file("$buildDir/mary/f0.mid.tree").exists()
+    }
+}
+
+task testConvertF0RightCart(group: 'Verification') {
+    dependsOn convertF0RightCart
+    doLast {
         assert file("$buildDir/mary/f0.right.tree").exists()
     }
 }
