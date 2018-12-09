@@ -85,24 +85,38 @@ task testLegacyInit(group: 'Verification') {
     }
 }
 
-task testLegacyPhoneUnitLabelComputer(group: 'Verification') {
-    dependsOn legacyPhoneUnitLabelComputer
+task testProcessPhoneLabels(group: 'Verification') {
+    dependsOn processPhoneLabels
     doLast {
-        assert fileTree(buildDir).include('phonelab/*.lab').files
+        assert fileTree(buildDir).include('lab_processed/*.lab').files
     }
 }
 
-task testLegacyHalfPhoneUnitLabelComputer(group: 'Verification') {
-    dependsOn legacyHalfPhoneUnitLabelComputer
+task testAlignLabelsWithPrompts(group: 'Verification') {
+    dependsOn alignLabelsWithPrompts
     doLast {
-        assert fileTree(buildDir).include('halfphonelab/*.hplab').files
+        assert fileTree(buildDir).include('allophones_new/*.xml').files
     }
 }
 
-task testLegacyTranscriptionAligner(group: 'Verification') {
-    dependsOn legacyTranscriptionAligner
+task testSplitPhoneLabelsIntoHalfPhones(group: 'Verification') {
+    dependsOn splitPhoneLabelsIntoHalfPhones
     doLast {
-        assert fileTree(buildDir).include('allophones/*.xml').files
+        assert fileTree(buildDir).include('halfphonelab_aligned_new/*.hplab').files
+    }
+}
+
+task testPhoneUnitFileMaker(group: 'Verification') {
+    dependsOn phoneUnitFileMaker
+    doLast {
+        assert file("$buildDir/mary/phoneUnits.mry").exists()
+    }
+}
+
+task testHalfPhoneUnitFileMaker(group: 'Verification') {
+    dependsOn halfPhoneUnitFileMaker
+    doLast {
+        assert file("$buildDir/mary/halfphoneUnits.mry").exists()
     }
 }
 
@@ -173,20 +187,6 @@ task testMcepTimelineMaker(group: 'Verification') {
     dependsOn mcepTimelineMaker
     doLast {
         assert file("$buildDir/mary/timeline_mcep.mry").exists()
-    }
-}
-
-task testLegacyPhoneUnitfileWriter(group: 'Verification') {
-    dependsOn legacyPhoneUnitfileWriter
-    doLast {
-        assert file("$buildDir/mary/phoneUnits.mry").exists()
-    }
-}
-
-task testLegacyHalfPhoneUnitfileWriter(group: 'Verification') {
-    dependsOn legacyHalfPhoneUnitfileWriter
-    doLast {
-        assert file("$buildDir/mary/halfphoneUnits.mry").exists()
     }
 }
 

@@ -36,32 +36,41 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         def basenamesTask = project.tasks.getByName('basenames')
 
-        def legacyPhoneUnitLabelComputerTask = project.task('legacyPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
+        project.task('processPhoneLabels', type: ProcessPhoneLabels) {
+            basenamesFile = project.basenames.destFile
             srcDir = project.layout.buildDirectory.dir('lab')
-            destDir = project.layout.buildDirectory.dir('phonelab_unaligned')
-            doLast {
-                project.copy {
-                    from "$project.buildDir/phonelab"
-                    into destDir
-                }
-            }
+            destDir = project.layout.buildDirectory.dir('lab_processed')
         }
 
-        def legacyHalfPhoneUnitLabelComputerTask = project.task('legacyHalfPhoneUnitLabelComputer', type: LegacyVoiceImportTask) {
-            srcDir = project.layout.buildDirectory.dir('lab')
-            destDir = project.layout.buildDirectory.dir('halfphonelab_unaligned')
-            doLast {
-                project.copy {
-                    from "$project.buildDir/halfphonelab"
-                    into destDir
-                }
-            }
+        project.task('alignLabelsWithPrompts', type: AlignLabelsWithPrompts) {
+            basenamesFile = project.basenames.destFile
+            labDir = project.layout.buildDirectory.dir('lab')
+            maryXmlDir = project.tasks.getByName('generateAllophones').destDir
+            destDir = project.layout.buildDirectory.dir('allophones_new')
         }
 
-        def legacyTranscriptionAlignerTask = project.task('legacyTranscriptionAligner', type: LegacyVoiceImportTask) {
-            srcDir = project.layout.buildDirectory.dir('lab')
-            srcDir2 = project.tasks.getByName('generateAllophones').destDir
-            destDir = project.layout.buildDirectory.dir('allophones')
+        project.task('splitPhoneLabelsIntoHalfPhones', type: SplitPhoneLabelsIntoHalfPhones) {
+            basenamesFile = project.basenames.destFile
+            srcDir = project.processPhoneLabels.destDir
+            destDir = project.layout.buildDirectory.dir('halfphonelab_aligned_new')
+        }
+
+        project.task('phoneUnitFileMaker', type: PhoneUnitFileMaker) {
+            basenamesFile = project.basenames.destFile
+            srcDir = project.processPhoneLabels.destDir
+            srcExt = 'lab'
+            pmDir = project.tasks.getByName('pitchmarkConverter').destDir
+            sampleRate = project.marytts.voice.samplingRate
+            destFile = project.legacyBuildDir.get().file('phoneUnits.mry')
+        }
+
+        project.task('halfPhoneUnitFileMaker', type: PhoneUnitFileMaker) {
+            basenamesFile = project.basenames.destFile
+            srcDir = project.splitPhoneLabelsIntoHalfPhones.destDir
+            srcExt = 'hplab'
+            pmDir = project.tasks.getByName('pitchmarkConverter').destDir
+            sampleRate = project.marytts.voice.samplingRate
+            destFile = project.legacyBuildDir.get().file('halfphoneUnits.mry')
         }
 
         project.task('featureLister', type: FeatureListerTask) {
@@ -70,7 +79,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         def phoneUnitFeatureComputerTask = project.task('phoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
             dependsOn project.featureLister
-            srcDir = legacyTranscriptionAlignerTask.destDir
+            srcDir = project.alignLabelsWithPrompts.destDir
             destDir = project.layout.buildDirectory.dir('phonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
@@ -85,7 +94,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         def halfPhoneUnitFeatureComputerTask = project.task('halfPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
             dependsOn project.featureLister
-            srcDir = legacyTranscriptionAlignerTask.destDir
+            srcDir = project.alignLabelsWithPrompts.destDir
             destDir = project.layout.buildDirectory.dir('halfphonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
@@ -150,67 +159,29 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('timeline_mcep.mry')
         }
 
-        def legacyPhoneLabelFeatureAlignerTask = project.task('legacyPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
-            srcDir = legacyPhoneUnitLabelComputerTask.destDir
-            srcDir2 = phoneUnitFeatureComputerTask.destDir
-            destDir = project.layout.buildDirectory.dir('phonelab_aligned')
-            doLast {
-                project.copy {
-                    from "$project.buildDir/phonelab"
-                    into destDir
-                }
-            }
-        }
-
-        def legacyHalfPhoneLabelFeatureAlignerTask = project.task('legacyHalfPhoneLabelFeatureAligner', type: LegacyVoiceImportTask) {
-            srcDir = legacyHalfPhoneUnitLabelComputerTask.destDir
-            srcDir2 = halfPhoneUnitFeatureComputerTask.destDir
-            destDir = project.layout.buildDirectory.dir('halfphonelab_aligned')
-            doLast {
-                project.copy {
-                    from "$project.buildDir/halfphonelab"
-                    into destDir
-                }
-            }
-        }
-
-        def legacyPhoneUnitfileWriterTask = project.task('legacyPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
-            srcDir = project.tasks.getByName('pitchmarkConverter').destDir
-            srcDir2 = legacyPhoneUnitLabelComputerTask.destDir
-            srcDir3 = legacyPhoneLabelFeatureAlignerTask.destDir
-            destFile = project.legacyBuildDir.get().file('phoneUnits.mry')
-        }
-
-        def legacyHalfPhoneUnitfileWriterTask = project.task('legacyHalfPhoneUnitfileWriter', type: LegacyVoiceImportTask) {
-            srcDir = project.tasks.getByName('pitchmarkConverter').destDir
-            srcDir2 = legacyHalfPhoneUnitLabelComputerTask.destDir
-            srcDir3 = legacyHalfPhoneLabelFeatureAlignerTask.destDir
-            destFile = project.legacyBuildDir.get().file('halfphoneUnits.mry')
-        }
-
         def legacyPhoneFeatureFileWriterTask = project.task('legacyPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            srcFile = legacyPhoneUnitfileWriterTask.destFile
+            srcFile = project.phoneUnitFileMaker.destFile
             srcDir = phoneUnitFeatureComputerTask.destDir
             destFile = project.legacyBuildDir.get().file('phoneFeatures.mry')
             destFile2 = project.legacyBuildDir.get().file('phoneUnitFeatureDefinition.txt')
         }
 
         def legacyHalfPhoneFeatureFileWriterTask = project.task('legacyHalfPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            srcFile = legacyHalfPhoneUnitfileWriterTask.destFile
+            srcFile = project.halfPhoneUnitFileMaker.destFile
             srcDir = halfPhoneUnitFeatureComputerTask.destDir
             destFile = project.legacyBuildDir.get().file('halfphoneFeatures.mry')
             destFile2 = project.legacyBuildDir.get().file('halfphoneUnitFeatureDefinition.txt')
         }
 
         def legacyF0PolynomialFeatureFileWriterTask = project.task('legacyF0PolynomialFeatureFileWriter', type: LegacyVoiceImportTask) {
-            srcFile = legacyHalfPhoneUnitfileWriterTask.destFile
+            srcFile = project.halfPhoneUnitFileMaker.destFile
             srcFile2 = project.waveTimelineMaker.destFile
             srcFile3 = legacyHalfPhoneFeatureFileWriterTask.destFile
             destFile = project.legacyBuildDir.get().file('syllableF0Polynomials.mry')
         }
 
         def legacyAcousticFeatureFileWriterTask = project.task('legacyAcousticFeatureFileWriter', type: LegacyVoiceImportTask) {
-            srcFile = legacyHalfPhoneUnitfileWriterTask.destFile
+            srcFile = project.halfPhoneUnitFileMaker.destFile
             srcFile2 = legacyF0PolynomialFeatureFileWriterTask.destFile
             srcFile3 = legacyHalfPhoneFeatureFileWriterTask.destFile
             destFile = project.legacyBuildDir.get().file('halfphoneFeatures_ac.mry')
@@ -219,7 +190,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.task('legacyJoinCostFileMaker', type: LegacyVoiceImportTask) {
             srcFile = project.mcepTimelineMaker.destFile
-            srcFile2 = legacyHalfPhoneUnitfileWriterTask.destFile
+            srcFile2 = project.halfPhoneUnitFileMaker.destFile
             srcFile3 = legacyAcousticFeatureFileWriterTask.destFile
             destFile = project.legacyBuildDir.get().file('joinCostFeatures.mry')
             destFile2 = project.legacyBuildDir.get().file('joinCostWeights.txt')
@@ -243,13 +214,13 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('extractDurationFeatures', type: ExtractDurationFeatures) {
-            unitFile = legacyPhoneUnitfileWriterTask.destFile
+            unitFile = project.phoneUnitFileMaker.destFile
             featureFile = legacyPhoneFeatureFileWriterTask.destFile
             destFile = project.layout.buildDirectory.dir('prosody').get().file('dur.feats')
         }
 
         project.task('extractF0Features', type: ExtractF0Features) {
-            unitFile = legacyPhoneUnitfileWriterTask.destFile
+            unitFile = project.phoneUnitFileMaker.destFile
             featureFile = legacyPhoneFeatureFileWriterTask.destFile
             timelineFile = project.waveTimelineMaker.destFile
             destFile = project.layout.buildDirectory.dir('prosody').get().file('f0.feats')
@@ -382,7 +353,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         project.processLegacyResources {
             from project.waveTimelineMaker
             from project.basenameTimelineMaker
-            from project.legacyHalfPhoneUnitfileWriter
+            from project.halfPhoneUnitFileMaker
             from project.legacyAcousticFeatureFileWriter, {
                 include 'halfphoneFeatures_ac.mry'
             }
