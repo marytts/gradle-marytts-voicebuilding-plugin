@@ -10,6 +10,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
+@Deprecated
 class LegacyVoiceImportTask extends DefaultTask {
 
     @InputFile
