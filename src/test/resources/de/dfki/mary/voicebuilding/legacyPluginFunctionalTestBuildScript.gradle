@@ -218,18 +218,24 @@ task testHalfPhoneFeatureFileMaker(group: 'Verification') {
     }
 }
 
-task testLegacyF0PolynomialFeatureFileWriter(group: 'Verification') {
-    dependsOn legacyF0PolynomialFeatureFileWriter
+task testF0ContourFeatureFileMaker(group: 'Verification') {
+    dependsOn f0ContourFeatureFileMaker
     doLast {
         assert file("$buildDir/mary/syllableF0Polynomials.mry").exists()
     }
 }
 
-task testLegacyAcousticFeatureFileWriter(group: 'Verification') {
-    dependsOn legacyAcousticFeatureFileWriter
+task testGenerateAcousticFeatureDefinitionFile(group: 'Verification') {
+    dependsOn generateAcousticFeatureDefinitionFile
+    doLast {
+        assert file("$buildDir/mary/halfphoneUnitFeatureDefinition_ac.txt").exists()
+    }
+}
+
+task testAcousticFeatureFileMaker(group: 'Verification') {
+    dependsOn acousticFeatureFileMaker
     doLast {
         assert file("$buildDir/mary/halfphoneFeatures_ac.mry").exists()
-        assert file("$buildDir/mary/halfphoneUnitFeatureDefinition_ac.txt").exists()
     }
 }
 

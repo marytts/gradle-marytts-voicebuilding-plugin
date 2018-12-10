@@ -189,31 +189,37 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('halfphoneFeatures.mry')
         }
 
-        def legacyF0PolynomialFeatureFileWriterTask = project.task('legacyF0PolynomialFeatureFileWriter', type: LegacyVoiceImportTask) {
-            srcFile = project.halfPhoneUnitFileMaker.destFile
-            srcFile2 = project.waveTimelineMaker.destFile
-            srcFile3 = project.halfPhoneFeatureFileMaker.destFile
+        project.task('f0ContourFeatureFileMaker', type: F0ContourFeatureFileMaker) {
+            featureFile = project.halfPhoneFeatureFileMaker.destFile
+            timelineFile = project.waveTimelineMaker.destFile
+            unitFile = project.halfPhoneUnitFileMaker.destFile
+            gender = project.marytts.voice.gender
             destFile = project.legacyBuildDir.get().file('syllableF0Polynomials.mry')
         }
 
-        def legacyAcousticFeatureFileWriterTask = project.task('legacyAcousticFeatureFileWriter', type: LegacyVoiceImportTask) {
-            srcFile = project.halfPhoneUnitFileMaker.destFile
-            srcFile2 = legacyF0PolynomialFeatureFileWriterTask.destFile
-            srcFile3 = project.halfPhoneFeatureFileMaker.destFile
+        project.task('generateAcousticFeatureDefinitionFile', type: GenerateAcousticFeatureDefinitionFile) {
+            srcFile = project.halfPhoneFeatureFileMaker.destFile
+            destFile = project.legacyBuildDir.get().file('halfphoneUnitFeatureDefinition_ac.txt')
+        }
+
+        project.task('acousticFeatureFileMaker', type: AcousticFeatureFileMaker) {
+            featureDefinitionFile = project.generateAcousticFeatureDefinitionFile.destFile
+            unitFile = project.halfPhoneUnitFileMaker.destFile
+            contourFile = project.f0ContourFeatureFileMaker.destFile
+            featureFile = project.halfPhoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('halfphoneFeatures_ac.mry')
-            destFile2 = project.legacyBuildDir.get().file('halfphoneUnitFeatureDefinition_ac.txt')
         }
 
         project.task('legacyJoinCostFileMaker', type: LegacyVoiceImportTask) {
             srcFile = project.mcepTimelineMaker.destFile
             srcFile2 = project.halfPhoneUnitFileMaker.destFile
-            srcFile3 = legacyAcousticFeatureFileWriterTask.destFile
+            srcFile3 = project.acousticFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('joinCostFeatures.mry')
             destFile2 = project.legacyBuildDir.get().file('joinCostWeights.txt')
         }
 
         project.task('legacyCARTBuilder', type: LegacyVoiceImportTask) {
-            srcFile = legacyAcousticFeatureFileWriterTask.destFile
+            srcFile = project.acousticFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('cart.mry')
         }
 
@@ -350,9 +356,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.processResources {
-            from project.legacyAcousticFeatureFileWriter, {
-                include 'halfphoneUnitFeatureDefinition_ac.txt'
-            }
+            from project.generateAcousticFeatureDefinitionFile
             from project.legacyJoinCostFileMaker, {
                 include 'joinCostWeights.txt'
             }
@@ -370,9 +374,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             from project.waveTimelineMaker
             from project.basenameTimelineMaker
             from project.halfPhoneUnitFileMaker
-            from project.legacyAcousticFeatureFileWriter, {
-                include 'halfphoneFeatures_ac.mry'
-            }
+            from project.acousticFeatureFileMaker
             from project.legacyJoinCostFileMaker, {
                 include 'joinCostFeatures.mry'
             }
