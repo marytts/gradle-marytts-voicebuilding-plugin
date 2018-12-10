@@ -134,10 +134,24 @@ task testPhoneUnitFeatureComputer(group: 'Verification') {
     }
 }
 
+task testGeneratePhoneFeatureDefinitionFile(group: 'Verification') {
+    dependsOn generatePhoneFeatureDefinitionFile
+    doLast {
+        assert file("$buildDir/mary/phoneUnitFeatureDefinition.txt").exists()
+    }
+}
+
 task testHalfPhoneUnitFeatureComputer(group: 'Verification') {
     dependsOn halfPhoneUnitFeatureComputer
     doLast {
         assert fileTree(buildDir).include('halfphonefeatures/*.hpfeats').files
+    }
+}
+
+task testGenerateHalfPhoneFeatureDefinitionFile(group: 'Verification') {
+    dependsOn generateHalfPhoneFeatureDefinitionFile
+    doLast {
+        assert file("$buildDir/mary/halfphoneUnitFeatureDefinition.txt").exists()
     }
 }
 
@@ -190,19 +204,17 @@ task testMcepTimelineMaker(group: 'Verification') {
     }
 }
 
-task testLegacyPhoneFeatureFileWriter(group: 'Verification') {
-    dependsOn legacyPhoneFeatureFileWriter
+task testPhoneFeatureFileMaker(group: 'Verification') {
+    dependsOn phoneFeatureFileMaker
     doLast {
         assert file("$buildDir/mary/phoneFeatures.mry").exists()
-        assert file("$buildDir/mary/phoneUnitFeatureDefinition.txt").exists()
     }
 }
 
-task testLegacyHalfPhoneFeatureFileWriter(group: 'Verification') {
-    dependsOn legacyHalfPhoneFeatureFileWriter
+task testHalfPhoneFeatureFileMaker(group: 'Verification') {
+    dependsOn halfPhoneFeatureFileMaker
     doLast {
         assert file("$buildDir/mary/halfphoneFeatures.mry").exists()
-        assert file("$buildDir/mary/halfphoneUnitFeatureDefinition.txt").exists()
     }
 }
 

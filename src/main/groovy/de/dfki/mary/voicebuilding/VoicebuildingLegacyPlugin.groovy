@@ -77,7 +77,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('features.txt')
         }
 
-        def phoneUnitFeatureComputerTask = project.task('phoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
+        project.task('phoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
             dependsOn project.featureLister
             srcDir = project.alignLabelsWithPrompts.destDir
             destDir = project.layout.buildDirectory.dir('phonefeatures')
@@ -92,7 +92,13 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             }
         }
 
-        def halfPhoneUnitFeatureComputerTask = project.task('halfPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
+        project.task('generatePhoneFeatureDefinitionFile', type: GeneratePhoneFeatureDefinitionFile) {
+            srcDir = project.phoneUnitFeatureComputer.destDir
+            srcExt = project.phoneUnitFeatureComputer.outputExt
+            destFile = project.legacyBuildDir.get().file('phoneUnitFeatureDefinition.txt')
+        }
+
+        project.task('halfPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
             dependsOn project.featureLister
             srcDir = project.alignLabelsWithPrompts.destDir
             destDir = project.layout.buildDirectory.dir('halfphonefeatures')
@@ -105,6 +111,12 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                     it != 'halfphone_unitname'
                 }
             }
+        }
+
+        project.task('generateHalfPhoneFeatureDefinitionFile', type: GeneratePhoneFeatureDefinitionFile) {
+            srcDir = project.halfPhoneUnitFeatureComputer.destDir
+            srcExt = project.halfPhoneUnitFeatureComputer.outputExt
+            destFile = project.legacyBuildDir.get().file('halfphoneUnitFeatureDefinition.txt')
         }
 
         project.task('makeBasenameDatagrams', type: MakeBasenameDatagrams) {
@@ -159,31 +171,35 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('timeline_mcep.mry')
         }
 
-        def legacyPhoneFeatureFileWriterTask = project.task('legacyPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            srcFile = project.phoneUnitFileMaker.destFile
-            srcDir = phoneUnitFeatureComputerTask.destDir
+        project.task('phoneFeatureFileMaker', type: PhoneFeatureFileMaker) {
+            basenamesFile = project.basenames.destFile
+            srcDir = project.phoneUnitFeatureComputer.destDir
+            srcExt = project.phoneUnitFeatureComputer.outputExt
+            unitFile = project.phoneUnitFileMaker.destFile
+            featureDefinitionFile = project.generatePhoneFeatureDefinitionFile.destFile
             destFile = project.legacyBuildDir.get().file('phoneFeatures.mry')
-            destFile2 = project.legacyBuildDir.get().file('phoneUnitFeatureDefinition.txt')
         }
 
-        def legacyHalfPhoneFeatureFileWriterTask = project.task('legacyHalfPhoneFeatureFileWriter', type: LegacyVoiceImportTask) {
-            srcFile = project.halfPhoneUnitFileMaker.destFile
-            srcDir = halfPhoneUnitFeatureComputerTask.destDir
+        project.task('halfPhoneFeatureFileMaker', type: PhoneFeatureFileMaker) {
+            basenamesFile = project.basenames.destFile
+            srcDir = project.halfPhoneUnitFeatureComputer.destDir
+            srcExt = project.halfPhoneUnitFeatureComputer.outputExt
+            unitFile = project.halfPhoneUnitFileMaker.destFile
+            featureDefinitionFile = project.generateHalfPhoneFeatureDefinitionFile.destFile
             destFile = project.legacyBuildDir.get().file('halfphoneFeatures.mry')
-            destFile2 = project.legacyBuildDir.get().file('halfphoneUnitFeatureDefinition.txt')
         }
 
         def legacyF0PolynomialFeatureFileWriterTask = project.task('legacyF0PolynomialFeatureFileWriter', type: LegacyVoiceImportTask) {
             srcFile = project.halfPhoneUnitFileMaker.destFile
             srcFile2 = project.waveTimelineMaker.destFile
-            srcFile3 = legacyHalfPhoneFeatureFileWriterTask.destFile
+            srcFile3 = project.halfPhoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('syllableF0Polynomials.mry')
         }
 
         def legacyAcousticFeatureFileWriterTask = project.task('legacyAcousticFeatureFileWriter', type: LegacyVoiceImportTask) {
             srcFile = project.halfPhoneUnitFileMaker.destFile
             srcFile2 = legacyF0PolynomialFeatureFileWriterTask.destFile
-            srcFile3 = legacyHalfPhoneFeatureFileWriterTask.destFile
+            srcFile3 = project.halfPhoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('halfphoneFeatures_ac.mry')
             destFile2 = project.legacyBuildDir.get().file('halfphoneUnitFeatureDefinition_ac.txt')
         }
@@ -202,26 +218,26 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('generateDurationFeatureDescription', type: GenerateProsodyFeatureDescription) {
-            srcFile = legacyPhoneFeatureFileWriterTask.destFile
+            srcFile = project.phoneFeatureFileMaker.destFile
             targetFeatures = ['segment_duration']
             destFile = project.layout.buildDirectory.dir('prosody').get().file('dur.desc')
         }
 
         project.task('generateF0FeatureDescription', type: GenerateProsodyFeatureDescription) {
-            srcFile = legacyPhoneFeatureFileWriterTask.destFile
+            srcFile = project.phoneFeatureFileMaker.destFile
             targetFeatures = ['leftF0', 'midF0', 'rightF0']
             destFile = project.layout.buildDirectory.dir('prosody').get().file('f0.desc')
         }
 
         project.task('extractDurationFeatures', type: ExtractDurationFeatures) {
             unitFile = project.phoneUnitFileMaker.destFile
-            featureFile = legacyPhoneFeatureFileWriterTask.destFile
+            featureFile = project.phoneFeatureFileMaker.destFile
             destFile = project.layout.buildDirectory.dir('prosody').get().file('dur.feats')
         }
 
         project.task('extractF0Features', type: ExtractF0Features) {
             unitFile = project.phoneUnitFileMaker.destFile
-            featureFile = legacyPhoneFeatureFileWriterTask.destFile
+            featureFile = project.phoneFeatureFileMaker.destFile
             timelineFile = project.waveTimelineMaker.destFile
             destFile = project.layout.buildDirectory.dir('prosody').get().file('f0.feats')
         }
@@ -259,25 +275,25 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.task('convertDurationCart', type: ConvertProsodyCart) {
             srcFile = project.trainDurationCart.destFile
-            featureFile = legacyPhoneFeatureFileWriterTask.destFile
+            featureFile = project.phoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('dur.tree')
         }
 
         project.task('convertF0LeftCart', type: ConvertProsodyCart) {
             srcFile = project.trainF0LeftCart.destFile
-            featureFile = legacyPhoneFeatureFileWriterTask.destFile
+            featureFile = project.phoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('f0.left.tree')
         }
 
         project.task('convertF0MidCart', type: ConvertProsodyCart) {
             srcFile = project.trainF0MidCart.destFile
-            featureFile = legacyPhoneFeatureFileWriterTask.destFile
+            featureFile = project.phoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('f0.mid.tree')
         }
 
         project.task('convertF0RightCart', type: ConvertProsodyCart) {
             srcFile = project.trainF0RightCart.destFile
-            featureFile = legacyPhoneFeatureFileWriterTask.destFile
+            featureFile = project.phoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('f0.right.tree')
         }
 
