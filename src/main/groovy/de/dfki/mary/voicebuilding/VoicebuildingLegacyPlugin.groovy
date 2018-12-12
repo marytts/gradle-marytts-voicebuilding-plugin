@@ -222,8 +222,14 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('joinCostFeatures.mry')
         }
 
-        project.task('legacyCARTBuilder', type: LegacyVoiceImportTask) {
-            srcFile = project.acousticFeatureFileMaker.destFile
+        project.task('generateFeatureSequence', type: GenerateFeatureSequence) {
+            features = ['phone']
+            destFile = project.legacyBuildDir.get().file('featureSequence.txt')
+        }
+
+        project.task('cartBuilder', type: CartBuilder) {
+            featureFile = project.acousticFeatureFileMaker.destFile
+            featureSequenceFile = project.generateFeatureSequence.destFile
             destFile = project.legacyBuildDir.get().file('cart.mry')
         }
 
@@ -362,7 +368,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         project.processResources {
             from project.generateAcousticFeatureDefinitionFile
             from project.generateJoinCostWeights
-            from project.legacyCARTBuilder
+            from project.cartBuilder
             from project.convertDurationCart
             from project.convertF0LeftCart
             from project.convertF0MidCart

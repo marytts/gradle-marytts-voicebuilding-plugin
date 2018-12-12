@@ -253,8 +253,15 @@ task testJoinCostFileMaker(group: 'Verification') {
     }
 }
 
-task testLegacyCARTBuilder(group: 'Verification') {
-    dependsOn legacyCARTBuilder
+task testGenerateFeatureSequence(group: 'Verification') {
+    dependsOn generateFeatureSequence
+    doLast {
+        assert file("$buildDir/mary/featureSequence.txt").exists()
+    }
+}
+
+task testCartBuilder(group: 'Verification') {
+    dependsOn cartBuilder
     doLast {
         assert file("$buildDir/mary/cart.mry").exists()
     }
