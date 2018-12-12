@@ -1,0 +1,45 @@
+# This file lists the weights and weighting functions to be used for
+# creating the MARY join cost file, joinCostFeature.mry .
+#
+# Lines starting with '#' are ignored; they can be used for comments
+# anywhere in the file. Empty lines are also ignored.
+# Entries must have the following form:
+# 
+# <feature index> : <weight value> <weighting function> <optional weighting function parameter>
+# 
+# The <feature index> is an integer value from 0 to the number of join cost features
+# minus one. It is used for readability, but is ignored when parsing the file.
+# The database import process will nevertheless check that the number of valid
+# lines corresponds to the number of join cost features specified from external
+# constraints (such as the order of the Mel-Cepstra).
+#
+# The <weight value> is a float value in text format.
+#
+# The <weighting function> is a string, for the moment one of "linear" or "step".
+#
+# The <optional weighting function parameter> is a string giving additional optional
+# info about the weighting function:
+# - "linear" does not take an optional argument;
+# - "step" takes a threshold position argument, e.g. "step 20%" means a step function
+#   with weighs 0 when the join feature difference is less than 20%, and applies
+#   the weight value when the join feature difference is 20% or more.
+#
+# THIS FILE WAS GENERATED AUTOMATICALLY
+
+# Weights applied to the Mel-cepstra:
+0  : 1.0 linear
+1  : 1.0 linear
+2  : 1.0 linear
+3  : 1.0 linear
+4  : 1.0 linear
+5  : 1.0 linear
+6  : 1.0 linear
+7  : 1.0 linear
+8  : 1.0 linear
+9  : 1.0 linear
+10 : 1.0 linear
+11 : 1.0 linear
+
+# Weight applied to the log F0 and log F0 delta parameters:
+12 : 10.0 linear
+13 : 0.5 linear

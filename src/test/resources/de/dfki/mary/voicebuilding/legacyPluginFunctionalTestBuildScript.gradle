@@ -71,38 +71,38 @@ task testPlugins(group: 'Verification') {
     }
 }
 
-task testTemplates(group: 'Verification') {
-    dependsOn templates
+task testProcessPhoneLabels(group: 'Verification') {
+    dependsOn processPhoneLabels
     doLast {
-        assert fileTree(buildDir).include('templates/*.config').files
+        assert fileTree(buildDir).include('lab_processed/*.lab').files
     }
 }
 
-task testLegacyInit(group: 'Verification') {
-    dependsOn legacyInit
-    doLast {
-        assert file("$buildDir/database.config").exists()
-    }
-}
-
-task testLegacyPhoneUnitLabelComputer(group: 'Verification') {
-    dependsOn legacyPhoneUnitLabelComputer
-    doLast {
-        assert fileTree(buildDir).include('phonelab/*.lab').files
-    }
-}
-
-task testLegacyHalfPhoneUnitLabelComputer(group: 'Verification') {
-    dependsOn legacyHalfPhoneUnitLabelComputer
-    doLast {
-        assert fileTree(buildDir).include('halfphonelab/*.hplab').files
-    }
-}
-
-task testLegacyTranscriptionAligner(group: 'Verification') {
-    dependsOn legacyTranscriptionAligner
+task testAlignLabelsWithPrompts(group: 'Verification') {
+    dependsOn alignLabelsWithPrompts
     doLast {
         assert fileTree(buildDir).include('allophones/*.xml').files
+    }
+}
+
+task testSplitPhoneLabelsIntoHalfPhones(group: 'Verification') {
+    dependsOn splitPhoneLabelsIntoHalfPhones
+    doLast {
+        assert fileTree(buildDir).include('halfphonelab_aligned/*.hplab').files
+    }
+}
+
+task testPhoneUnitFileMaker(group: 'Verification') {
+    dependsOn phoneUnitFileMaker
+    doLast {
+        assert file("$buildDir/mary/phoneUnits.mry").exists()
+    }
+}
+
+task testHalfPhoneUnitFileMaker(group: 'Verification') {
+    dependsOn halfPhoneUnitFileMaker
+    doLast {
+        assert file("$buildDir/mary/halfphoneUnits.mry").exists()
     }
 }
 
@@ -120,6 +120,13 @@ task testPhoneUnitFeatureComputer(group: 'Verification') {
     }
 }
 
+task testGeneratePhoneFeatureDefinitionFile(group: 'Verification') {
+    dependsOn generatePhoneFeatureDefinitionFile
+    doLast {
+        assert file("$buildDir/mary/phoneUnitFeatureDefinition.txt").exists()
+    }
+}
+
 task testHalfPhoneUnitFeatureComputer(group: 'Verification') {
     dependsOn halfPhoneUnitFeatureComputer
     doLast {
@@ -127,99 +134,205 @@ task testHalfPhoneUnitFeatureComputer(group: 'Verification') {
     }
 }
 
-task testLegacyWaveTimelineMaker(group: 'Verification') {
-    dependsOn legacyWaveTimelineMaker
+task testGenerateHalfPhoneFeatureDefinitionFile(group: 'Verification') {
+    dependsOn generateHalfPhoneFeatureDefinitionFile
     doLast {
-        assert file("$buildDir/mary/timeline_waveforms.mry").exists()
+        assert file("$buildDir/mary/halfphoneUnitFeatureDefinition.txt").exists()
     }
 }
 
-task testLegacyBasenameTimelineMaker(group: 'Verification') {
-    dependsOn legacyBasenameTimelineMaker
+task testMakeBasenameDatagrams(group: 'Verification') {
+    dependsOn makeBasenameDatagrams
+    doLast {
+        assert fileTree(buildDir).include('basenameDatagrams/*.json').files
+    }
+}
+
+task testBasenameTimelineMaker(group: 'Verification') {
+    dependsOn basenameTimelineMaker
     doLast {
         assert file("$buildDir/mary/timeline_basenames.mry").exists()
     }
 }
 
-task testLegacyMCepTimelineMaker(group: 'Verification') {
-    dependsOn legacyMCepTimelineMaker
+task testMakeWaveDatagrams(group: 'Verification') {
+    dependsOn makeWaveDatagrams
+    doLast {
+        assert fileTree(buildDir).include('waveDatagrams/*.json').files
+    }
+}
+
+task testWaveTimelineMaker(group: 'Verification') {
+    dependsOn waveTimelineMaker
+    doLast {
+        assert file("$buildDir/mary/timeline_waveforms.mry").exists()
+    }
+}
+
+task testMakeMcepDatagrams(group: 'Verification') {
+    dependsOn makeMcepDatagrams
+    doLast {
+        assert fileTree(buildDir).include('mcepDatagrams/*.json').files
+    }
+}
+
+task testGenerateMcepTimelineHeader(group: 'Verification') {
+    dependsOn generateMcepTimelineHeader
+    doLast {
+        assert file("$buildDir/mary/timeline_mcep.properties").exists()
+    }
+}
+
+task testMcepTimelineMaker(group: 'Verification') {
+    dependsOn mcepTimelineMaker
     doLast {
         assert file("$buildDir/mary/timeline_mcep.mry").exists()
     }
 }
 
-task testLegacyPhoneUnitfileWriter(group: 'Verification') {
-    dependsOn legacyPhoneUnitfileWriter
-    doLast {
-        assert file("$buildDir/mary/phoneUnits.mry").exists()
-    }
-}
-
-task testLegacyHalfPhoneUnitfileWriter(group: 'Verification') {
-    dependsOn legacyHalfPhoneUnitfileWriter
-    doLast {
-        assert file("$buildDir/mary/halfphoneUnits.mry").exists()
-    }
-}
-
-task testLegacyPhoneFeatureFileWriter(group: 'Verification') {
-    dependsOn legacyPhoneFeatureFileWriter
+task testPhoneFeatureFileMaker(group: 'Verification') {
+    dependsOn phoneFeatureFileMaker
     doLast {
         assert file("$buildDir/mary/phoneFeatures.mry").exists()
-        assert file("$buildDir/mary/phoneUnitFeatureDefinition.txt").exists()
     }
 }
 
-task testLegacyHalfPhoneFeatureFileWriter(group: 'Verification') {
-    dependsOn legacyHalfPhoneFeatureFileWriter
+task testHalfPhoneFeatureFileMaker(group: 'Verification') {
+    dependsOn halfPhoneFeatureFileMaker
     doLast {
         assert file("$buildDir/mary/halfphoneFeatures.mry").exists()
-        assert file("$buildDir/mary/halfphoneUnitFeatureDefinition.txt").exists()
     }
 }
 
-task testLegacyF0PolynomialFeatureFileWriter(group: 'Verification') {
-    dependsOn legacyF0PolynomialFeatureFileWriter
+task testF0ContourFeatureFileMaker(group: 'Verification') {
+    dependsOn f0ContourFeatureFileMaker
     doLast {
         assert file("$buildDir/mary/syllableF0Polynomials.mry").exists()
     }
 }
 
-task testLegacyAcousticFeatureFileWriter(group: 'Verification') {
-    dependsOn legacyAcousticFeatureFileWriter
+task testGenerateAcousticFeatureDefinitionFile(group: 'Verification') {
+    dependsOn generateAcousticFeatureDefinitionFile
     doLast {
-        assert file("$buildDir/mary/halfphoneFeatures_ac.mry").exists()
         assert file("$buildDir/mary/halfphoneUnitFeatureDefinition_ac.txt").exists()
     }
 }
 
-task testLegacyJoinCostFileMaker(group: 'Verification') {
-    dependsOn legacyJoinCostFileMaker
+task testAcousticFeatureFileMaker(group: 'Verification') {
+    dependsOn acousticFeatureFileMaker
     doLast {
-        assert file("$buildDir/mary/joinCostFeatures.mry").exists()
+        assert file("$buildDir/mary/halfphoneFeatures_ac.mry").exists()
+    }
+}
+
+task testGenerateJoinCostWeights(group: 'Verification') {
+    dependsOn generateJoinCostWeights
+    doLast {
         assert file("$buildDir/mary/joinCostWeights.txt").exists()
     }
 }
 
-task testLegacyCARTBuilder(group: 'Verification') {
-    dependsOn legacyCARTBuilder
+task testJoinCostFileMaker(group: 'Verification') {
+    dependsOn joinCostFileMaker
+    doLast {
+        assert file("$buildDir/mary/joinCostFeatures.mry").exists()
+    }
+}
+
+task testGenerateFeatureSequence(group: 'Verification') {
+    dependsOn generateFeatureSequence
+    doLast {
+        assert file("$buildDir/mary/featureSequence.txt").exists()
+    }
+}
+
+task testCartBuilder(group: 'Verification') {
+    dependsOn cartBuilder
     doLast {
         assert file("$buildDir/mary/cart.mry").exists()
     }
 }
 
-task testLegacyDurationCARTTrainer(group: 'Verification') {
-    dependsOn legacyDurationCARTTrainer
+task testGenerateDurationFeatureDescription(group: 'Verification') {
+    dependsOn generateDurationFeatureDescription
+    doLast {
+        assert file("$buildDir/prosody/dur.desc").exists()
+    }
+}
+
+task testGenerateF0FeatureDescription(group: 'Verification') {
+    dependsOn generateF0FeatureDescription
+    doLast {
+        assert file("$buildDir/prosody/f0.desc").exists()
+    }
+}
+
+task testExtractDurationFeatures(group: 'Verification') {
+    dependsOn extractDurationFeatures
+    doLast {
+        assert file("$buildDir/prosody/dur.feats").exists()
+    }
+}
+
+task testExtractF0Features(group: 'Verification') {
+    dependsOn extractF0Features
+    doLast {
+        assert file("$buildDir/prosody/f0.feats").exists()
+    }
+}
+
+task testTrainDurationCart(group: 'Verification') {
+    dependsOn trainDurationCart
+    doLast {
+        assert file("$buildDir/prosody/dur.tree").exists()
+    }
+}
+
+task testTrainF0LeftCart(group: 'Verification') {
+    dependsOn trainF0LeftCart
+    doLast {
+        assert file("$buildDir/prosody/f0.left.tree").exists()
+    }
+}
+
+task testTrainF0MidCart(group: 'Verification') {
+    dependsOn trainF0MidCart
+    doLast {
+        assert file("$buildDir/prosody/f0.mid.tree").exists()
+    }
+}
+
+task testTrainF0RightCart(group: 'Verification') {
+    dependsOn trainF0RightCart
+    doLast {
+        assert file("$buildDir/prosody/f0.right.tree").exists()
+    }
+}
+
+task testConvertDurationCart(group: 'Verification') {
+    dependsOn convertDurationCart
     doLast {
         assert file("$buildDir/mary/dur.tree").exists()
     }
 }
 
-task testLegacyF0CARTTrainer(group: 'Verification') {
-    dependsOn legacyF0CARTTrainer
+task testConvertF0LeftCart(group: 'Verification') {
+    dependsOn convertF0LeftCart
     doLast {
         assert file("$buildDir/mary/f0.left.tree").exists()
+    }
+}
+
+task testConvertF0MidCart(group: 'Verification') {
+    dependsOn convertF0MidCart
+    doLast {
         assert file("$buildDir/mary/f0.mid.tree").exists()
+    }
+}
+
+task testConvertF0RightCart(group: 'Verification') {
+    dependsOn convertF0RightCart
+    doLast {
         assert file("$buildDir/mary/f0.right.tree").exists()
     }
 }
@@ -241,7 +354,7 @@ task testProcessResources(group: 'Verification') {
 task testProcessLegacyResources(group: 'Verification') {
     dependsOn processLegacyResources
     doLast {
-        def prefix = "$sourceSets.legacy.output.resourcesDir/lib/voices/$voiceName"
+        def prefix = "$buildDir/legacy/lib/voices/$voiceName"
         assert file("$prefix/halfphoneFeatures_ac.mry").exists()
         assert file("$prefix/halfphoneUnits.mry").exists()
         assert file("$prefix/joinCostFeatures.mry").exists()
