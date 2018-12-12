@@ -239,11 +239,17 @@ task testAcousticFeatureFileMaker(group: 'Verification') {
     }
 }
 
-task testLegacyJoinCostFileMaker(group: 'Verification') {
-    dependsOn legacyJoinCostFileMaker
+task testGenerateJoinCostWeights(group: 'Verification') {
+    dependsOn generateJoinCostWeights
+    doLast {
+        assert file("$buildDir/mary/joinCostWeights.txt").exists()
+    }
+}
+
+task testJoinCostFileMaker(group: 'Verification') {
+    dependsOn joinCostFileMaker
     doLast {
         assert file("$buildDir/mary/joinCostFeatures.mry").exists()
-        assert file("$buildDir/mary/joinCostWeights.txt").exists()
     }
 }
 

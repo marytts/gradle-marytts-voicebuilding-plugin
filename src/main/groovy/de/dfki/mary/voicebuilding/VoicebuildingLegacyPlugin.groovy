@@ -210,12 +210,16 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('halfphoneFeatures_ac.mry')
         }
 
-        project.task('legacyJoinCostFileMaker', type: LegacyVoiceImportTask) {
-            srcFile = project.mcepTimelineMaker.destFile
-            srcFile2 = project.halfPhoneUnitFileMaker.destFile
-            srcFile3 = project.acousticFeatureFileMaker.destFile
+        project.task('generateJoinCostWeights', type: GenerateJoinCostWeights) {
+            destFile = project.legacyBuildDir.get().file('joinCostWeights.txt')
+        }
+
+        project.task('joinCostFileMaker', type: JoinCostFileMaker) {
+            weightsFile = project.generateJoinCostWeights.destFile
+            mcepFile = project.mcepTimelineMaker.destFile
+            unitFile = project.halfPhoneUnitFileMaker.destFile
+            featureFile = project.acousticFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('joinCostFeatures.mry')
-            destFile2 = project.legacyBuildDir.get().file('joinCostWeights.txt')
         }
 
         project.task('legacyCARTBuilder', type: LegacyVoiceImportTask) {
@@ -357,9 +361,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.processResources {
             from project.generateAcousticFeatureDefinitionFile
-            from project.legacyJoinCostFileMaker, {
-                include 'joinCostWeights.txt'
-            }
+            from project.generateJoinCostWeights
             from project.legacyCARTBuilder
             from project.convertDurationCart
             from project.convertF0LeftCart
@@ -375,9 +377,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             from project.basenameTimelineMaker
             from project.halfPhoneUnitFileMaker
             from project.acousticFeatureFileMaker
-            from project.legacyJoinCostFileMaker, {
-                include 'joinCostFeatures.mry'
-            }
+            from project.joinCostFileMaker
             project.afterEvaluate {
                 rename { "lib/voices/$project.marytts.voice.name/$it" }
             }
