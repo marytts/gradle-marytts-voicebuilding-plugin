@@ -10,6 +10,8 @@ Gradle MaryTTS voicebuilding plugin
 
 ### Changes
 
+- Rewritten, functionally equivalent build logic;
+  parallel processing for ~6-fold increase in processing efficiency
 - One-shot build via lazy configuration (no need to run `legacyInit` first)
 - Data processing controlled by `basenames.lst`, not file globs
 - Legacy artifacts built (and published) by default
