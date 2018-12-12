@@ -26,13 +26,13 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             basenamesFile = project.basenames.destFile
             labDir = project.layout.buildDirectory.dir('lab')
             maryXmlDir = project.tasks.getByName('generateAllophones').destDir
-            destDir = project.layout.buildDirectory.dir('allophones_new')
+            destDir = project.layout.buildDirectory.dir('allophones')
         }
 
         project.task('splitPhoneLabelsIntoHalfPhones', type: SplitPhoneLabelsIntoHalfPhones) {
             basenamesFile = project.basenames.destFile
             srcDir = project.processPhoneLabels.destDir
-            destDir = project.layout.buildDirectory.dir('halfphonelab_aligned_new')
+            destDir = project.layout.buildDirectory.dir('halfphonelab_aligned')
         }
 
         project.task('phoneUnitFileMaker', type: PhoneUnitFileMaker) {
