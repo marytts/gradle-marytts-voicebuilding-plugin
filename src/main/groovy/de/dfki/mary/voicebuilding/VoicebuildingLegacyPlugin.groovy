@@ -3,7 +3,7 @@ package de.dfki.mary.voicebuilding
 import de.dfki.mary.voicebuilding.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.bundling.Zip
+import org.gradle.api.tasks.Copy
 
 class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
@@ -12,29 +12,9 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.plugins.apply VoicebuildingDataPlugin
 
-        project.sourceSets.create 'legacy'
-
-        project.configurations.create 'legacy'
-
         project.ext {
             legacyBuildDir = project.layout.buildDirectory.dir('mary')
-
-            // configure speech-tools
-            def proc = 'which ch_track'.execute()
-            proc.waitFor()
-            speechToolsDir = new File(proc.in.text)?.parentFile?.parent
         }
-
-        project.templates {
-            resources.add '/de/dfki/mary/voicebuilding/templates/database.config'
-        }
-
-        def legacyInitTask = project.task('legacyInit', type: LegacyInitTask) {
-            srcDir = project.tasks.getByName('templates').destDir
-            configFile = project.layout.buildDirectory.file('database.config')
-        }
-
-        def basenamesTask = project.tasks.getByName('basenames')
 
         project.task('processPhoneLabels', type: ProcessPhoneLabels) {
             basenamesFile = project.basenames.destFile
@@ -313,11 +293,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('f0.right.tree')
         }
 
-        project.tasks.withType(LegacyVoiceImportTask) {
-            configFile = legacyInitTask.configFile
-            basenamesFile = basenamesTask.destFile
-        }
-
         project.generateVoiceConfig {
             project.afterEvaluate {
                 config.get() << [
@@ -366,37 +341,34 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.processResources {
-            from project.generateAcousticFeatureDefinitionFile
-            from project.generateJoinCostWeights
-            from project.cartBuilder
-            from project.convertDurationCart
-            from project.convertF0LeftCart
-            from project.convertF0MidCart
-            from project.convertF0RightCart
-            project.afterEvaluate {
-                rename { "marytts/voice/$project.marytts.voice.nameCamelCase/$it" }
-            }
+            from project.generateAcousticFeatureDefinitionFile,
+                    project.generateJoinCostWeights,
+                    project.cartBuilder,
+                    project.convertDurationCart,
+                    project.convertF0LeftCart,
+                    project.convertF0MidCart,
+                    project.convertF0RightCart
+            rename { "marytts/voice/$project.marytts.voice.nameCamelCase/$it" }
         }
 
-        project.processLegacyResources {
-            from project.waveTimelineMaker
-            from project.basenameTimelineMaker
-            from project.halfPhoneUnitFileMaker
-            from project.acousticFeatureFileMaker
-            from project.joinCostFileMaker
-            project.afterEvaluate {
-                rename { "lib/voices/$project.marytts.voice.name/$it" }
-            }
+        project.task('processLegacyResources', type: Copy) {
+            from project.waveTimelineMaker,
+                    project.basenameTimelineMaker,
+                    project.halfPhoneUnitFileMaker,
+                    project.acousticFeatureFileMaker,
+                    project.joinCostFileMaker
+            into project.layout.buildDirectory.dir('legacy')
+            rename { "lib/voices/$project.marytts.voice.name/$it" }
         }
 
         project.run {
             dependsOn project.processLegacyResources
-            systemProperty 'mary.base', project.sourceSets.legacy.output.resourcesDir
+            systemProperty 'mary.base', project.processLegacyResources.destinationDir
         }
 
         project.integrationTest {
             dependsOn project.processLegacyResources
-            systemProperty 'mary.base', project.sourceSets.legacy.output.resourcesDir
+            systemProperty 'mary.base', project.processLegacyResources.destinationDir
         }
 
         def legacyZipTask = project.task('legacyZip', type: LegacyZip) {
@@ -429,10 +401,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             project.dependencies {
                 compile "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
                     exclude group: '*', module: 'groovy-all'
-                }
-                legacy("de.dfki.mary:marytts-builder:$project.marytts.version") {
-                    exclude group: '*', module: 'mwdumper'
-                    exclude group: '*', module: 'sgt'
                 }
                 testCompile "junit:junit:4.12"
             }

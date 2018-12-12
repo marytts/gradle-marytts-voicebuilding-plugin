@@ -71,20 +71,6 @@ task testPlugins(group: 'Verification') {
     }
 }
 
-task testTemplates(group: 'Verification') {
-    dependsOn templates
-    doLast {
-        assert fileTree(buildDir).include('templates/*.config').files
-    }
-}
-
-task testLegacyInit(group: 'Verification') {
-    dependsOn legacyInit
-    doLast {
-        assert file("$buildDir/database.config").exists()
-    }
-}
-
 task testProcessPhoneLabels(group: 'Verification') {
     dependsOn processPhoneLabels
     doLast {
@@ -368,7 +354,7 @@ task testProcessResources(group: 'Verification') {
 task testProcessLegacyResources(group: 'Verification') {
     dependsOn processLegacyResources
     doLast {
-        def prefix = "$sourceSets.legacy.output.resourcesDir/lib/voices/$voiceName"
+        def prefix = "$buildDir/legacy/lib/voices/$voiceName"
         assert file("$prefix/halfphoneFeatures_ac.mry").exists()
         assert file("$prefix/halfphoneUnits.mry").exists()
         assert file("$prefix/joinCostFeatures.mry").exists()

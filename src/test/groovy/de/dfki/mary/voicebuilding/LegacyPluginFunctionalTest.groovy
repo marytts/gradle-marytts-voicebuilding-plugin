@@ -45,8 +45,6 @@ class LegacyPluginFunctionalTest {
         [
                 ['help', false],
                 ['testPlugins', false],
-                ['templates', true],
-                ['legacyInit', true],
                 ['processPhoneLabels', true],
                 ['alignLabelsWithPrompts', true],
                 ['splitPhoneLabelsIntoHalfPhones', true],
