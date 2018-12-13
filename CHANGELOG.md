@@ -29,6 +29,7 @@ Gradle MaryTTS voicebuilding plugin
 
 ### Fixed
 
+- BufferUnderflowExceptions after building timelines with mismatched non-speech units
 - Exclude utterances with missing text/lab files
 - Concurrent Praat unpacking errors on Mac OSX by upgrading wrapper plugin
 
