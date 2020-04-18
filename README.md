@@ -17,7 +17,7 @@ plugins {
     id 'de.dfki.mary.voicebuilding-legacy' version '5.4'
 }
 ```
-See [here](https://plugins.gradle.org/plugin/de.dfki.mary.voicebuilding-legacy) for details.
+For details, see https://plugins.gradle.org/plugin/de.dfki.mary.voicebuilding-legacy.
 
 Prerequisites
 -------------
@@ -31,43 +31,40 @@ Prerequisites
 #### Mac OSX
 
 With [Homebrew], just run
-```
-$ brew install sox speech-tools
-```
+
+    brew install sox speech-tools
 
 #### Linux
 
 On Debian-based systems, just run
-```
-$ sudo apt install sox speech-tools
-```
+
+    sudo apt install sox speech-tools
 
 ### Project layout
 
 In your project directory, place the source audio, text, and label files under your `build` directory like this:
 
-```
-build
-├── lab
-│   ├── utt0001.lab
-│   ├── utt0002.lab
-│   ├── utt0003.lab
-│   ├── utt0004.lab
-│   └── utt0005.lab
-├── text
-│   ├── utt0001.txt
-│   ├── utt0002.txt
-│   ├── utt0003.txt
-│   ├── utt0004.txt
-│   └── utt0005.txt
-└── resources
-    └── data
-        ├── utt0001.wav
-        ├── utt0002.wav
-        ├── utt0003.wav
-        ├── utt0004.wav
-        └── utt0005.wav
-```
+    build
+    ├── lab
+    │   ├── utt0001.lab
+    │   ├── utt0002.lab
+    │   ├── utt0003.lab
+    │   ├── utt0004.lab
+    │   └── utt0005.lab
+    ├── text
+    │   ├── utt0001.txt
+    │   ├── utt0002.txt
+    │   ├── utt0003.txt
+    │   ├── utt0004.txt
+    │   └── utt0005.txt
+    └── resources
+        └── data
+            ├── utt0001.wav
+            ├── utt0002.wav
+            ├── utt0003.wav
+            ├── utt0004.wav
+            └── utt0005.wav
+
 The audio location can be easily customized, by configuring the layout in the `build.gradle` like this:
 ```groovy
 // wav files under "$projectDir/wav"
@@ -77,8 +74,8 @@ wav.srcDir = file('wav')
 Configuring the voice
 ---------------------
 
-Crucial details of the voice to be built are configured in the `marytts.voice` extension in the `build.gradle` file".
-Without any custmozation, the defaults are: 
+Crucial details of the voice to be built are configured in the `marytts.voice` extension in the `build.gradle` file.
+Without any customization, the defaults are:
 ```groovy
 marytts {
     voice {
@@ -105,9 +102,9 @@ Building the voice
 ------------------
 
 To assemble and test the voice, run
-```
-$ ./gradlew build
-```
+
+    ./gradlew build
+
 Afterwards, the packaged voice component (and its XML descriptor) will be found under `build/distributions`.
 These files can be installed in a MaryTTS v5.2 instance, by placing them in the `download` directory and running the *MaryTTS Component Installer GUI*.
 
