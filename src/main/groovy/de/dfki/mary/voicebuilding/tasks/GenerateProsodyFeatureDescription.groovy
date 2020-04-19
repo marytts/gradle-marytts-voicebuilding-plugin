@@ -12,13 +12,13 @@ import org.gradle.api.tasks.TaskAction
 class GenerateProsodyFeatureDescription extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty srcFile = newInputFile()
+    final RegularFileProperty srcFile = project.objects.fileProperty()
 
     @Input
     ListProperty<String> targetFeatures = project.objects.listProperty(String)
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void generate() {

@@ -19,9 +19,6 @@ class FestvoxPluginFunctionalTest {
         new File(projectDir, 'build.gradle').withWriter {
             it << this.class.getResourceAsStream('festvoxPluginFunctionalTestBuildScript.gradle')
         }
-        new File(projectDir, 'settings.gradle').withWriter {
-            it << "enableFeaturePreview('STABLE_PUBLISHING')"
-        }
     }
 
     @DataProvider

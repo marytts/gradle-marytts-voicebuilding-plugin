@@ -19,13 +19,13 @@ class MakeMcepDatagrams extends DefaultTask {
     Property<Integer> sampleRate = project.objects.property(Integer)
 
     @InputFile
-    final RegularFileProperty basenamesFile = newInputFile()
+    final RegularFileProperty basenamesFile = project.objects.fileProperty()
 
     @InputDirectory
-    final DirectoryProperty mcepDir = newInputDirectory()
+    final DirectoryProperty mcepDir = project.objects.directoryProperty()
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @Inject
     MakeMcepDatagrams(WorkerExecutor workerExecutor) {

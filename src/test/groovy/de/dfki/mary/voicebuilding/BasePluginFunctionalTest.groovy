@@ -35,9 +35,6 @@ class BasePluginFunctionalTest {
         new File(projectDir, 'build.gradle').withWriter {
             it << this.class.getResourceAsStream('basePluginFunctionalTestBuildScript.gradle')
         }
-        new File(projectDir, 'settings.gradle').withWriter {
-            it << "enableFeaturePreview('STABLE_PUBLISHING')"
-        }
     }
 
     @DataProvider

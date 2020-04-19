@@ -13,7 +13,7 @@ class CopyClasspathResources extends DefaultTask {
     ListProperty<String> resources = project.objects.listProperty(String)
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @TaskAction
     void copy() {

@@ -7,7 +7,7 @@ import org.gradle.api.tasks.*
 class GenerateServiceLoader extends DefaultTask {
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void generate() {

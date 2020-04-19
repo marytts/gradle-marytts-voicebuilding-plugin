@@ -11,7 +11,7 @@ class GenerateVoiceConfig extends DefaultTask {
     Property<Map> config = project.objects.property(Map)
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     GenerateVoiceConfig() {
         this.config.set([:])

@@ -20,16 +20,16 @@ class ExtractMcep extends DefaultTask {
     final WorkerExecutor workerExecutor
 
     @InputFile
-    final RegularFileProperty basenamesFile = newInputFile()
+    final RegularFileProperty basenamesFile = project.objects.fileProperty()
 
     @InputDirectory
-    final DirectoryProperty wavDir = newInputDirectory()
+    final DirectoryProperty wavDir = project.objects.directoryProperty()
 
     @InputDirectory
-    final DirectoryProperty pmDir = newInputDirectory()
+    final DirectoryProperty pmDir = project.objects.directoryProperty()
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @Inject
     ExtractMcep(WorkerExecutor workerExecutor) {

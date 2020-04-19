@@ -24,19 +24,19 @@ import org.gradle.api.tasks.TaskAction
 class F0ContourFeatureFileMaker extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty unitFile = newInputFile()
+    final RegularFileProperty unitFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty featureFile = newInputFile()
+    final RegularFileProperty featureFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty timelineFile = newInputFile()
+    final RegularFileProperty timelineFile = project.objects.fileProperty()
 
     @Input
     Property<String> gender = project.objects.property(String)
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void make() {

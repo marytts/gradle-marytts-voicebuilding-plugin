@@ -10,7 +10,7 @@ import org.gradle.api.tasks.TaskAction
 class McepTimelineMaker extends TimelineMaker {
 
     @InputFile
-    final RegularFileProperty headerFile = newInputFile()
+    final RegularFileProperty headerFile = project.objects.fileProperty()
 
     @Override
     @TaskAction

@@ -18,10 +18,10 @@ class ProcessWav extends DefaultTask {
     final WorkerExecutor workerExecutor
 
     @InputDirectory
-    final DirectoryProperty srcDir = newInputDirectory()
+    final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @Inject
     ProcessWav(WorkerExecutor workerExecutor) {

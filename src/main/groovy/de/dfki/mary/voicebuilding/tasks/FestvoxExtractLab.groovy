@@ -18,7 +18,7 @@ class FestvoxExtractLab extends DefaultTask {
     Property<Map> mapping = project.objects.property(Map)
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @TaskAction
     void process() {

@@ -376,13 +376,13 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             from project.jar, {
                 rename { "lib/$it" }
             }
-            destFile = project.layout.fileProperty()
+            destFile = project.objects.fileProperty()
         }
 
         def legacyDescriptorTask = project.task('legacyDescriptor', type: LegacyDescriptorTask) {
             project.assemble.dependsOn it
             srcFile = legacyZipTask.destFile
-            destFile = project.layout.fileProperty()
+            destFile = project.objects.fileProperty()
         }
 
         project.artifacts {

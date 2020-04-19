@@ -11,10 +11,10 @@ import org.gradle.api.tasks.TaskAction
 class FestvoxExtractText extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty srcFile = newInputFile()
+    final RegularFileProperty srcFile = project.objects.fileProperty()
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @TaskAction
     void extract() {

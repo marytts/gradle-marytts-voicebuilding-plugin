@@ -7,7 +7,7 @@ import org.gradle.api.tasks.bundling.Zip
 class LegacyZip extends Zip {
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     LegacyZip() {
         classifier 'legacy'

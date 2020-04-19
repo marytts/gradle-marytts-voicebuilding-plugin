@@ -20,16 +20,16 @@ class PraatExtractPitch extends DefaultTask {
     final WorkerExecutor workerExecutor
 
     @InputFile
-    final RegularFileProperty basenamesFile = newInputFile()
+    final RegularFileProperty basenamesFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty scriptFile = newInputFile()
+    final RegularFileProperty scriptFile = project.objects.fileProperty()
 
     @InputDirectory
-    final DirectoryProperty srcDir = newInputDirectory()
+    final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @Inject
     PraatExtractPitch(WorkerExecutor workerExecutor) {

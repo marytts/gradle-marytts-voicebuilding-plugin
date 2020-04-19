@@ -14,19 +14,19 @@ import org.gradle.api.tasks.TaskAction
 class JoinCostFileMaker extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty weightsFile = newInputFile()
+    final RegularFileProperty weightsFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty mcepFile = newInputFile()
+    final RegularFileProperty mcepFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty unitFile = newInputFile()
+    final RegularFileProperty unitFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty featureFile = newInputFile()
+    final RegularFileProperty featureFile = project.objects.fileProperty()
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void make() {

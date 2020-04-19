@@ -13,13 +13,13 @@ import org.gradle.api.tasks.TaskAction
 class GeneratePhoneFeatureDefinitionFile extends DefaultTask {
 
     @InputDirectory
-    final DirectoryProperty srcDir = newInputDirectory()
+    final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @Input
     Property<String> srcExt = project.objects.property(String)
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void generate() {

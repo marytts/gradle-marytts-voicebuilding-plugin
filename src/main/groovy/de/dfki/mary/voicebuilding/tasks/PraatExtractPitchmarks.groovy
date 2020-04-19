@@ -20,19 +20,19 @@ class PraatExtractPitchmarks extends DefaultTask {
     final WorkerExecutor workerExecutor
 
     @InputFile
-    final RegularFileProperty basenamesFile = newInputFile()
+    final RegularFileProperty basenamesFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty scriptFile = newInputFile()
+    final RegularFileProperty scriptFile = project.objects.fileProperty()
 
     @InputDirectory
-    final DirectoryProperty wavDir = newInputDirectory()
+    final DirectoryProperty wavDir = project.objects.directoryProperty()
 
     @InputDirectory
-    final DirectoryProperty pitchDir = newInputDirectory()
+    final DirectoryProperty pitchDir = project.objects.directoryProperty()
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @Inject
     PraatExtractPitchmarks(WorkerExecutor workerExecutor) {

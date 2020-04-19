@@ -11,13 +11,13 @@ marytts {
 repositories {
     ivy {
         url 'https://dl.bintray.com/marytts/marytts'
-        layout 'pattern', {
+        patternLayout {
             artifact '[organisation]/[module]/[artifact].[ext]'
         }
     }
     ivy {
         url 'http://festvox.org/examples'
-        layout 'pattern', {
+        patternLayout {
             artifact '[module]_[classifier]/packed/[artifact].[ext]'
         }
     }

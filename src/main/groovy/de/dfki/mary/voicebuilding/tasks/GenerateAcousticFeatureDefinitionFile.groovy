@@ -10,10 +10,10 @@ import org.gradle.api.tasks.TaskAction
 class GenerateAcousticFeatureDefinitionFile extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty srcFile = newInputFile()
+    final RegularFileProperty srcFile = project.objects.fileProperty()
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void generate() {

@@ -15,13 +15,13 @@ import org.gradle.api.tasks.TaskAction
 class CartBuilder extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty featureFile = newInputFile()
+    final RegularFileProperty featureFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty featureSequenceFile = newInputFile()
+    final RegularFileProperty featureSequenceFile = project.objects.fileProperty()
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void build() {

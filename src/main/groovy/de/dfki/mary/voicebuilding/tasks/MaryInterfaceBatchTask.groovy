@@ -16,10 +16,10 @@ import org.gradle.api.tasks.TaskAction
 class MaryInterfaceBatchTask extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty basenamesFile = newInputFile()
+    final RegularFileProperty basenamesFile = project.objects.fileProperty()
 
     @InputDirectory
-    final DirectoryProperty srcDir = newInputDirectory()
+    final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @Input
     Property<String> inputType = project.objects.property(String)
@@ -41,7 +41,7 @@ class MaryInterfaceBatchTask extends DefaultTask {
     Property<Map> maryttsProperties = project.objects.property(Map)
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @TaskAction
     void process() {

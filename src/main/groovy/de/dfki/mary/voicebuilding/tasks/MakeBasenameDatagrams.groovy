@@ -13,13 +13,13 @@ class MakeBasenameDatagrams extends DefaultTask {
     Property<Integer> sampleRate = project.objects.property(Integer)
 
     @InputFile
-    final RegularFileProperty basenamesFile = newInputFile()
+    final RegularFileProperty basenamesFile = project.objects.fileProperty()
 
     @InputDirectory
-    final DirectoryProperty pmDir = newInputDirectory()
+    final DirectoryProperty pmDir = project.objects.directoryProperty()
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @TaskAction
     void make() {

@@ -13,7 +13,7 @@ class GenerateFeatureSequence extends DefaultTask {
     ListProperty<String> features = project.objects.listProperty(String)
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void generate() {
