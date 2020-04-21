@@ -43,6 +43,11 @@ class MaryInterfaceBatchTask extends DefaultTask {
     @OutputDirectory
     final DirectoryProperty destDir = project.objects.directoryProperty()
 
+    MaryInterfaceBatchTask() {
+        // TODO ListProperty initialization required in Gradle v5.0
+        this.outputTypeParams.empty()
+    }
+
     @TaskAction
     void process() {
         def batch = []

@@ -15,6 +15,11 @@ class CopyClasspathResources extends DefaultTask {
     @OutputDirectory
     final DirectoryProperty destDir = project.objects.directoryProperty()
 
+    CopyClasspathResources() {
+        // TODO ListProperty initialization required in Gradle v5.0
+        this.resources.empty()
+    }
+
     @TaskAction
     void copy() {
         resources.get().each { resourcePath ->
