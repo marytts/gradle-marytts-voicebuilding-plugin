@@ -88,8 +88,7 @@ class VoiceExtension {
     }
 
     Integer getSamplingRate() {
-        def samplingRate = this.samplingRate.get()
-        samplingRate ?: 16000
+        this.samplingRate.getOrElse(16000)
     }
 
     void setSamplingRate(Integer samplingRate) {
