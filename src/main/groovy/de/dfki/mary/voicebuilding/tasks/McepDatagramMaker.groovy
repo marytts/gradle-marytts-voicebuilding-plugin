@@ -1,6 +1,6 @@
 package de.dfki.mary.voicebuilding.tasks
 
-import groovy.json.JsonBuilder
+import com.google.gson.Gson
 import marytts.util.data.ESTTrackReader
 
 import javax.inject.Inject
@@ -36,7 +36,11 @@ class McepDatagramMaker implements Runnable {
                     coeffs  : frame
             ]
         }
-        def json = new JsonBuilder(jsonDatagrams)
-        destFile.text = json.toPrettyString()
+        // TODO: workaround for JSON serialization in Gradle v5.0
+        // java.util.ServiceConfigurationError:
+        // org.apache.groovy.json.FastStringServiceFactory:
+        // Provider org.apache.groovy.json.DefaultFastStringServiceFactory not a subtype
+        def json = new Gson().toJson(jsonDatagrams)
+        destFile.text = json
     }
 }
