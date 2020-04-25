@@ -2,13 +2,15 @@ package de.dfki.mary.voicebuilding.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
 
 class GenerateVoiceConfig extends DefaultTask {
 
     @Input
-    Property<Map> config = project.objects.property(Map)
+    final MapProperty<String, Object> config = project.objects.mapProperty(String, Object)
 
     @OutputFile
     final RegularFileProperty destFile = project.objects.fileProperty()

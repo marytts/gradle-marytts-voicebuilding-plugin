@@ -3,7 +3,7 @@ package de.dfki.mary.voicebuilding.tasks
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
-import org.gradle.api.provider.Property
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
@@ -15,7 +15,7 @@ class FestvoxExtractLab extends DefaultTask {
     FileCollection srcFiles = project.files()
 
     @Input
-    Property<Map> mapping = project.objects.property(Map)
+    final MapProperty<String, String> mapping = project.objects.mapProperty(String, String)
 
     @OutputDirectory
     final DirectoryProperty destDir = project.objects.directoryProperty()
