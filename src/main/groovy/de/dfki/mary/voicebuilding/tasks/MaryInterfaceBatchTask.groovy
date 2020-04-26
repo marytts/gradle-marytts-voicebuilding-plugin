@@ -18,19 +18,19 @@ class MaryInterfaceBatchTask extends DefaultTask {
     final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @Input
-    Property<String> inputType = project.objects.property(String)
+    final Property<String> inputType = project.objects.property(String)
 
     @Input
-    Property<String> outputType = project.objects.property(String)
+    final Property<String> outputType = project.objects.property(String)
 
     @Input
-    ListProperty<String> outputTypeParams = project.objects.listProperty(String)
+    final ListProperty<String> outputTypeParams = project.objects.listProperty(String)
 
     @Input
-    Property<String> inputExt = project.objects.property(String)
+    final Property<String> inputExt = project.objects.property(String)
 
     @Input
-    Property<String> outputExt = project.objects.property(String)
+    final Property<String> outputExt = project.objects.property(String)
 
     @Optional
     @Input

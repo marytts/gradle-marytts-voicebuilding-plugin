@@ -18,13 +18,13 @@ class PhoneUnitFileMaker extends DefaultTask {
     final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @Input
-    Property<String> srcExt = project.objects.property(String)
+    final Property<String> srcExt = project.objects.property(String)
 
     @InputDirectory
     final DirectoryProperty pmDir = project.objects.directoryProperty()
 
     @Input
-    Property<Integer> sampleRate = project.objects.property(Integer)
+    final Property<Integer> sampleRate = project.objects.property(Integer)
 
     @OutputFile
     final RegularFileProperty destFile = project.objects.fileProperty()

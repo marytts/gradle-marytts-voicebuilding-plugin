@@ -18,7 +18,7 @@ class PhoneFeatureFileMaker extends DefaultTask {
     final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @Input
-    Property<String> srcExt = project.objects.property(String)
+    final Property<String> srcExt = project.objects.property(String)
 
     @InputFile
     final RegularFileProperty unitFile = project.objects.fileProperty()

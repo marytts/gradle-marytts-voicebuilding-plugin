@@ -10,7 +10,7 @@ import org.gradle.api.tasks.*
 class MakeBasenameDatagrams extends DefaultTask {
 
     @Input
-    Property<Integer> sampleRate = project.objects.property(Integer)
+    final Property<Integer> sampleRate = project.objects.property(Integer)
 
     @InputFile
     final RegularFileProperty basenamesFile = project.objects.fileProperty()

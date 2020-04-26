@@ -16,7 +16,7 @@ class GeneratePhoneFeatureDefinitionFile extends DefaultTask {
     final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @Input
-    Property<String> srcExt = project.objects.property(String)
+    final Property<String> srcExt = project.objects.property(String)
 
     @OutputFile
     final RegularFileProperty destFile = project.objects.fileProperty()

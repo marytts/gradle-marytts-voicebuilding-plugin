@@ -16,7 +16,7 @@ class MakeWaveDatagrams extends DefaultTask {
     final WorkerExecutor workerExecutor
 
     @Input
-    Property<Integer> sampleRate = project.objects.property(Integer)
+    final Property<Integer> sampleRate = project.objects.property(Integer)
 
     @InputFile
     final RegularFileProperty basenamesFile = project.objects.fileProperty()

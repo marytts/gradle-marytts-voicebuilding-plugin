@@ -18,11 +18,11 @@ class TrainProsodyCart extends DefaultTask {
     final RegularFileProperty descriptionFile = project.objects.fileProperty()
 
     @Input
-    Property<String> predictee = project.objects.property(String)
+    final Property<String> predictee = project.objects.property(String)
 
     @Optional
     @Input
-    ListProperty<String> ignoreFields = project.objects.listProperty(String)
+    final ListProperty<String> ignoreFields = project.objects.listProperty(String)
 
     @OutputFile
     final RegularFileProperty destFile = project.objects.fileProperty()
