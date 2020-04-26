@@ -295,7 +295,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.generateVoiceConfig {
             project.afterEvaluate {
-                config.get() << [
+                config.putAll([
                         'viterbi.wTargetCosts'    : 0.7,
                         'viterbi.beamsize'        : 100,
                         databaseClass             : 'marytts.unitselection.data.DiphoneUnitDatabase',
@@ -336,7 +336,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                         'rightF0.attribute.format': '(100,%.0f)',
                         'rightF0.predictFrom'     : 'firstVowels',
                         'rightF0.applyTo'         : 'lastVoicedSegments'
-                ]
+                ])
             }
         }
 

@@ -21,12 +21,6 @@ class GenerateVoiceConfig extends DefaultTask {
 
     @TaskAction
     void generate() {
-        config.get() << [
-                domain      : 'general',
-                gender      : project.marytts.voice.gender,
-                locale      : project.marytts.voice.locale,
-                samplingRate: project.marytts.voice.samplingRate
-        ]
         destFile.get().asFile.withWriter 'UTF-8', { writer ->
             writer.println """|# Auto-generated config file for voice ${project.marytts.voice.name}
                               |
@@ -36,9 +30,14 @@ class GenerateVoiceConfig extends DefaultTask {
                               |${voiceType()}.voices.list = ${project.marytts.voice.name}
                               |
                               |""".stripMargin()
-            writer.println config.get().collect { key, value ->
-                "voice.${project.marytts.voice.name}.$key = $value"
-            }.join('\n')
+            ([
+                    domain      : 'general',
+                    gender      : project.marytts.voice.gender,
+                    locale      : project.marytts.voice.locale,
+                    samplingRate: project.marytts.voice.samplingRate
+            ] + config.get()).each { key, value ->
+                writer.println "voice.${project.marytts.voice.name}.$key = $value"
+            }
         }
     }
 
