@@ -1,20 +1,19 @@
 package de.dfki.mary.voicebuilding.tasks
 
-import javax.inject.Inject
+import org.gradle.api.provider.ListProperty
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
 
-class RunnableExec implements Runnable {
+interface RunnableParameters extends WorkParameters {
+    ListProperty<String> getCommandLine()
+}
 
-    Map args
-
-    @Inject
-    RunnableExec(Map args) {
-        this.args = args
-    }
+abstract class RunnableExec implements WorkAction<RunnableParameters> {
 
     @Override
-    void run() {
-        println args.commandLine.join(' ')
-        def proc = args.commandLine.execute()
+    void execute() {
+        println parameters.commandLine.get().join(' ')
+        def proc = parameters.commandLine.get().execute()
         proc.waitFor()
         assert proc.exitValue() == 0: proc.errorStream.text
     }
