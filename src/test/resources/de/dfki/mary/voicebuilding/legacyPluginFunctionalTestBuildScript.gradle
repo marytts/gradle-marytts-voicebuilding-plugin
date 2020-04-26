@@ -34,11 +34,18 @@ repositories {
         patternLayout {
             artifact '[organisation]/[module]/[artifact].[ext]'
         }
+        metadataSources {
+            artifact()
+        }
     }
     ivy {
         url 'http://festvox.org/examples'
+        allowInsecureProtocol = true
         patternLayout {
             artifact '[module]_[classifier]/packed/[artifact].[ext]'
+        }
+        metadataSources {
+            artifact()
         }
     }
 }
@@ -425,6 +432,8 @@ task testGenerateVoiceConfig(group: 'Verification') {
     }
 }
 
+import org.custommonkey.xmlunit.XMLUnit
+
 import java.util.zip.ZipFile
 
 task testJar(group: 'Verification') {
@@ -468,8 +477,6 @@ task testLegacyZip(group: 'Verification') {
         assert actual == expected
     }
 }
-
-import org.custommonkey.xmlunit.XMLUnit
 
 task testLegacyDescriptor(group: 'Verification') {
     dependsOn legacyDescriptor

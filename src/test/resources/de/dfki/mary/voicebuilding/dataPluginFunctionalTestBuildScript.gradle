@@ -14,11 +14,18 @@ repositories {
         patternLayout {
             artifact '[organisation]/[module]/[artifact].[ext]'
         }
+        metadataSources {
+            artifact()
+        }
     }
     ivy {
         url 'http://festvox.org/examples'
+        allowInsecureProtocol = true
         patternLayout {
             artifact '[module]_[classifier]/packed/[artifact].[ext]'
+        }
+        metadataSources {
+            artifact()
         }
     }
 }
