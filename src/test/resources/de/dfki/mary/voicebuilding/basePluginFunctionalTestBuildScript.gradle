@@ -166,6 +166,7 @@ task testGeneratePomFileForMavenJavaPublication(group: 'Verification') {
             }
         } as String
         XMLUnit.ignoreWhitespace = true
+        XMLUnit.ignoreComments = true
         def diff = XMLUnit.compareXML(pomXml, pomFile.text)
         diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier())
         if (!diff.similar()) {
