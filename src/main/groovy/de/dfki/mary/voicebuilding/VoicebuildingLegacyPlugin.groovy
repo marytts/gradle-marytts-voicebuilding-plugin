@@ -53,23 +53,25 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('halfphoneUnits.mry')
         }
 
-        project.task('featureLister', type: FeatureListerTask) {
+        def featureListerTask = project.task('featureLister', type: FeatureListerTask) {
             destFile = project.legacyBuildDir.get().file('features.txt')
         }
 
+        def phoneUnitFeatureListerTask = project.task('phoneUnitFeatureLister', type: PhoneUnitFeatureLister) {
+            srcFile = featureListerTask.destFile
+            destFile = project.layout.buildDirectory.file('phoneUnitFeatures.txt')
+            featureToListFirst = 'phone'
+            featuresToExclude = ['halfphone_lr', 'halfphone_unitname']
+        }
+
         project.task('phoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
-            dependsOn project.featureLister
             srcDir = project.alignLabelsWithPrompts.destDir
             destDir = project.layout.buildDirectory.dir('phonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
             outputType = 'TARGETFEATURES'
             outputExt = 'pfeats'
-            doFirst {
-                outputTypeParams = ['phone'] + project.featureLister.destFile.get().asFile.readLines().findAll {
-                    it != 'phone' && !(it in ['halfphone_lr', 'halfphone_unitname'])
-                }
-            }
+            outputTypeParamsFile = phoneUnitFeatureListerTask.destFile
         }
 
         project.task('generatePhoneFeatureDefinitionFile', type: GeneratePhoneFeatureDefinitionFile) {
@@ -78,19 +80,21 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('phoneUnitFeatureDefinition.txt')
         }
 
+        def halfPhoneUnitFeatureListerTask = project.task('halfPhoneUnitFeatureLister', type: PhoneUnitFeatureLister) {
+            srcFile = featureListerTask.destFile
+            destFile = project.layout.buildDirectory.file('halfPhoneUnitFeatures.txt')
+            featureToListFirst = 'halfphone_unitname'
+        }
+
         project.task('halfPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
-            dependsOn project.featureLister
+            dependsOn featureListerTask
             srcDir = project.alignLabelsWithPrompts.destDir
             destDir = project.layout.buildDirectory.dir('halfphonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
             outputType = 'HALFPHONE_TARGETFEATURES'
             outputExt = 'hpfeats'
-            doFirst {
-                outputTypeParams = ['halfphone_unitname'] + project.featureLister.destFile.get().asFile.readLines().findAll {
-                    it != 'halfphone_unitname'
-                }
-            }
+            outputTypeParamsFile = halfPhoneUnitFeatureListerTask.destFile
         }
 
         project.task('generateHalfPhoneFeatureDefinitionFile', type: GeneratePhoneFeatureDefinitionFile) {
@@ -411,4 +415,5 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             legacyDescriptorTask.destFile.set(distsDir.get().file(legacyZipTask.archiveName.replace('.zip', '-component-descriptor.xml')))
         }
     }
+
 }

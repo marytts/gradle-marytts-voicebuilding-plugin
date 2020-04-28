@@ -120,6 +120,32 @@ task testFeatureLister(group: 'Verification') {
     }
 }
 
+task testPhoneUnitFeatureLister(group: 'Verification') {
+    dependsOn phoneUnitFeatureLister
+    doLast {
+        def phoneUnitFeatureFile = file("$buildDir/phoneUnitFeatures.txt")
+        assert phoneUnitFeatureFile.exists()
+        def features = phoneUnitFeatureFile.readLines()
+        def featureToListFirst = phoneUnitFeatureLister.featureToListFirst.get()
+        assert features.count(featureToListFirst) == 1
+        assert features.first() == featureToListFirst
+        def featuresToExclude = phoneUnitFeatureLister.featuresToExclude.get()
+        assert features.intersect(featuresToExclude).isEmpty()
+    }
+}
+
+task testHalfPhoneUnitFeatureLister(group: 'Verification') {
+    dependsOn halfPhoneUnitFeatureLister
+    doLast {
+        def halfPhoneUnitFeatureFile = file("$buildDir/halfPhoneUnitFeatures.txt")
+        assert halfPhoneUnitFeatureFile.exists()
+        def features = halfPhoneUnitFeatureFile.readLines()
+        def featureToListFirst = halfPhoneUnitFeatureLister.featureToListFirst.get()
+        assert features.count(featureToListFirst) == 1
+        assert features.first() == featureToListFirst
+    }
+}
+
 task testPhoneUnitFeatureComputer(group: 'Verification') {
     dependsOn phoneUnitFeatureComputer
     doLast {

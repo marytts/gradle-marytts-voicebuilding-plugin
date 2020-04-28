@@ -48,6 +48,8 @@ class LegacyPluginFunctionalTest {
                 ['phoneUnitFileMaker', true],
                 ['halfPhoneUnitFileMaker', true],
                 ['featureLister', true],
+                ['phoneUnitFeatureLister', true],
+                ['halfPhoneUnitFeatureLister', true],
                 ['phoneUnitFeatureComputer', true],
                 ['generatePhoneFeatureDefinitionFile', true],
                 ['halfPhoneUnitFeatureComputer', true],

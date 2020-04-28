@@ -26,6 +26,10 @@ class MaryInterfaceBatchTask extends DefaultTask {
     @Input
     final ListProperty<String> outputTypeParams = project.objects.listProperty(String)
 
+    @Optional
+    @InputFile
+    final RegularFileProperty outputTypeParamsFile = project.objects.fileProperty()
+
     @Input
     final Property<String> inputExt = project.objects.property(String)
 
@@ -47,6 +51,10 @@ class MaryInterfaceBatchTask extends DefaultTask {
     @TaskAction
     void process() {
         def batch = []
+        def outputTypeParams = this.outputTypeParams.get()
+        if (outputTypeParamsFile.getOrNull()) {
+            outputTypeParams = outputTypeParamsFile.get().asFile.readLines()
+        }
         basenamesFile.get().asFile.eachLine('UTF-8') { basename ->
             def srcFile = srcDir.file("${basename}.${inputExt.get()}").get().asFile
             def destFile = destDir.file(srcFile.name.replace(inputExt.get(), outputExt.get())).get().asFile
@@ -55,7 +63,7 @@ class MaryInterfaceBatchTask extends DefaultTask {
                     inputType       : inputType.get(),
                     inputFile       : "$srcFile",
                     outputType      : outputType.get(),
-                    outputTypeParams: outputTypeParams.get(),
+                    outputTypeParams: outputTypeParams,
                     outputFile      : "$destFile"
             ]
         }
