@@ -1,11 +1,13 @@
 package de.dfki.mary.voicebuilding
 
 import de.dfki.mary.MaryttsExtension
-import de.dfki.mary.voicebuilding.tasks.*
-
+import de.dfki.mary.voicebuilding.tasks.GenerateServiceLoader
+import de.dfki.mary.voicebuilding.tasks.GenerateSource
+import de.dfki.mary.voicebuilding.tasks.GenerateVoiceConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.GroovyPlugin
+import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.tasks.JavaExec
@@ -16,6 +18,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+        project.plugins.apply JavaLibraryPlugin
         project.plugins.apply GroovyPlugin
         project.plugins.apply MavenPublishPlugin
 
@@ -43,17 +46,17 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.configurations {
-            integrationTestCompile.extendsFrom testCompile
-            integrationTestRuntime.extendsFrom testRuntime
+            integrationTestCompile.extendsFrom testImplementation
+            integrationTestRuntime.extendsFrom testRuntimeOnly
         }
 
         project.dependencies {
-            compile group: 'de.dfki.mary', name: 'marytts-runtime', version: project.marytts.version, {
+            api group: 'de.dfki.mary', name: 'marytts-runtime', version: project.marytts.version, {
                 exclude group: '*', module: 'groovy-all'
             }
-            testCompile group: 'junit', name: 'junit', version: '4.12'
-            integrationTestCompile localGroovy()
-            integrationTestCompile group: 'org.testng', name: 'testng', version: '6.14.3'
+            testImplementation group: 'junit', name: 'junit', version: '4.12'
+            integrationTestImplementation localGroovy()
+            integrationTestImplementation group: 'org.testng', name: 'testng', version: '6.14.3'
         }
 
         project.afterEvaluate {
