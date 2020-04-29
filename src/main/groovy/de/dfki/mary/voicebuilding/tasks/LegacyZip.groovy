@@ -10,6 +10,6 @@ class LegacyZip extends Zip {
     final RegularFileProperty destFile = project.objects.fileProperty()
 
     LegacyZip() {
-        classifier 'legacy'
+        archiveClassifier.set('legacy')
     }
 }
