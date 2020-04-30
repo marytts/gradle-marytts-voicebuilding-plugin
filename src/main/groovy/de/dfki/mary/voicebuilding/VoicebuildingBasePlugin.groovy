@@ -54,9 +54,9 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             api group: 'de.dfki.mary', name: 'marytts-runtime', version: project.marytts.version, {
                 exclude group: '*', module: 'groovy-all'
             }
-            testImplementation group: 'junit', name: 'junit', version: '4.12'
+            testImplementation group: 'junit', name: 'junit', version: '4.13'
             integrationTestImplementation localGroovy()
-            integrationTestImplementation group: 'org.testng', name: 'testng', version: '6.14.3'
+            integrationTestImplementation group: 'org.testng', name: 'testng', version: '7.0.0'
         }
 
         project.afterEvaluate {

@@ -406,7 +406,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 api "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
                     exclude group: '*', module: 'groovy-all'
                 }
-                testImplementation "junit:junit:4.12"
+                testImplementation "junit:junit:4.13"
             }
 
             // TODO: legacyZip.archiveName is modified (version is infixed), so we need to update
