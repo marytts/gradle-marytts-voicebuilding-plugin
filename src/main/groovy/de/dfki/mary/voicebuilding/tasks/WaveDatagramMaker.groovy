@@ -1,6 +1,6 @@
 package de.dfki.mary.voicebuilding.tasks
 
-import com.google.gson.Gson
+import groovy.json.JsonBuilder
 import marytts.tools.voiceimport.WavReader
 import marytts.util.data.ESTTrackReader
 
@@ -48,11 +48,7 @@ class WaveDatagramMaker implements Runnable {
                     data    : baos.toByteArray().encodeBase64().toString()
             ]
         }
-        // TODO: workaround for JSON serialization in Gradle v5.0
-        // java.util.ServiceConfigurationError:
-        // org.apache.groovy.json.FastStringServiceFactory:
-        // Provider org.apache.groovy.json.DefaultFastStringServiceFactory not a subtype
-        def json = new Gson().toJson(jsonDatagrams)
-        destFile.text = json
+        def json = new JsonBuilder(jsonDatagrams)
+        destFile.text = json.toPrettyString()
     }
 }
