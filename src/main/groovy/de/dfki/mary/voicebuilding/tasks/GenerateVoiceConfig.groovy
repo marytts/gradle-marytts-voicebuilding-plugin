@@ -42,11 +42,14 @@ class GenerateVoiceConfig extends DefaultTask {
     }
 
     String voiceType() {
+        def type
         switch (project.marytts.voice.type) {
             case ~/hs?mm/:
-                return 'hmm'
+                type = 'hmm'
+                break
             default:
-                return 'unitselection'
+                type = 'unitselection'
         }
+        return type
     }
 }
