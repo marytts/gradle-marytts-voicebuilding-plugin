@@ -5,7 +5,6 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
-import org.gradle.workers.IsolationMode
 import org.gradle.workers.WorkerExecutor
 
 import javax.inject.Inject
@@ -37,13 +36,13 @@ class MakeWaveDatagrams extends DefaultTask {
 
     @TaskAction
     void make() {
+        def workQueue = workerExecutor.processIsolation()
         basenamesFile.get().asFile.eachLine('UTF-8') { basename ->
-            def wavFile = wavDir.file("${basename}.wav").get().asFile
-            def pmFile = pmDir.file("${basename}.pm").get().asFile
-            def destFile = destDir.file("${basename}.json").get().asFile
-            workerExecutor.submit(WaveDatagramMaker.class) { config ->
-                config.params wavFile, pmFile, destFile, sampleRate.get()
-                config.isolationMode = IsolationMode.PROCESS
+            workQueue.submit(WaveDatagramMaker.class) { parameters ->
+                parameters.wavFile = wavDir.file("${basename}.wav")
+                parameters.pmFile = pmDir.file("${basename}.pm")
+                parameters.destFile = destDir.file("${basename}.json")
+                parameters.sampleRate = this.sampleRate
             }
         }
     }
