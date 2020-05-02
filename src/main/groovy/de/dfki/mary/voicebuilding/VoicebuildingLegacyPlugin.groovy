@@ -4,6 +4,7 @@ import de.dfki.mary.voicebuilding.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.bundling.Zip
 
 class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
@@ -53,23 +54,25 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('halfphoneUnits.mry')
         }
 
-        project.task('featureLister', type: FeatureListerTask) {
+        def featureListerTask = project.task('featureLister', type: FeatureListerTask) {
             destFile = project.legacyBuildDir.get().file('features.txt')
         }
 
+        def phoneUnitFeatureListerTask = project.task('phoneUnitFeatureLister', type: PhoneUnitFeatureLister) {
+            srcFile = featureListerTask.destFile
+            destFile = project.layout.buildDirectory.file('phoneUnitFeatures.txt')
+            featureToListFirst = 'phone'
+            featuresToExclude = ['halfphone_lr', 'halfphone_unitname']
+        }
+
         project.task('phoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
-            dependsOn project.featureLister
             srcDir = project.alignLabelsWithPrompts.destDir
             destDir = project.layout.buildDirectory.dir('phonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
             outputType = 'TARGETFEATURES'
             outputExt = 'pfeats'
-            doFirst {
-                outputTypeParams = ['phone'] + project.featureLister.destFile.get().asFile.readLines().findAll {
-                    it != 'phone' && !(it in ['halfphone_lr', 'halfphone_unitname'])
-                }
-            }
+            outputTypeParamsFile = phoneUnitFeatureListerTask.destFile
         }
 
         project.task('generatePhoneFeatureDefinitionFile', type: GeneratePhoneFeatureDefinitionFile) {
@@ -78,19 +81,21 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             destFile = project.legacyBuildDir.get().file('phoneUnitFeatureDefinition.txt')
         }
 
+        def halfPhoneUnitFeatureListerTask = project.task('halfPhoneUnitFeatureLister', type: PhoneUnitFeatureLister) {
+            srcFile = featureListerTask.destFile
+            destFile = project.layout.buildDirectory.file('halfPhoneUnitFeatures.txt')
+            featureToListFirst = 'halfphone_unitname'
+        }
+
         project.task('halfPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
-            dependsOn project.featureLister
+            dependsOn featureListerTask
             srcDir = project.alignLabelsWithPrompts.destDir
             destDir = project.layout.buildDirectory.dir('halfphonefeatures')
             inputType = 'ALLOPHONES'
             inputExt = 'xml'
             outputType = 'HALFPHONE_TARGETFEATURES'
             outputExt = 'hpfeats'
-            doFirst {
-                outputTypeParams = ['halfphone_unitname'] + project.featureLister.destFile.get().asFile.readLines().findAll {
-                    it != 'halfphone_unitname'
-                }
-            }
+            outputTypeParamsFile = halfPhoneUnitFeatureListerTask.destFile
         }
 
         project.task('generateHalfPhoneFeatureDefinitionFile', type: GeneratePhoneFeatureDefinitionFile) {
@@ -295,7 +300,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.generateVoiceConfig {
             project.afterEvaluate {
-                config.get() << [
+                config.putAll([
                         'viterbi.wTargetCosts'    : 0.7,
                         'viterbi.beamsize'        : 100,
                         databaseClass             : 'marytts.unitselection.data.DiphoneUnitDatabase',
@@ -336,7 +341,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                         'rightF0.attribute.format': '(100,%.0f)',
                         'rightF0.predictFrom'     : 'firstVowels',
                         'rightF0.applyTo'         : 'lastVoicedSegments'
-                ]
+                ])
             }
         }
 
@@ -371,18 +376,23 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             systemProperty 'mary.base', project.processLegacyResources.destinationDir
         }
 
-        def legacyZipTask = project.task('legacyZip', type: LegacyZip) {
+        def legacyZipTask = project.task('legacyZip', type: Zip) {
             from project.processLegacyResources
             from project.jar, {
                 rename { "lib/$it" }
             }
-            destFile = project.layout.fileProperty()
+            archiveClassifier = 'legacy'
         }
 
-        def legacyDescriptorTask = project.task('legacyDescriptor', type: LegacyDescriptorTask) {
-            project.assemble.dependsOn it
-            srcFile = legacyZipTask.destFile
-            destFile = project.layout.fileProperty()
+        project.task('legacyDescriptor', type: LegacyDescriptorTask) {
+            srcFile = legacyZipTask.archiveFile
+            destFile = project.distsDirectory.get().file([
+                    legacyZipTask.archiveBaseName.get(),
+                    legacyZipTask.archiveVersion.get(),
+                    legacyZipTask.archiveClassifier.get(),
+                    'component-descriptor.xml'
+            ].join('-'))
+            legacyZipTask.finalizedBy it
         }
 
         project.artifacts {
@@ -399,16 +409,12 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.afterEvaluate {
             project.dependencies {
-                compile "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
+                api "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
                     exclude group: '*', module: 'groovy-all'
                 }
-                testCompile "junit:junit:4.12"
+                testImplementation "junit:junit:4.13"
             }
-
-            // TODO: legacyZip.archiveName is modified (version is infixed), so we need to update
-            def distsDir = project.layout.buildDirectory.dir(project.distsDirName)
-            legacyZipTask.destFile.set(distsDir.get().file(legacyZipTask.archiveName))
-            legacyDescriptorTask.destFile.set(distsDir.get().file(legacyZipTask.archiveName.replace('.zip', '-component-descriptor.xml')))
         }
     }
+
 }

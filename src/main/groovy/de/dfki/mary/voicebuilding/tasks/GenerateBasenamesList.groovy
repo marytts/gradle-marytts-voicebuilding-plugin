@@ -4,22 +4,18 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 
 class GenerateBasenamesList extends DefaultTask {
 
     @InputDirectory
-    final DirectoryProperty wavDir = newInputDirectory()
+    final DirectoryProperty wavDir = project.objects.directoryProperty()
 
     @InputDirectory
-    final DirectoryProperty textDir = newInputDirectory()
+    final DirectoryProperty textDir = project.objects.directoryProperty()
 
     @InputDirectory
-    final DirectoryProperty labDir = newInputDirectory()
+    final DirectoryProperty labDir = project.objects.directoryProperty()
 
     @Optional
     @Input
@@ -30,7 +26,13 @@ class GenerateBasenamesList extends DefaultTask {
     ListProperty<String> excludes = project.objects.listProperty(String)
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
+
+    GenerateBasenamesList() {
+        // TODO ListProperty initialization required in Gradle v5.0
+        this.includes.empty()
+        this.excludes.empty()
+    }
 
     void include(String... includes) {
         this.includes.addAll(includes)

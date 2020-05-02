@@ -3,38 +3,35 @@ package de.dfki.mary.voicebuilding.tasks
 import groovy.json.JsonBuilder
 import marytts.tools.voiceimport.WavReader
 import marytts.util.data.ESTTrackReader
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
 
-import javax.inject.Inject
+interface WaveDatagramMakerParameters extends WorkParameters {
 
-class WaveDatagramMaker implements Runnable {
+    RegularFileProperty getWavFile()
 
-    File wavFile
+    RegularFileProperty getPmFile()
 
-    File pmFile
+    RegularFileProperty getDestFile()
 
-    File destFile
+    Property<Integer> getSampleRate()
+}
 
-    int sampleRate
-
-    @Inject
-    WaveDatagramMaker(File wavFile, File pmFile, File destFile, int sampleRate) {
-        this.wavFile = wavFile
-        this.pmFile = pmFile
-        this.destFile = destFile
-        this.sampleRate = sampleRate
-    }
+abstract class WaveDatagramMaker implements WorkAction<WaveDatagramMakerParameters> {
 
     @Override
-    void run() {
-        def pm = new ESTTrackReader(pmFile.path)
-        def wav = new WavReader(wavFile.path)
+    void execute() {
+        def pm = new ESTTrackReader(parameters.pmFile.get().asFile.path)
+        def wav = new WavReader(parameters.wavFile.get().asFile.path)
         def wave = wav.samples
         def jsonDatagrams = []
         int frameStart
         int frameEnd = 0
         pm.times.each { time ->
             frameStart = frameEnd
-            frameEnd = (time * sampleRate) as int
+            frameEnd = (time * parameters.sampleRate.get()) as int
             def duration = frameEnd - frameStart
             def baos = new ByteArrayOutputStream(2 * duration)
             def dos = new DataOutputStream(baos)
@@ -49,6 +46,6 @@ class WaveDatagramMaker implements Runnable {
             ]
         }
         def json = new JsonBuilder(jsonDatagrams)
-        destFile.text = json.toPrettyString()
+        parameters.destFile.get().asFile.text = json.toPrettyString()
     }
 }

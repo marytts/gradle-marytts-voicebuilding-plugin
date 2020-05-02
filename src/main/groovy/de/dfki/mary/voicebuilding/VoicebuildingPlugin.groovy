@@ -1,9 +1,7 @@
 package de.dfki.mary.voicebuilding
 
 import groovy.json.JsonBuilder
-
 import marytts.features.FeatureProcessorManager
-
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Zip
@@ -35,7 +33,7 @@ class VoicebuildingPlugin implements Plugin<Project> {
 
         project.task('dataZip', type: Zip) {
             from project.processDataResources
-            classifier 'data'
+            archiveClassifier = 'data'
         }
     }
 

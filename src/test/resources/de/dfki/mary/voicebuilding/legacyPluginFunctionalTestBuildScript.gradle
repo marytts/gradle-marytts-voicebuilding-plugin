@@ -31,14 +31,21 @@ def voiceLocale = new Locale.Builder()
 repositories {
     ivy {
         url 'https://dl.bintray.com/marytts/marytts'
-        layout 'pattern', {
+        patternLayout {
             artifact '[organisation]/[module]/[artifact].[ext]'
+        }
+        metadataSources {
+            artifact()
         }
     }
     ivy {
         url 'http://festvox.org/examples'
-        layout 'pattern', {
+        allowInsecureProtocol = true
+        patternLayout {
             artifact '[module]_[classifier]/packed/[artifact].[ext]'
+        }
+        metadataSources {
+            artifact()
         }
     }
 }
@@ -110,6 +117,32 @@ task testFeatureLister(group: 'Verification') {
     dependsOn featureLister
     doLast {
         assert file("$buildDir/mary/features.txt").exists()
+    }
+}
+
+task testPhoneUnitFeatureLister(group: 'Verification') {
+    dependsOn phoneUnitFeatureLister
+    doLast {
+        def phoneUnitFeatureFile = file("$buildDir/phoneUnitFeatures.txt")
+        assert phoneUnitFeatureFile.exists()
+        def features = phoneUnitFeatureFile.readLines()
+        def featureToListFirst = phoneUnitFeatureLister.featureToListFirst.get()
+        assert features.count(featureToListFirst) == 1
+        assert features.first() == featureToListFirst
+        def featuresToExclude = phoneUnitFeatureLister.featuresToExclude.get()
+        assert features.intersect(featuresToExclude).isEmpty()
+    }
+}
+
+task testHalfPhoneUnitFeatureLister(group: 'Verification') {
+    dependsOn halfPhoneUnitFeatureLister
+    doLast {
+        def halfPhoneUnitFeatureFile = file("$buildDir/halfPhoneUnitFeatures.txt")
+        assert halfPhoneUnitFeatureFile.exists()
+        def features = halfPhoneUnitFeatureFile.readLines()
+        def featureToListFirst = halfPhoneUnitFeatureLister.featureToListFirst.get()
+        assert features.count(featureToListFirst) == 1
+        assert features.first() == featureToListFirst
     }
 }
 
@@ -425,6 +458,8 @@ task testGenerateVoiceConfig(group: 'Verification') {
     }
 }
 
+import org.custommonkey.xmlunit.XMLUnit
+
 import java.util.zip.ZipFile
 
 task testJar(group: 'Verification') {
@@ -454,9 +489,9 @@ task testLegacyZip(group: 'Verification') {
     dependsOn legacyZip
     doLast {
         def zipFileName = "$project.name-$version-legacy.zip"
-        def zipFile = file("$distsDir/$zipFileName")
-        assert legacyZip.destFile.get().asFile == zipFile
-        def actual = new ZipFile(zipFile).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
+        def zipFile = distsDirectory.get().file(zipFileName)
+        assert legacyZip.archiveFile.get() == zipFile
+        def actual = new ZipFile(zipFile.asFile).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
         def expected = [
                 "lib/voices/$voiceName/halfphoneFeatures_ac.mry",
                 "lib/voices/$voiceName/halfphoneUnits.mry",
@@ -469,13 +504,11 @@ task testLegacyZip(group: 'Verification') {
     }
 }
 
-import org.custommonkey.xmlunit.XMLUnit
-
 task testLegacyDescriptor(group: 'Verification') {
     dependsOn legacyDescriptor
     doLast {
         def zipFileName = "$project.name-$version-legacy.zip"
-        def zipFile = file("$distsDir/$zipFileName")
+        def zipFile = distsDirectory.get().file(zipFileName).asFile
         ant.checksum file: zipFile, algorithm: 'MD5', property: 'md5Hash'
         def expected = new groovy.xml.StreamingMarkupBuilder().bind {
             'marytts-install'(xmlns: "http://mary.dfki.de/installer") {

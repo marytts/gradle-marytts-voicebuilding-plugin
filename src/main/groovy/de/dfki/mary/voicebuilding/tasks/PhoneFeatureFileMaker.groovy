@@ -12,22 +12,22 @@ import org.gradle.api.tasks.*
 class PhoneFeatureFileMaker extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty basenamesFile = newInputFile()
+    final RegularFileProperty basenamesFile = project.objects.fileProperty()
 
     @InputDirectory
-    final DirectoryProperty srcDir = newInputDirectory()
+    final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @Input
-    Property<String> srcExt = project.objects.property(String)
+    final Property<String> srcExt = project.objects.property(String)
 
     @InputFile
-    final RegularFileProperty unitFile = newInputFile()
+    final RegularFileProperty unitFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty featureDefinitionFile = newInputFile()
+    final RegularFileProperty featureDefinitionFile = project.objects.fileProperty()
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void make() {

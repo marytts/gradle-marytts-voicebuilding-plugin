@@ -2,34 +2,32 @@ package de.dfki.mary.voicebuilding.tasks
 
 import groovy.json.JsonBuilder
 import marytts.util.data.ESTTrackReader
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
 
-import javax.inject.Inject
+interface McepDatagramMakerParameters extends WorkParameters {
 
-class McepDatagramMaker implements Runnable {
+    RegularFileProperty getMcepFile()
 
-    File mcepFile
+    RegularFileProperty getDestFile()
 
-    File destFile
+    Property<Integer> getSampleRate()
+}
 
-    int sampleRate
-
-    @Inject
-    McepDatagramMaker(File mcepFile, File destFile, int sampleRate) {
-        this.mcepFile = mcepFile
-        this.destFile = destFile
-        this.sampleRate = sampleRate
-    }
+abstract class McepDatagramMaker implements WorkAction<McepDatagramMakerParameters> {
 
     @Override
-    void run() {
-        def mcep = new ESTTrackReader(mcepFile.path)
+    void execute() {
+        def mcep = new ESTTrackReader(parameters.mcepFile.get().asFile.path)
         def jsonDatagrams = []
         int frameStart
         int frameEnd = 0
         mcep.frames.eachWithIndex { frame, f ->
             frameStart = frameEnd
             def time = mcep.getTime(f)
-            frameEnd = (time * sampleRate) as int
+            frameEnd = (time * parameters.sampleRate.get()) as int
             def duration = frameEnd - frameStart
             jsonDatagrams << [
                     duration: duration,
@@ -37,6 +35,6 @@ class McepDatagramMaker implements Runnable {
             ]
         }
         def json = new JsonBuilder(jsonDatagrams)
-        destFile.text = json.toPrettyString()
+        parameters.destFile.get().asFile.text = json.toPrettyString()
     }
 }

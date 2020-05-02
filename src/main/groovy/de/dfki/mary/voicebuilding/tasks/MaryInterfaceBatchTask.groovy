@@ -5,47 +5,56 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.Optional
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 
 class MaryInterfaceBatchTask extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty basenamesFile = newInputFile()
+    final RegularFileProperty basenamesFile = project.objects.fileProperty()
 
     @InputDirectory
-    final DirectoryProperty srcDir = newInputDirectory()
+    final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @Input
-    Property<String> inputType = project.objects.property(String)
+    final Property<String> inputType = project.objects.property(String)
 
     @Input
-    Property<String> outputType = project.objects.property(String)
+    final Property<String> outputType = project.objects.property(String)
 
     @Input
-    ListProperty<String> outputTypeParams = project.objects.listProperty(String)
+    final ListProperty<String> outputTypeParams = project.objects.listProperty(String)
+
+    @Optional
+    @InputFile
+    final RegularFileProperty outputTypeParamsFile = project.objects.fileProperty()
 
     @Input
-    Property<String> inputExt = project.objects.property(String)
+    final Property<String> inputExt = project.objects.property(String)
 
     @Input
-    Property<String> outputExt = project.objects.property(String)
+    final Property<String> outputExt = project.objects.property(String)
 
     @Optional
     @Input
-    Property<Map> maryttsProperties = project.objects.property(Map)
+    final MapProperty<String, Object> maryttsProperties = project.objects.mapProperty(String, Object)
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
+
+    MaryInterfaceBatchTask() {
+        // TODO ListProperty initialization required in Gradle v5.0
+        this.outputTypeParams.empty()
+    }
 
     @TaskAction
     void process() {
         def batch = []
+        def outputTypeParams = this.outputTypeParams.get()
+        if (outputTypeParamsFile.getOrNull()) {
+            outputTypeParams = outputTypeParamsFile.get().asFile.readLines()
+        }
         basenamesFile.get().asFile.eachLine('UTF-8') { basename ->
             def srcFile = srcDir.file("${basename}.${inputExt.get()}").get().asFile
             def destFile = destDir.file(srcFile.name.replace(inputExt.get(), outputExt.get())).get().asFile
@@ -54,7 +63,7 @@ class MaryInterfaceBatchTask extends DefaultTask {
                     inputType       : inputType.get(),
                     inputFile       : "$srcFile",
                     outputType      : outputType.get(),
-                    outputTypeParams: outputTypeParams.get(),
+                    outputTypeParams: outputTypeParams,
                     outputFile      : "$destFile"
             ]
         }

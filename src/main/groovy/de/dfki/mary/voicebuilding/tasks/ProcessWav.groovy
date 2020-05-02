@@ -6,8 +6,6 @@ import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.gradle.workers.IsolationMode
-import org.gradle.workers.WorkerConfiguration
 import org.gradle.workers.WorkerExecutor
 
 import javax.inject.Inject
@@ -18,10 +16,10 @@ class ProcessWav extends DefaultTask {
     final WorkerExecutor workerExecutor
 
     @InputDirectory
-    final DirectoryProperty srcDir = newInputDirectory()
+    final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @Inject
     ProcessWav(WorkerExecutor workerExecutor) {
@@ -34,13 +32,16 @@ class ProcessWav extends DefaultTask {
             new File(dir, 'sox')
         }.find { it.exists() }
         assert soxPath
+        def workQueue = workerExecutor.processIsolation()
         project.fileTree(srcDir).include('**/*.wav').each { wavFile ->
             def destFile = destDir.file("$wavFile.name").get().asFile
-            workerExecutor.submit(RunnableExec.class) { WorkerConfiguration config ->
-                def cmd = [soxPath, wavFile, destFile, 'rate', project.marytts.voice.samplingRate]
-                def args = [commandLine: cmd]
-                config.params args
-                config.isolationMode = IsolationMode.PROCESS
+            workQueue.submit(RunnableExec.class) { parameters ->
+                parameters.commandLine = [
+                        soxPath,
+                        wavFile,
+                        destFile,
+                        'rate', project.marytts.voice.samplingRate
+                ].collect { it.toString() }
             }
         }
     }

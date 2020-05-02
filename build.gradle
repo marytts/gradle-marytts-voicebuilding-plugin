@@ -2,7 +2,7 @@ plugins {
     id 'groovy'
     id 'java-gradle-plugin'
     id 'maven-publish'
-    id 'com.gradle.plugin-publish' version '0.10.0'
+    id 'com.gradle.plugin-publish' version '0.11.0'
 }
 
 group 'de.dfki.mary'
@@ -62,16 +62,16 @@ repositories {
 }
 
 dependencies {
-    compile localGroovy()
-    compile group: 'de.dfki.mary', name: 'marytts-builder', version: maryttsVersion, {
+    implementation localGroovy()
+    implementation group: 'de.dfki.mary', name: 'marytts-builder', version: maryttsVersion, {
         exclude group: '*', module: 'groovy-all'
         exclude group: '*', module: 'mwdumper'
         exclude group: '*', module: 'sgt'
     }
-    compile group: 'org.m2ci.msp', name: 'gradle-praat-wrapper-plugin', version: '0.5.2'
-    compile group: 'org.m2ci.msp', name: 'jtgt', version: '0.6.1'
-    testCompile group: 'org.testng', name: 'testng', version: '6.14.3'
-    testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
+    implementation group: 'org.m2ci.msp', name: 'gradle-praat-wrapper-plugin', version: '0.6'
+    implementation group: 'org.m2ci.msp', name: 'jtgt', version: '0.6.1'
+    testImplementation group: 'org.testng', name: 'testng', version: '7.0.0'
+    testImplementation group: 'xmlunit', name: 'xmlunit', version: '1.6'
 }
 
 processResources {

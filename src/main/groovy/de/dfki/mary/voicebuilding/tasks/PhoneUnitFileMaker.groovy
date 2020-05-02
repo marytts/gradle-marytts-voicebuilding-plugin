@@ -12,22 +12,22 @@ import org.m2ci.msp.jtgt.io.XWaveLabelSerializer
 class PhoneUnitFileMaker extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty basenamesFile = newInputFile()
+    final RegularFileProperty basenamesFile = project.objects.fileProperty()
 
     @InputDirectory
-    final DirectoryProperty srcDir = newInputDirectory()
+    final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @Input
-    Property<String> srcExt = project.objects.property(String)
+    final Property<String> srcExt = project.objects.property(String)
 
     @InputDirectory
-    final DirectoryProperty pmDir = newInputDirectory()
+    final DirectoryProperty pmDir = project.objects.directoryProperty()
 
     @Input
-    Property<Integer> sampleRate = project.objects.property(Integer)
+    final Property<Integer> sampleRate = project.objects.property(Integer)
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void make() {

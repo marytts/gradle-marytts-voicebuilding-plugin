@@ -24,19 +24,19 @@ import org.gradle.api.tasks.TaskAction
 class F0ContourFeatureFileMaker extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty unitFile = newInputFile()
+    final RegularFileProperty unitFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty featureFile = newInputFile()
+    final RegularFileProperty featureFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty timelineFile = newInputFile()
+    final RegularFileProperty timelineFile = project.objects.fileProperty()
 
     @Input
-    Property<String> gender = project.objects.property(String)
+    final Property<String> gender = project.objects.property(String)
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void make() {
@@ -63,12 +63,9 @@ class F0ContourFeatureFileMaker extends DefaultTask {
      *
      * @param out
      *            out
-     * @throws IOException
-     *             IOException
-     * @throws UnsupportedEncodingException
-     *             UnsupportedEncodingException
-     * @throws FileNotFoundException
-     *             FileNotFoundException
+     * @throws IOException*             IOException
+     * @throws UnsupportedEncodingException*             UnsupportedEncodingException
+     * @throws FileNotFoundException*             FileNotFoundException
      */
     protected void writeUnitFeaturesTo(DataOutput out, int polynomOrder, UnitFileReader units, FeatureDefinition outFeatureDefinition) throws IOException, UnsupportedEncodingException, FileNotFoundException {
 
@@ -153,8 +150,7 @@ class F0ContourFeatureFileMaker extends DefaultTask {
      *            the sampling frequency of the F0 contour to return (e.g., 0.005 to get a value every 5 ms)
      * @return a double array representing the F0 contour, sampled at skipSizeInSeconds, or null if no f0 contour could be
      *         computed
-     * @throws IOException
-     *             if there is a problem reading the audio data
+     * @throws IOException*             if there is a problem reading the audio data
      */
     private double[] getLogF0Contour(Sentence s, double skipSizeInSeconds, TimelineReader audio, UnitFileReader units) throws IOException {
         PitchFileHeader params = new PitchFileHeader();
@@ -195,8 +191,7 @@ class F0ContourFeatureFileMaker extends DefaultTask {
      * @param s
      *            s
      * @return the audio data for the sentence, in double representation
-     * @throws IOException
-     *             if there is a problem reading the audio data
+     * @throws IOException*             if there is a problem reading the audio data
      */
     private double[] getAudio(Sentence s, TimelineReader audio, UnitFileReader units) throws IOException {
         long tsSentenceStart = units.getUnit(s.getFirstUnitIndex()).startTime;

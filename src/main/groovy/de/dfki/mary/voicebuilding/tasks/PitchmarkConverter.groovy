@@ -11,38 +11,27 @@ import org.gradle.api.tasks.TaskAction
 class PitchmarkConverter extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty basenamesFile = newInputFile()
+    final RegularFileProperty basenamesFile = project.objects.fileProperty()
 
     @InputDirectory
-    final DirectoryProperty srcDir = newInputDirectory()
+    final DirectoryProperty srcDir = project.objects.directoryProperty()
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @TaskAction
     void convert() {
         basenamesFile.get().asFile.eachLine('UTF-8') { basename ->
             def srcFile = srcDir.file("${basename}.PointProcess").get().asFile
             def destFile = destDir.file("${basename}.pm").get().asFile
-            def nx
-            def times = []
-            srcFile.readLines().eachWithIndex { line, l ->
-                switch (l) {
-                    case { it < 5 }:
-                        // ignore praat header...
-                        break
-                    case 5:
-                        // ...up to line 5, which tells number of points
-                        nx = line
-                        break
-                    default:
-                        times << line
-                }
-            }
+            // ignore Praat header...
+            def times = srcFile.readLines().drop(5)
+            // ...up to line 6, which tells number of points (the remaining lines are the times)
+            def nx = times.pop()
             destFile.withWriter { pm ->
                 pm.println 'EST_File Track'
                 pm.println 'DataType ascii'
-                pm.println 'NumFrames ' + nx
+                pm.println "NumFrames $nx"
                 pm.println 'NumChannels 0'
                 pm.println 'NumAuxChannels 0'
                 pm.println 'EqualSpace 0'

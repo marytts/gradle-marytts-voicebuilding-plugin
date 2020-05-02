@@ -5,14 +5,21 @@ plugins {
 repositories {
     ivy {
         url 'https://dl.bintray.com/marytts/marytts'
-        layout 'pattern', {
+        patternLayout {
             artifact '[organisation]/[module]/[artifact].[ext]'
+        }
+        metadataSources {
+            artifact()
         }
     }
     ivy {
         url 'http://festvox.org/examples'
-        layout 'pattern', {
+        allowInsecureProtocol = true
+        patternLayout {
             artifact '[module]_[classifier]/packed/[artifact].[ext]'
+        }
+        metadataSources {
+            artifact()
         }
     }
 }

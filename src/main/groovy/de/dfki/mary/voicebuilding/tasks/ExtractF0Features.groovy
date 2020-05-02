@@ -12,16 +12,16 @@ import org.gradle.api.tasks.TaskAction
 class ExtractF0Features extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty unitFile = newInputFile()
+    final RegularFileProperty unitFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty featureFile = newInputFile()
+    final RegularFileProperty featureFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty timelineFile = newInputFile()
+    final RegularFileProperty timelineFile = project.objects.fileProperty()
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     @TaskAction
     void extract() {

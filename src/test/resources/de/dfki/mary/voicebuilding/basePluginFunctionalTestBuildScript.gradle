@@ -113,9 +113,12 @@ task testGenerateServiceLoader(group: 'Verification') {
     }
 }
 
+
 import groovy.xml.XmlUtil
 import org.custommonkey.xmlunit.XMLUnit
 import org.custommonkey.xmlunit.examples.RecursiveElementNameAndTextQualifier
+
+import java.util.zip.ZipFile
 
 task testGeneratePomFileForMavenJavaPublication(group: 'Verification') {
     dependsOn generatePomFileForMavenJavaPublication
@@ -166,6 +169,7 @@ task testGeneratePomFileForMavenJavaPublication(group: 'Verification') {
             }
         } as String
         XMLUnit.ignoreWhitespace = true
+        XMLUnit.ignoreComments = true
         def diff = XMLUnit.compareXML(pomXml, pomFile.text)
         diff.overrideElementQualifier(new RecursiveElementNameAndTextQualifier())
         if (!diff.similar()) {
@@ -193,12 +197,10 @@ task testGeneratePomProperties(group: 'Verification') {
     }
 }
 
-import java.util.zip.ZipFile
-
 task testJar(group: 'Verification') {
     dependsOn jar
     doLast {
-        def actual = new ZipFile(jar.archivePath).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
+        def actual = new ZipFile(jar.archiveFile.get().asFile).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
         def expected = [
                 'META-INF/MANIFEST.MF',
                 'META-INF/services/marytts.config.MaryConfig',

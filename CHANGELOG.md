@@ -10,6 +10,8 @@ Gradle MaryTTS voicebuilding plugin
 
 ### Changed
 
+- Build with Gradle v6.3
+- Upgrade test dependencies
 - [all changes since v5.4]
 
 [v5.4] - 2018-12-12

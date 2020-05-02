@@ -9,23 +9,23 @@ import org.gradle.api.tasks.*
 class TrainProsodyCart extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty wagon = newInputFile()
+    final RegularFileProperty wagon = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty dataFile = newInputFile()
+    final RegularFileProperty dataFile = project.objects.fileProperty()
 
     @InputFile
-    final RegularFileProperty descriptionFile = newInputFile()
+    final RegularFileProperty descriptionFile = project.objects.fileProperty()
 
     @Input
-    Property<String> predictee = project.objects.property(String)
+    final Property<String> predictee = project.objects.property(String)
 
     @Optional
     @Input
-    ListProperty<String> ignoreFields = project.objects.listProperty(String)
+    final ListProperty<String> ignoreFields = project.objects.listProperty(String)
 
     @OutputFile
-    final RegularFileProperty destFile = newOutputFile()
+    final RegularFileProperty destFile = project.objects.fileProperty()
 
     TrainProsodyCart() {
         def wagonPath = System.env['PATH'].split(':').collect { dir ->

@@ -15,16 +15,16 @@ import org.m2ci.msp.jtgt.io.XWaveLabelSerializer
 class AlignLabelsWithPrompts extends DefaultTask {
 
     @InputFile
-    final RegularFileProperty basenamesFile = newInputFile()
+    final RegularFileProperty basenamesFile = project.objects.fileProperty()
 
     @InputDirectory
-    final DirectoryProperty labDir = newInputDirectory()
+    final DirectoryProperty labDir = project.objects.directoryProperty()
 
     @InputDirectory
-    final DirectoryProperty maryXmlDir = newInputDirectory()
+    final DirectoryProperty maryXmlDir = project.objects.directoryProperty()
 
     @OutputDirectory
-    final DirectoryProperty destDir = newOutputDirectory()
+    final DirectoryProperty destDir = project.objects.directoryProperty()
 
     @TaskAction
     void align() {

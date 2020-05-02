@@ -8,13 +8,17 @@ import static org.gradle.testkit.runner.TaskOutcome.SUCCESS
 
 class LegacyPluginOneShotFunctionalTest {
 
-    def gradle
+    GradleRunner gradle
+    final List DEFAULT_ARGS = ['--warning-mode', 'all', '--stacktrace']
 
     @BeforeSuite
     void setup() {
         def projectDir = File.createTempDir()
 
-        gradle = GradleRunner.create().withProjectDir(projectDir).withPluginClasspath().forwardOutput()
+        gradle = GradleRunner.create()
+                .withProjectDir(projectDir)
+                .withPluginClasspath()
+                .forwardOutput()
 
         // Add the logic under test to the test build
         new File(projectDir, 'gradle.properties').withWriter {
@@ -32,14 +36,11 @@ class LegacyPluginOneShotFunctionalTest {
         new File(projectDir, 'build.gradle').withWriter {
             it << this.class.getResourceAsStream('legacyPluginFunctionalTestBuildScript.gradle')
         }
-        new File(projectDir, 'settings.gradle').withWriter {
-            it << "enableFeaturePreview('STABLE_PUBLISHING')"
-        }
     }
 
     @Test
     void testOneShotBuild() {
-        def result = gradle.withArguments('build').build()
+        def result = gradle.withArguments(DEFAULT_ARGS + 'build').build()
         assert result.task(":build").outcome == SUCCESS
     }
 }
