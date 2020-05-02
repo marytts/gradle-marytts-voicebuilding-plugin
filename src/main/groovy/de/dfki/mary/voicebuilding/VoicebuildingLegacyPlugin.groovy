@@ -4,6 +4,7 @@ import de.dfki.mary.voicebuilding.tasks.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.bundling.Zip
 
 class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
@@ -375,18 +376,23 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             systemProperty 'mary.base', project.processLegacyResources.destinationDir
         }
 
-        def legacyZipTask = project.task('legacyZip', type: LegacyZip) {
+        def legacyZipTask = project.task('legacyZip', type: Zip) {
             from project.processLegacyResources
             from project.jar, {
                 rename { "lib/$it" }
             }
-            destFile = project.objects.fileProperty()
+            archiveClassifier = 'legacy'
         }
 
-        def legacyDescriptorTask = project.task('legacyDescriptor', type: LegacyDescriptorTask) {
-            project.assemble.dependsOn it
-            srcFile = legacyZipTask.destFile
-            destFile = project.objects.fileProperty()
+        project.task('legacyDescriptor', type: LegacyDescriptorTask) {
+            srcFile = legacyZipTask.archiveFile
+            destFile = project.distsDirectory.get().file([
+                    legacyZipTask.archiveBaseName.get(),
+                    legacyZipTask.archiveVersion.get(),
+                    legacyZipTask.archiveClassifier.get(),
+                    'component-descriptor.xml'
+            ].join('-'))
+            legacyZipTask.finalizedBy it
         }
 
         project.artifacts {
@@ -408,11 +414,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 }
                 testImplementation "junit:junit:4.13"
             }
-
-            // TODO: legacyZip.archiveName is modified (version is infixed), so we need to update
-            def distsDir = project.layout.buildDirectory.dir(project.distsDirName)
-            legacyZipTask.destFile.set(distsDir.get().file(legacyZipTask.archiveName))
-            legacyDescriptorTask.destFile.set(distsDir.get().file(legacyZipTask.archiveName.replace('.zip', '-component-descriptor.xml')))
         }
     }
 
