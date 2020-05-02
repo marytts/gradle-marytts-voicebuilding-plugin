@@ -489,9 +489,9 @@ task testLegacyZip(group: 'Verification') {
     dependsOn legacyZip
     doLast {
         def zipFileName = "$project.name-$version-legacy.zip"
-        def zipFile = file("$distsDir/$zipFileName")
-        assert legacyZip.destFile.get().asFile == zipFile
-        def actual = new ZipFile(zipFile).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
+        def zipFile = distsDirectory.get().file(zipFileName)
+        assert legacyZip.destFile.get() == zipFile
+        def actual = new ZipFile(zipFile.asFile).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
         def expected = [
                 "lib/voices/$voiceName/halfphoneFeatures_ac.mry",
                 "lib/voices/$voiceName/halfphoneUnits.mry",
@@ -508,7 +508,7 @@ task testLegacyDescriptor(group: 'Verification') {
     dependsOn legacyDescriptor
     doLast {
         def zipFileName = "$project.name-$version-legacy.zip"
-        def zipFile = file("$distsDir/$zipFileName")
+        def zipFile = distsDirectory.get().file(zipFileName).asFile
         ant.checksum file: zipFile, algorithm: 'MD5', property: 'md5Hash'
         def expected = new groovy.xml.StreamingMarkupBuilder().bind {
             'marytts-install'(xmlns: "http://mary.dfki.de/installer") {
