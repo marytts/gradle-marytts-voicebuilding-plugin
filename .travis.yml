@@ -5,6 +5,8 @@ branches:
 language: groovy
 jdk:
   - openjdk8
+  - openjdk11
+  - openjdk13
 
 addons:
   apt:
