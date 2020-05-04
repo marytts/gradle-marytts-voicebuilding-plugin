@@ -14,7 +14,7 @@ addons:
       - sox
       - speech-tools
 
-script: ./gradlew check --info
+script: ./gradlew check
 
 cache:
   directories:
