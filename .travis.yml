@@ -13,8 +13,8 @@ jdk:
 addons:
   apt:
     packages:
-    - sox
-    - speech-tools
+      - sox
+      - speech-tools
 
 script: ./gradlew check --info
 
