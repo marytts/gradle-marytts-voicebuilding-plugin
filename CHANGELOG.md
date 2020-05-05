@@ -7,11 +7,13 @@ Gradle MaryTTS voicebuilding plugin
 ### Added
 
 - Plugin usage in readme
+- Testing on OpenJDK 11 and 13
 
 ### Changed
 
 - Build with Gradle v6.3
 - Upgrade test dependencies
+- Drop testing on Oracle JDK
 - [all changes since v5.4]
 
 [v5.4] - 2018-12-12
