@@ -59,11 +59,12 @@ pluginBundle {
 
 repositories {
     jcenter()
+    mavenLocal()
 }
 
 dependencies {
     implementation localGroovy()
-    implementation group: 'de.dfki.mary', name: 'marytts-builder', version: maryttsVersion, {
+    implementation group: 'de.dfki.mary', name: 'marytts-voicebuilding', version: maryttsVBVersion, {
         exclude group: '*', module: 'groovy-all'
         exclude group: '*', module: 'mwdumper'
         exclude group: '*', module: 'sgt'
