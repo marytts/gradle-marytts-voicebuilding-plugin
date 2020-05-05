@@ -25,8 +25,8 @@ class LegacyPluginLegacyGradleTest {
     }
 
     @Test
-    void 'Gradle v6-1-1 cannot apply plugin'() {
-        gradle.withGradleVersion('6.1.1').buildAndFail()
+    void 'Gradle v6-1 cannot apply plugin'() {
+        gradle.withGradleVersion('6.1').buildAndFail()
     }
 
     @Test
