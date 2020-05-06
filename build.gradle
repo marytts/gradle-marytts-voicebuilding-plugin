@@ -85,7 +85,11 @@ test {
         parallel = 'classes'
     }
     testLogging {
+        events 'started', 'passed', 'failed', 'skipped'
         exceptionFormat = 'full'
+        info {
+            showStandardStreams = true
+        }
     }
     failFast = true
     doFirst {

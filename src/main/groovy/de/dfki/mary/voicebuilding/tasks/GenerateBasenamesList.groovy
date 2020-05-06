@@ -28,12 +28,6 @@ class GenerateBasenamesList extends DefaultTask {
     @OutputFile
     final RegularFileProperty destFile = project.objects.fileProperty()
 
-    GenerateBasenamesList() {
-        // TODO ListProperty initialization required in Gradle v5.0
-        this.includes.empty()
-        this.excludes.empty()
-    }
-
     void include(String... includes) {
         this.includes.addAll(includes)
     }

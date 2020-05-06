@@ -386,12 +386,8 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.task('legacyDescriptor', type: LegacyDescriptorTask) {
             srcFile = legacyZipTask.archiveFile
-            destFile = project.distsDirectory.get().file([
-                    legacyZipTask.archiveBaseName.get(),
-                    legacyZipTask.archiveVersion.get(),
-                    legacyZipTask.archiveClassifier.get(),
-                    'component-descriptor.xml'
-            ].join('-'))
+            def destFileName = legacyZipTask.archiveFileName.get() - '.zip' + '-component-descriptor.xml'
+            destFile = project.distsDirectory.get().file(destFileName)
             legacyZipTask.finalizedBy it
         }
 

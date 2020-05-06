@@ -488,7 +488,7 @@ task testJar(group: 'Verification') {
 task testLegacyZip(group: 'Verification') {
     dependsOn legacyZip
     doLast {
-        def zipFileName = "$project.name-$version-legacy.zip"
+        def zipFileName = "$project.name${version == 'unspecified' ? '' : '-' + version}-legacy.zip"
         def zipFile = distsDirectory.get().file(zipFileName)
         assert legacyZip.archiveFile.get() == zipFile
         def actual = new ZipFile(zipFile.asFile).entries().findAll { !it.isDirectory() }.collect { it.name } as Set
@@ -507,7 +507,7 @@ task testLegacyZip(group: 'Verification') {
 task testLegacyDescriptor(group: 'Verification') {
     dependsOn legacyDescriptor
     doLast {
-        def zipFileName = "$project.name-$version-legacy.zip"
+        def zipFileName = "$project.name${version == 'unspecified' ? '' : '-' + version}-legacy.zip"
         def zipFile = distsDirectory.get().file(zipFileName).asFile
         ant.checksum file: zipFile, algorithm: 'MD5', property: 'md5Hash'
         def expected = new groovy.xml.StreamingMarkupBuilder().bind {
