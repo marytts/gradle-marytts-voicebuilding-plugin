@@ -54,8 +54,8 @@ task testJavaCompatibility(group: 'Verification') {
     }
 }
 
-task testGenerateSource(group: 'Verification') {
-    dependsOn generateSource
+task testGenerateVoiceSource(group: 'Verification') {
+    dependsOn generateVoiceSource
     doLast {
         assert file("$buildDir/generatedSrc/main/java/marytts/voice/$marytts.voice.nameCamelCase/Config.java").exists()
     }

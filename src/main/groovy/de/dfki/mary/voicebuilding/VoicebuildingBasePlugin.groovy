@@ -1,8 +1,8 @@
 package de.dfki.mary.voicebuilding
 
-import de.dfki.mary.MaryttsExtension
-import de.dfki.mary.voicebuilding.tasks.GenerateServiceLoader
-import de.dfki.mary.voicebuilding.tasks.GenerateSource
+import de.dfki.mary.ComponentPlugin
+
+import de.dfki.mary.voicebuilding.tasks.GenerateVoiceSource
 import de.dfki.mary.voicebuilding.tasks.GenerateVoiceConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -21,16 +21,19 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         project.plugins.apply JavaLibraryPlugin
         project.plugins.apply GroovyPlugin
         project.plugins.apply MavenPublishPlugin
+        project.plugins.apply ComponentPlugin
 
         project.sourceCompatibility = '1.8'
 
-        project.extensions.create 'marytts', MaryttsExtension, project
-        project.marytts {
-            version = this.getClass().getResource('/maryttsVersion.txt')?.text
-        }
-
         project.marytts.extensions.create 'voice', VoiceExtension, project
         project.marytts.voice.extensions.create 'license', VoiceLicenseExtension, project
+
+        project.marytts {
+            component {
+                name = project.marytts.voice.nameCamelCase
+                packageName = "marytts.voice.${project.marytts.component.name}"
+            }
+        }
 
         project.repositories {
             jcenter()
@@ -43,11 +46,6 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
                     runtimeClasspath += main.output + test.output
                 }
             }
-        }
-
-        project.configurations {
-            integrationTestCompile.extendsFrom testImplementation
-            integrationTestRuntime.extendsFrom testRuntimeOnly
         }
 
         project.dependencies {
@@ -67,22 +65,23 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             }
         }
 
-        project.task('generateSource', type: GenerateSource) {
-            destDir = project.layout.buildDirectory.dir('generatedSrc')
-            project.sourceSets.main.java.srcDirs += "${destDir.get().asFile}/main/java"
-            project.sourceSets.test.java.srcDirs += "${destDir.get().asFile}/test/java"
-            project.sourceSets.integrationTest.groovy.srcDirs += "${destDir.get().asFile}/integrationTest/groovy"
+        project.tasks.register 'generateVoiceSource', GenerateVoiceSource, {
+            dependsOn "generateSource"
+            configClassFile = project.layout.buildDirectory.file("generatedSrc/main/java/${project.marytts.component.packagePath}/Config.java")
+            configTestFile =  project.layout.buildDirectory.file("generatedSrc/test/java/${project.marytts.component.packagePath}/ConfigTest.java")
+            integrationTestFile =  project.layout.buildDirectory.file("generatedSrc/integrationTest/groovy/${project.marytts.component.packagePath}/LoadVoiceIT.groovy")
+
+            project.sourceSets.main.java.srcDirs += "${project.buildDir}/generatedSrc/main/java"
+            project.sourceSets.test.java.srcDirs += "${project.buildDir}/generatedSrc/test/java"
+            project.sourceSets.integrationTest.groovy.srcDirs += "${project.buildDir}/generatedSrc/integrationTest/groovy"
+
             project.compileJava.dependsOn it
             project.compileTestJava.dependsOn it
             project.compileIntegrationTestGroovy.dependsOn it
         }
 
-        project.task('generateVoiceConfig', type: GenerateVoiceConfig) {
+        project.tasks.register 'generateVoiceConfig', GenerateVoiceConfig, {
             destFile = project.layout.buildDirectory.file('voice.config')
-        }
-
-        project.task('generateServiceLoader', type: GenerateServiceLoader) {
-            destFile = project.layout.buildDirectory.file('serviceLoader.txt')
         }
 
         project.publishing {
@@ -129,7 +128,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             }
         }
 
-        project.task('integrationTest', type: Test) {
+        project.task('voiceIntegrationTest', type: Test) {
             useTestNG()
             workingDir = project.buildDir
             testClassesDirs = project.sourceSets.integrationTest.output.classesDirs

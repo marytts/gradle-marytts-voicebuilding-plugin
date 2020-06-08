@@ -5,6 +5,7 @@ import org.gradle.api.provider.Property
 
 class VoiceExtension {
 
+    Project project
     Property<String> name
     Property<String> gender
     Property<String> domain
@@ -24,6 +25,7 @@ class VoiceExtension {
         this.type = project.objects.property(String)
         this.description = project.objects.property(String)
         this.samplingRate = project.objects.property(Integer)
+        this.project = project
     }
 
     String getName() {
@@ -32,6 +34,8 @@ class VoiceExtension {
 
     void setName(String name) {
         this.name.set(name)
+        this.project.marytts.component.name = this.nameCamelCase
+        this.project.marytts.component.packageName = "marytts.voice.${this.nameCamelCase}"
     }
 
     String getNameCamelCase() {
