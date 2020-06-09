@@ -16,19 +16,19 @@ public class VoiceConfigTest {
 
     @Test
     public void isNotMainConfig() throws MaryConfigurationException {
-        MaryConfig m = new CmuSltConfig();
+        MaryConfig m = new ${project.marytts.voice.nameCamelCase}Config();
         assertFalse(m.isMainConfig());
     }
 
     @Test
     public void isVoiceConfig() throws MaryConfigurationException {
-        MaryConfig m = new CmuSltConfig();
+        MaryConfig m = new ${project.marytts.voice.nameCamelCase}Config();
         assertTrue(m.isVoiceConfig());
     }
 
     @Test
     public void hasRightName() throws MaryConfigurationException {
-        VoiceConfig m = new CmuSltConfig();
+        VoiceConfig m = new ${project.marytts.voice.nameCamelCase}Config();
         assertEquals(voiceName, m.getName());
     }
 

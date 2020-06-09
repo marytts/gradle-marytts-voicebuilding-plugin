@@ -52,9 +52,9 @@ class BasePluginFunctionalTest {
                 ['testPlugins', false],
                 ['testVoiceProps', false],
                 ['testJavaCompatibility', false],
-                ['generateConfig', true]
-                ['generateVoiceSource', true],
-                ['compileTestJava', true],
+                ['generateConfig', false],
+                ['generateVoiceSource', false],
+                // ['compileTestJava', true],
                 ['compileGroovy', true],
                 // NOTE: no need for now, but in case it is needed for the future ['compileJava', true],
                 ['compileIntegrationTestGroovy', true],

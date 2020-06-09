@@ -10,12 +10,12 @@ import org.testng.annotations.*
 public class LoadVoiceIT {
 
     LocalMaryInterface mary
-    CmuSltConfig config
+    ${project.marytts.voice.nameCamelCase}Config config
 
     @BeforeMethod
     void setup() {
         mary = new LocalMaryInterface()
-        config = new CmuSltConfig()
+        config = new ${project.marytts.voice.nameCamelCase}Config()
     }
 
     @Test
@@ -43,7 +43,7 @@ public class LoadVoiceIT {
     @Test
     void canProcessTextToSpeech() {
         def mary = new LocalMaryInterface()
-        def config = new CmuSltConfig()
+        def config = new ${project.marytts.voice.nameCamelCase}Config()
         mary.voice = config.name
         def input = MaryDataType.getExampleText(MaryDataType.TEXT, config.locale)
         assert input : "Could not get example text for \$MaryDataType.TEXT / locale \$config.locale"

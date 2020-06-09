@@ -61,17 +61,17 @@ task testGenerateVoiceSource(group: 'Verification') {
     }
 }
 
-task testCompileJava(group: 'Verification') {
-    dependsOn compileJava
+task testCompileGroovy(group: 'Verification') {
+    dependsOn compileGroovy
     doLast {
-        // TODO: assert file("$buildDir/classes/java/main/marytts/voice/$marytts.voice.nameCamelCase/Config.class").exists()
+        assert file("$buildDir/classes/groovy/main/marytts/voice/$marytts.voice.nameCamelCase/${marytts.voice.nameCamelCase}Config.class").exists()
     }
 }
 
-task testCompileTestJava(group: 'Verification') {
-    dependsOn compileTestJava
+task testCompileTestGroovy(group: 'Verification') {
+    dependsOn compileTestGroovy
     doLast {
-        assert file("$buildDir/classes/java/test/marytts/voice/$marytts.voice.nameCamelCase/ConfigTest.class").exists()
+        assert file("$buildDir/classes/groovy/test/marytts/voice/$marytts.voice.nameCamelCase/ConfigTest.class").exists()
     }
 }
 

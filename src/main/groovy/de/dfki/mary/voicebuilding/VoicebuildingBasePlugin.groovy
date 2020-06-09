@@ -66,23 +66,23 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             }
         }
 
-        project.tasks.register 'generateVoiceSource', GenerateVoiceSource, {
-            dependsOn "generateSource"
-            configTestFile =  project.layout.buildDirectory.file("generatedSrc/test/java/${project.marytts.component.packagePath}/ConfigTest.java")
-            integrationTestFile =  project.layout.buildDirectory.file("generatedSrc/integrationTest/groovy/${project.marytts.component.packagePath}/LoadVoiceIT.groovy")
-
-            project.sourceSets.main.java.srcDirs += "${project.buildDir}/generatedSrc/main/java"
-            project.sourceSets.test.java.srcDirs += "${project.buildDir}/generatedSrc/test/java"
-            project.sourceSets.integrationTest.groovy.srcDirs += "${project.buildDir}/generatedSrc/integrationTest/groovy"
-
-            project.compileGroovy.dependsOn it
-            project.compileJava.dependsOn it
-            project.compileTestJava.dependsOn it
-            project.compileIntegrationTestGroovy.dependsOn it
-        }
 
         project.tasks.register 'generateVoiceConfig', GenerateVoiceConfig, {
-            project.generateConfig.dependsOn it
+
+        }
+
+        project.tasks.register 'generateVoiceSource', GenerateVoiceSource, {
+            dependsOn "generateSource", "generateConfig"
+            configTestFile =  project.layout.buildDirectory.file("generatedSrc/test/groovy/${project.marytts.component.packagePath}/VoiceConfigTest.groovy")
+            integrationTestFile =  project.layout.buildDirectory.file("generatedSrc/integrationTest/groovy/${project.marytts.component.packagePath}/LoadVoiceIT.groovy")
+
+        }
+
+        project.generateConfig {
+            dependsOn project.tasks.named("generateVoiceConfig")
+        }
+        project.compileGroovy {
+            dependsOn project.tasks.named("generateVoiceSource")
         }
 
         project.publishing {
