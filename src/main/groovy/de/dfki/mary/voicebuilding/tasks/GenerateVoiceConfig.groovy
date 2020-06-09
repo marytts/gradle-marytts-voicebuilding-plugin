@@ -12,33 +12,29 @@ class GenerateVoiceConfig extends DefaultTask {
     @Input
     final MapProperty<String, Object> config = project.objects.mapProperty(String, Object)
 
-    @OutputFile
-    final RegularFileProperty destFile = project.objects.fileProperty()
-
     GenerateVoiceConfig() {
         this.config.set([:])
     }
 
     @TaskAction
     void generate() {
-        destFile.get().asFile.withWriter 'UTF-8', { writer ->
-            writer.println """|# Auto-generated config file for voice ${project.marytts.voice.name}
-                              |
-                              |name = ${project.marytts.voice.name}
-                              |locale = ${project.marytts.voice.maryLocale}
-                              |
-                              |${voiceType()}.voices.list = ${project.marytts.voice.name}
-                              |
-                              |""".stripMargin()
-            ([
-                    domain      : 'general',
-                    gender      : project.marytts.voice.gender,
-                    locale      : project.marytts.voice.locale,
-                    samplingRate: project.marytts.voice.samplingRate
-            ] + config.get()).each { key, value ->
-                writer.println "voice.${project.marytts.voice.name}.$key = $value"
-            }
+
+        def tmp_config = [:]
+        tmp_config["name"] = project.marytts.voice.name
+        tmp_config["locale"] = project.marytts.voice.maryLocale
+        tmp_config["${voiceType()}.voices.list"] = project.marytts.voice.name
+
+        ([
+            domain      : 'general',
+            gender      : project.marytts.voice.gender,
+            locale      : project.marytts.voice.locale,
+            samplingRate: project.marytts.voice.samplingRate
+        ] + config.get()).each { key, value ->
+            tmp_config["voice.${project.marytts.voice.name}.$key"] = value
         }
+
+        project.marytts.component.config = tmp_config
+
     }
 
     String voiceType() {

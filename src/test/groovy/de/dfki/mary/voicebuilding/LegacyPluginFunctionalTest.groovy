@@ -86,7 +86,7 @@ class LegacyPluginFunctionalTest {
                 ['convertF0LeftCart', true],
                 ['convertF0MidCart', true],
                 ['convertF0RightCart', true],
-                ['generateVoiceConfig', true],
+                ['generateVoiceConfig', false],
                 ['processResources', true],
                 ['processLegacyResources', true],
                 ['integrationTest', false],

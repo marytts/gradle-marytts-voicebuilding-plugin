@@ -32,6 +32,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             component {
                 name = project.marytts.voice.nameCamelCase
                 packageName = "marytts.voice.${project.marytts.component.name}"
+                configBaseClass = "VoiceConfig"
             }
         }
 
@@ -67,7 +68,6 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.tasks.register 'generateVoiceSource', GenerateVoiceSource, {
             dependsOn "generateSource"
-            configClassFile = project.layout.buildDirectory.file("generatedSrc/main/java/${project.marytts.component.packagePath}/Config.java")
             configTestFile =  project.layout.buildDirectory.file("generatedSrc/test/java/${project.marytts.component.packagePath}/ConfigTest.java")
             integrationTestFile =  project.layout.buildDirectory.file("generatedSrc/integrationTest/groovy/${project.marytts.component.packagePath}/LoadVoiceIT.groovy")
 
@@ -75,13 +75,14 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             project.sourceSets.test.java.srcDirs += "${project.buildDir}/generatedSrc/test/java"
             project.sourceSets.integrationTest.groovy.srcDirs += "${project.buildDir}/generatedSrc/integrationTest/groovy"
 
+            project.compileGroovy.dependsOn it
             project.compileJava.dependsOn it
             project.compileTestJava.dependsOn it
             project.compileIntegrationTestGroovy.dependsOn it
         }
 
         project.tasks.register 'generateVoiceConfig', GenerateVoiceConfig, {
-            destFile = project.layout.buildDirectory.file('voice.config')
+            project.generateConfig.dependsOn it
         }
 
         project.publishing {
@@ -114,12 +115,6 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.processResources {
-            from project.generateVoiceConfig, {
-                rename { "marytts/voice/$project.marytts.voice.nameCamelCase/voice.config" }
-            }
-            from project.generateServiceLoader, {
-                rename { 'META-INF/services/marytts.config.MaryConfig' }
-            }
             from project.generatePomProperties, {
                 rename { "META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.xml" }
             }

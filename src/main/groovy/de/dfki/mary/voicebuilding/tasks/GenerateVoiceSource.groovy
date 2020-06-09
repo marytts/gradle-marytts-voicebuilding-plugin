@@ -7,9 +7,6 @@ import org.gradle.api.tasks.*
 class GenerateVoiceSource extends DefaultTask {
 
     @OutputFile
-    final RegularFileProperty configClassFile = project.objects.fileProperty()
-
-    @OutputFile
     final RegularFileProperty configTestFile = project.objects.fileProperty()
 
     @OutputFile
@@ -17,18 +14,6 @@ class GenerateVoiceSource extends DefaultTask {
 
     @TaskAction
     void generate() {
-        configClassFile.get().asFile.text =
-            """|package marytts.voice.${project.marytts.voice.nameCamelCase};
-               |
-               |import marytts.config.VoiceConfig;
-               |import marytts.exceptions.MaryConfigurationException;
-               |
-               |public class Config extends VoiceConfig {
-               |    public Config() throws MaryConfigurationException {
-               |        super(Config.class.getResourceAsStream("voice.config"));
-               |    }
-               |}
-               |""".stripMargin()
 
         configTestFile.get().asFile.text =
             """|package marytts.voice.${project.marytts.voice.nameCamelCase};
@@ -49,19 +34,19 @@ class GenerateVoiceSource extends DefaultTask {
                |
                |    @Test
                |    public void isNotMainConfig() throws MaryConfigurationException {
-               |        MaryConfig m = new Config();
+               |        MaryConfig m = new CmuSltConfig();
                |        assertFalse(m.isMainConfig());
                |    }
                |
                |    @Test
                |    public void isVoiceConfig() throws MaryConfigurationException {
-               |        MaryConfig m = new Config();
+               |        MaryConfig m = new CmuSltConfig();
                |        assertTrue(m.isVoiceConfig());
                |    }
                |
                |    @Test
                |    public void hasRightName() throws MaryConfigurationException {
-               |        VoiceConfig m = new Config();
+               |        VoiceConfig m = new CmuSltConfig();
                |        assertEquals(voiceName, m.getName());
                |    }
                |
@@ -90,12 +75,10 @@ class GenerateVoiceSource extends DefaultTask {
 
         integrationTestFile.get().asFile.text =
             """|package marytts.voice.${project.marytts.voice.nameCamelCase}
-                                           |
+               |
                |import marytts.LocalMaryInterface
                |import marytts.datatypes.MaryDataType
-               |import ${
-                                            project.marytts.voice.type == 'hsmm' ? 'marytts.htsengine.HMMVoice' : 'marytts.unitselection.UnitSelectionVoice'
-                                        }
+               |import ${project.marytts.voice.type == 'hsmm' ? 'marytts.htsengine.HMMVoice' : 'marytts.unitselection.UnitSelectionVoice'}
                |import marytts.util.dom.DomUtils
                |
                |import org.testng.annotations.*
@@ -103,19 +86,17 @@ class GenerateVoiceSource extends DefaultTask {
                |public class LoadVoiceIT {
                |
                |    LocalMaryInterface mary
-               |    Config config
+               |    CmuSltConfig config
                |
                |    @BeforeMethod
                |    void setup() {
                |        mary = new LocalMaryInterface()
-               |        config = new Config()
+               |        config = new CmuSltConfig()
                |    }
                |
                |    @Test
                |    void canLoadVoice() {
-               |        def voice = new ${
-                                            project.marytts.voice.type == 'hsmm' ? 'HMM' : 'UnitSelection'
-                                        }Voice(config.name, null)
+               |        def voice = new ${project.marytts.voice.type == 'hsmm' ? 'HMM' : 'UnitSelection'}Voice(config.name, null)
                |        assert voice
                |    }
                |
@@ -138,7 +119,7 @@ class GenerateVoiceSource extends DefaultTask {
                |    @Test
                |    void canProcessTextToSpeech() {
                |        def mary = new LocalMaryInterface()
-               |        def config = new Config()
+               |        def config = new CmuSltConfig()
                |        mary.voice = config.name
                |        def input = MaryDataType.getExampleText(MaryDataType.TEXT, config.locale)
                |        assert input : "Could not get example text for \$MaryDataType.TEXT / locale \$config.locale"
