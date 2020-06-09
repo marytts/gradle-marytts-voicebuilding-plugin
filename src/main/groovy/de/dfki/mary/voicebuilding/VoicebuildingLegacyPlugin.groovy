@@ -376,6 +376,11 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
             systemProperty 'mary.base', project.processLegacyResources.destinationDir
         }
 
+        project.voiceIntegrationTest {
+            dependsOn project.processLegacyResources
+            systemProperty 'mary.base', project.processLegacyResources.destinationDir
+        }
+
         def legacyZipTask = project.task('legacyZip', type: Zip) {
             from project.processLegacyResources
             from project.jar, {
