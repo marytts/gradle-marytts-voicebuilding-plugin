@@ -64,7 +64,7 @@ repositories {
 
 dependencies {
     implementation localGroovy()
-    implementation group: 'de.dfki.mary', name: 'marytts-builder', version: maryttsVersion, {
+    implementation group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion, {
         exclude group: '*', module: 'groovy-all'
         exclude group: '*', module: 'mwdumper'
         exclude group: '*', module: 'sgt'
