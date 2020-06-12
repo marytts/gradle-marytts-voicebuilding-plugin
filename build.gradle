@@ -59,7 +59,10 @@ pluginBundle {
 
 repositories {
     jcenter()
-    mavenLocal()
+    maven {
+        name 'OJO'
+        url 'https://oss.jfrog.org/artifactory/oss-snapshot-local'
+    }
 }
 
 dependencies {
