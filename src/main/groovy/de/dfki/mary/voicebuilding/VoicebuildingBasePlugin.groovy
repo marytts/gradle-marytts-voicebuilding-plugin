@@ -36,19 +36,6 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             }
         }
 
-        project.repositories {
-            jcenter()
-        }
-
-        project.sourceSets {
-            integrationTest {
-                java {
-                    compileClasspath += main.output + test.output
-                    runtimeClasspath += main.output + test.output
-                }
-            }
-        }
-
         project.dependencies {
             api group: 'de.dfki.mary', name: 'marytts-runtime', version: project.marytts.version, {
                 exclude group: '*', module: 'groovy-all'
@@ -73,17 +60,28 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.tasks.register 'generateVoiceSource', GenerateVoiceSource, {
             dependsOn "generateSource", "generateConfig"
-            configTestFile =  project.layout.buildDirectory.file("generatedSrc/test/groovy/${project.marytts.component.packagePath}/VoiceConfigTest.groovy")
-            integrationTestFile =  project.layout.buildDirectory.file("generatedSrc/integrationTest/groovy/${project.marytts.component.packagePath}/LoadVoiceIT.groovy")
+            testDirectory = project.file("$project.buildDir/generatedSrc/test/groovy/voice")
+            integrationTestDirectory = project.file("$project.buildDir/generatedSrc/integrationTest/groovy/voice")
 
         }
 
         project.generateConfig {
             dependsOn project.tasks.named("generateVoiceConfig")
         }
-        project.compileGroovy {
-            dependsOn project.tasks.named("generateVoiceSource")
+
+        project.sourceSets {
+            test {
+                groovy {
+                    srcDirs += project.generateVoiceSource.testDirectory.get()
+                }
+            }
+            integrationTest {
+                groovy {
+                    srcDirs += project.generateVoiceSource.integrationTestDirectory.get()
+                }
+            }
         }
+
 
         project.publishing {
             publications {
