@@ -12,13 +12,13 @@ class VoiceExtensionTest {
         voice = new VoiceExtension(ProjectBuilder.builder().build())
     }
 
-    // @Test
-    // void testName() {
-    //     assert voice.name == 'my_voice'
-    //     assert voice.nameCamelCase == 'My_voice'
-    //     voice.name = 'foo-bar-baz'
-    //     assert voice.nameCamelCase == 'FooBarBaz'
-    // }
+    @Test(enabled=false)
+    void testName() {
+        assert voice.name == 'my_voice'
+        assert voice.nameCamelCase == 'My_voice'
+        voice.name = 'foo-bar-baz'
+        assert voice.nameCamelCase == 'FooBarBaz'
+    }
 
     @Test
     void testEnglishLocale() {
