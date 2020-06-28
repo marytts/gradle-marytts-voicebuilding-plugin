@@ -121,18 +121,6 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             }
         }
 
-        project.task('voiceIntegrationTest', type: Test) {
-            useTestNG()
-            workingDir = project.buildDir
-            testClassesDirs = project.sourceSets.integrationTest.output.classesDirs
-            classpath = project.sourceSets.integrationTest.runtimeClasspath
-            systemProperty 'log4j.logger.marytts', 'INFO,stderr'
-            testLogging.showStandardStreams = true
-            reports.html.destination = project.file("$project.reporting.baseDir/$name")
-            project.check.dependsOn it
-            mustRunAfter project.test
-        }
-
         project.task('run', type: JavaExec) {
             classpath = project.configurations.runtimeClasspath + project.sourceSets.main.output
             main = 'marytts.server.Mary'
