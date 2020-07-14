@@ -11,6 +11,8 @@ Gradle MaryTTS voicebuilding plugin
 
 ### Changed
 
+- Refactor to depends to gradle-marytts-component-plugin v0.2.2
+- Refactor to replace the dependency on the defunct marytts-builder by a dependecy on marytts-runtime
 - Build with Gradle v6.3
 - Upgrade test dependencies
 - Drop testing on Oracle JDK
