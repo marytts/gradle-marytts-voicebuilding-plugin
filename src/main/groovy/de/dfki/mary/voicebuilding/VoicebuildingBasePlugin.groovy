@@ -1,8 +1,8 @@
 package de.dfki.mary.voicebuilding
 
-import de.dfki.mary.MaryttsExtension
-import de.dfki.mary.voicebuilding.tasks.GenerateServiceLoader
-import de.dfki.mary.voicebuilding.tasks.GenerateSource
+import de.dfki.mary.ComponentPlugin
+
+import de.dfki.mary.voicebuilding.tasks.GenerateVoiceSource
 import de.dfki.mary.voicebuilding.tasks.GenerateVoiceConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -21,33 +21,19 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         project.plugins.apply JavaLibraryPlugin
         project.plugins.apply GroovyPlugin
         project.plugins.apply MavenPublishPlugin
+        project.plugins.apply ComponentPlugin
 
         project.sourceCompatibility = '1.8'
-
-        project.extensions.create 'marytts', MaryttsExtension, project
-        project.marytts {
-            version = this.getClass().getResource('/maryttsVersion.txt')?.text
-        }
 
         project.marytts.extensions.create 'voice', VoiceExtension, project
         project.marytts.voice.extensions.create 'license', VoiceLicenseExtension, project
 
-        project.repositories {
-            jcenter()
-        }
-
-        project.sourceSets {
-            integrationTest {
-                java {
-                    compileClasspath += main.output + test.output
-                    runtimeClasspath += main.output + test.output
-                }
+        project.marytts {
+            component {
+                name = project.marytts.voice.nameCamelCase
+                packageName = "marytts.voice.${project.marytts.component.name}"
+                configBaseClass = "VoiceConfig"
             }
-        }
-
-        project.configurations {
-            integrationTestCompile.extendsFrom testImplementation
-            integrationTestRuntime.extendsFrom testRuntimeOnly
         }
 
         project.dependencies {
@@ -67,23 +53,35 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             }
         }
 
-        project.task('generateSource', type: GenerateSource) {
-            destDir = project.layout.buildDirectory.dir('generatedSrc')
-            project.sourceSets.main.java.srcDirs += "${destDir.get().asFile}/main/java"
-            project.sourceSets.test.java.srcDirs += "${destDir.get().asFile}/test/java"
-            project.sourceSets.integrationTest.groovy.srcDirs += "${destDir.get().asFile}/integrationTest/groovy"
-            project.compileJava.dependsOn it
-            project.compileTestJava.dependsOn it
-            project.compileIntegrationTestGroovy.dependsOn it
+
+        project.tasks.register 'generateVoiceConfig', GenerateVoiceConfig, {
+
         }
 
-        project.task('generateVoiceConfig', type: GenerateVoiceConfig) {
-            destFile = project.layout.buildDirectory.file('voice.config')
+        project.tasks.register 'generateVoiceSource', GenerateVoiceSource, {
+            dependsOn "generateSource", "generateConfig"
+            testDirectory = project.file("$project.buildDir/generatedSrc/test/groovy/voice")
+            integrationTestDirectory = project.file("$project.buildDir/generatedSrc/integrationTest/groovy/voice")
+
         }
 
-        project.task('generateServiceLoader', type: GenerateServiceLoader) {
-            destFile = project.layout.buildDirectory.file('serviceLoader.txt')
+        project.generateConfig {
+            dependsOn project.tasks.named("generateVoiceConfig")
         }
+
+        project.sourceSets {
+            test {
+                groovy {
+                    srcDirs += project.generateVoiceSource.testDirectory.get()
+                }
+            }
+            integrationTest {
+                groovy {
+                    srcDirs += project.generateVoiceSource.integrationTestDirectory.get()
+                }
+            }
+        }
+
 
         project.publishing {
             publications {
@@ -115,30 +113,12 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.processResources {
-            from project.generateVoiceConfig, {
-                rename { "marytts/voice/$project.marytts.voice.nameCamelCase/voice.config" }
-            }
-            from project.generateServiceLoader, {
-                rename { 'META-INF/services/marytts.config.MaryConfig' }
-            }
             from project.generatePomProperties, {
                 rename { "META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.xml" }
             }
             from project.generatePomProperties, {
                 rename { "META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.properties" }
             }
-        }
-
-        project.task('integrationTest', type: Test) {
-            useTestNG()
-            workingDir = project.buildDir
-            testClassesDirs = project.sourceSets.integrationTest.output.classesDirs
-            classpath = project.sourceSets.integrationTest.runtimeClasspath
-            systemProperty 'log4j.logger.marytts', 'INFO,stderr'
-            testLogging.showStandardStreams = true
-            reports.html.destination = project.file("$project.reporting.baseDir/$name")
-            project.check.dependsOn it
-            mustRunAfter project.test
         }
 
         project.task('run', type: JavaExec) {

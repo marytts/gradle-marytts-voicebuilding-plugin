@@ -54,24 +54,24 @@ task testJavaCompatibility(group: 'Verification') {
     }
 }
 
-task testGenerateSource(group: 'Verification') {
+task testGenerateVoiceSource(group: 'Verification') {
     dependsOn generateSource
     doLast {
-        assert file("$buildDir/generatedSrc/main/java/marytts/voice/$marytts.voice.nameCamelCase/Config.java").exists()
+        // TODO: assert file("$buildDir/generatedSrc/main/java/marytts/voice/$marytts.voice.nameCamelCase/Config.java").exists()
     }
 }
 
-task testCompileJava(group: 'Verification') {
-    dependsOn compileJava
+task testCompileGroovy(group: 'Verification') {
+    dependsOn compileGroovy
     doLast {
-        assert file("$buildDir/classes/java/main/marytts/voice/$marytts.voice.nameCamelCase/Config.class").exists()
+        assert file("$buildDir/classes/groovy/main/marytts/voice/$marytts.voice.nameCamelCase/${marytts.voice.nameCamelCase}Config.class").exists()
     }
 }
 
-task testCompileTestJava(group: 'Verification') {
-    dependsOn compileTestJava
+task testCompileTestGroovy(group: 'Verification') {
+    dependsOn compileTestGroovy
     doLast {
-        assert file("$buildDir/classes/java/test/marytts/voice/$marytts.voice.nameCamelCase/ConfigTest.class").exists()
+        assert file("$buildDir/classes/groovy/test/marytts/voice/$marytts.voice.nameCamelCase/ConfigTest.class").exists()
     }
 }
 
@@ -83,9 +83,9 @@ task testCompileIntegrationTestGroovy(group: 'Verification') {
 }
 
 task testGenerateVoiceConfig(group: 'Verification') {
-    dependsOn generateVoiceConfig
+    dependsOn generateConfig
     doLast {
-        def configFile = file("$buildDir/voice.config")
+        def configFile = file("$buildDir/generated.config")
         assert configFile.exists()
         def actual = new Properties()
         configFile.withInputStream {
@@ -206,8 +206,8 @@ task testJar(group: 'Verification') {
                 'META-INF/services/marytts.config.MaryConfig',
                 "META-INF/maven/$project.group/voice-$voiceName/pom.xml",
                 "META-INF/maven/$project.group/voice-$voiceName/pom.properties",
-                "marytts/voice/$voiceNameCamelCase/Config.class",
-                "marytts/voice/$voiceNameCamelCase/voice.config"
+                "marytts/voice/$voiceNameCamelCase/${voiceNameCamelCase}Config.class",
+                "marytts/voice/$voiceNameCamelCase/${voiceNameCamelCase.toLowerCase()}.config"
         ] as Set
         assert actual == expected
     }

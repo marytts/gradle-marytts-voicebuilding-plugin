@@ -397,9 +397,9 @@ task testProcessLegacyResources(group: 'Verification') {
 }
 
 task testGenerateVoiceConfig(group: 'Verification') {
-    dependsOn generateVoiceConfig
+    dependsOn generateConfig
     doLast {
-        def configFile = file("$buildDir/voice.config")
+        def configFile = file("$buildDir/generated.config")
         assert configFile.exists()
         def actual = new Properties()
         configFile.withInputStream {
@@ -471,7 +471,7 @@ task testJar(group: 'Verification') {
                 'META-INF/services/marytts.config.MaryConfig',
                 "META-INF/maven/$project.group/voice-$voiceName/pom.xml",
                 "META-INF/maven/$project.group/voice-$voiceName/pom.properties",
-                "marytts/voice/$voiceNameCamelCase/Config.class",
+                "marytts/voice/$voiceNameCamelCase/${voiceNameCamelCase}Config.class",
                 "marytts/voice/$voiceNameCamelCase/cart.mry",
                 "marytts/voice/$voiceNameCamelCase/dur.tree",
                 "marytts/voice/$voiceNameCamelCase/f0.left.tree",
@@ -479,7 +479,7 @@ task testJar(group: 'Verification') {
                 "marytts/voice/$voiceNameCamelCase/f0.right.tree",
                 "marytts/voice/$voiceNameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
                 "marytts/voice/$voiceNameCamelCase/joinCostWeights.txt",
-                "marytts/voice/$voiceNameCamelCase/voice.config"
+                "marytts/voice/$voiceNameCamelCase/${voiceNameCamelCase.toLowerCase()}.config"
         ] as Set
         assert actual == expected
     }

@@ -59,15 +59,17 @@ pluginBundle {
 
 repositories {
     jcenter()
+    gradlePluginPortal()
 }
 
 dependencies {
     implementation localGroovy()
-    implementation group: 'de.dfki.mary', name: 'marytts-builder', version: maryttsVersion, {
+    implementation group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion, {
         exclude group: '*', module: 'groovy-all'
         exclude group: '*', module: 'mwdumper'
         exclude group: '*', module: 'sgt'
     }
+    implementation group: 'de.dfki.mary', name: 'gradle-marytts-component-plugin', version: '0.2.2'
     implementation group: 'org.m2ci.msp', name: 'gradle-praat-wrapper-plugin', version: '0.6'
     implementation group: 'org.m2ci.msp', name: 'jtgt', version: '0.6.1'
     testImplementation group: 'org.testng', name: 'testng', version: '7.0.0'

@@ -12,7 +12,7 @@ class VoiceExtensionTest {
         voice = new VoiceExtension(ProjectBuilder.builder().build())
     }
 
-    @Test
+    @Test(enabled=false)
     void testName() {
         assert voice.name == 'my_voice'
         assert voice.nameCamelCase == 'My_voice'
