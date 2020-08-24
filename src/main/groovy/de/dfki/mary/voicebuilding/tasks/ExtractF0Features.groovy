@@ -76,9 +76,13 @@ class ExtractF0Features extends DefaultTask {
                     def leftDatagrams = waveTimeline.getDatagrams(firstVoicedUnitInSyllable, sampleRate)
                     def rightDatagrams = waveTimeline.getDatagrams(lastVoicedUnitInSyllable, sampleRate)
                     if (midDatagrams && leftDatagrams && rightDatagrams) {
-                        def midF0 = sampleRate / midDatagrams[midDatagrams.length / 2 as int].duration as float
                         def leftF0 = sampleRate / leftDatagrams[0].duration as float
                         def rightF0 = sampleRate / rightDatagrams[rightDatagrams.length - 1 as int].duration as float
+                        def midF0 = (rightF0-leftF0) / 2
+                        def dur = midDatagrams[midDatagrams.length / 2 as int].duration as float
+                        if (dur != 0) { // FIXME: dur should not be 0 in a first place!
+                            midF0 = sampleRate / dur
+                        }
                         dest.println "$leftF0 $midF0 $rightF0 ${featureDefinition.toFeatureString(unitFeatures)}"
                     }
                     unitIndex = nextUnitIndex - 1
