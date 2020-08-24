@@ -122,7 +122,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         project.task('makeWaveDatagrams', type: MakeWaveDatagrams) {
             basenamesFile = project.basenames.destFile
             sampleRate = project.marytts.voice.samplingRate
-            wavDir = project.wav.destDir
+            wavDir = project.layout.buildDirectory.dir('wav')
             pmDir = project.tasks.getByName('pitchmarkConverter').destDir
             destDir = project.layout.buildDirectory.dir('waveDatagrams')
         }
@@ -299,7 +299,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.generateVoiceConfig {
-            project.afterEvaluate {
+            // project.afterEvaluate {
                 config.putAll([
                         'viterbi.wTargetCosts'    : 0.7,
                         'viterbi.beamsize'        : 100,
@@ -342,7 +342,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                         'rightF0.predictFrom'     : 'firstVowels',
                         'rightF0.applyTo'         : 'lastVoicedSegments'
                 ])
-            }
+            //}
         }
 
         project.processResources {

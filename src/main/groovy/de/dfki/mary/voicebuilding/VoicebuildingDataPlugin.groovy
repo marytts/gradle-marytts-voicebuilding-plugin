@@ -54,7 +54,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             dependsOn project.praat, templateTask
             basenamesFile = basenamesTask.destFile
             scriptFile = templateTask.destDir.file('extractPitch.praat')
-            srcDir = wavTask.destDir
+            srcDir = project.layout.buildDirectory.dir('wav')
             destDir = project.layout.buildDirectory.dir('Pitch')
         }
 
@@ -62,7 +62,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             dependsOn project.praat, templateTask
             basenamesFile = basenamesTask.destFile
             scriptFile = templateTask.destDir.file('pitchmarks.praat')
-            wavDir = wavTask.destDir
+            wavDir = project.layout.buildDirectory.dir('wav')
             pitchDir = praatPitchExtractorTask.destDir
             destDir = project.layout.buildDirectory.dir('PointProcess')
         }
@@ -75,7 +75,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
 
         project.task('mcepExtractor', type: ExtractMcep) {
             basenamesFile = basenamesTask.destFile
-            wavDir = wavTask.destDir
+            wavDir = project.layout.buildDirectory.dir('wav')
             pmDir = pitchmarkConverterTask.destDir
             destDir = project.layout.buildDirectory.dir('mcep')
         }
