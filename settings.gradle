@@ -7,3 +7,4 @@ pluginManagement {
     }
 }
 rootProject.name = 'gradle-marytts-voicebuilding-plugin'
+includeBuild 'gradle-marytts-component-plugin'
