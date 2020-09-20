@@ -54,9 +54,11 @@ class PhoneUnitFileMaker extends DefaultTask {
                 unitStartSample = unitEndSample
                 numUnits++
             }
+            /*
             out.writeLong(utteranceEndSample + unitStartSample)
             out.writeInt(-1)
             numUnits++
+             */
             def utteranceEndTime = pm.timeSpan
             utteranceEndSample += (utteranceEndTime * sampleRate.get()) as long
         }
