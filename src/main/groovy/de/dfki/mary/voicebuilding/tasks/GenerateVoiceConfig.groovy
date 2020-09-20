@@ -19,6 +19,8 @@ class GenerateVoiceConfig extends DefaultTask {
     @TaskAction
     void generate() {
 
+        def engine = new groovy.text.SimpleTemplateEngine()
+        def bindings = ["project" : project]
         def tmp_config = [:]
         tmp_config["name"] = project.marytts.voice.name
         tmp_config["locale"] = project.marytts.voice.maryLocale
@@ -30,7 +32,7 @@ class GenerateVoiceConfig extends DefaultTask {
             locale      : project.marytts.voice.locale,
             samplingRate: project.marytts.voice.samplingRate
         ] + config.get()).each { key, value ->
-            tmp_config["voice.${project.marytts.voice.name}.$key"] = value
+            tmp_config["voice.${project.marytts.voice.name}.$key"] = engine.createTemplate(value.toString()).make(bindings)
         }
 
         project.marytts.component.config = tmp_config
