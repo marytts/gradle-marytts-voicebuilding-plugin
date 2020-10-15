@@ -27,7 +27,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         project.task('alignLabelsWithPrompts', type: AlignLabelsWithPrompts) {
             group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
-            labDir = project.layout.buildDirectory.dir('lab')
+            labDir = project.tasks.getByName("processPhoneLabels").destDir
             maryXmlDir = project.tasks.getByName('generateAllophones').destDir
             destDir = project.layout.buildDirectory.dir('allophones')
         }

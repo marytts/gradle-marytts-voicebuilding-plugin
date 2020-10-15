@@ -36,29 +36,40 @@ class PhoneUnitFileMaker extends DefaultTask {
         def out = new DataOutputStream(baos)
         def utteranceEndSample = 0
         def numUnits = 0
+
         basenamesFile.get().asFile.eachLine('UTF-8') { basename ->
             def pmFile = pmDir.file("${basename}.pm").get().asFile
             def pm = new ESTTrackReader(pmFile.path)
+
+            // Insert start edge
             out.writeLong(utteranceEndSample)
             out.writeInt(-1)
             numUnits++
+
             def srcFile = srcDir.file("${basename}.${srcExt.get()}").get().asFile
             def unitStartSample = 0
             labSerializer.fromString(srcFile.text).tiers[0].annotations.each { segment ->
                 def unitEndTime = pm.getClosestTime(segment.end)
                 def unitEndSample = (unitEndTime * sampleRate.get()) as long
                 def unitNumSamples = unitEndSample - unitStartSample
-                // TODO: skip units with zero duration
-                out.writeLong(utteranceEndSample + unitStartSample)
-                out.writeInt(unitNumSamples as int)
-                unitStartSample = unitEndSample
-                numUnits++
+                if (unitNumSamples > 0) {
+                    out.writeLong(utteranceEndSample + unitStartSample)
+                    out.writeInt(unitNumSamples as int)
+                    unitStartSample = unitEndSample
+                    numUnits++
+                } else { // skip units with zero duration
+                    println("$basename, $segment => ${unitNumSamples}")
+                    out.writeLong(utteranceEndSample + unitStartSample)
+                    out.writeInt(unitNumSamples as int)
+                    unitStartSample = unitEndSample
+                    numUnits++
+                }
             }
-            /*
+
             out.writeLong(utteranceEndSample + unitStartSample)
             out.writeInt(-1)
             numUnits++
-             */
+
             def utteranceEndTime = pm.timeSpan
             utteranceEndSample += (utteranceEndTime * sampleRate.get()) as long
         }
