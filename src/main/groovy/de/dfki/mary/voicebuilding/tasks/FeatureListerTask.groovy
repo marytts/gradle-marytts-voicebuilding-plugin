@@ -14,7 +14,8 @@ class FeatureListerTask extends DefaultTask {
     void generate() {
         project.javaexec {
             classpath project.configurations.marytts
-            main 'marytts.FeatureLister'
+            classpath this.class.classLoader.URLs
+            main 'de.dfki.mary.voicebuilding.utils.FeatureLister'
             systemProperties = [
                     locale    : project.marytts.voice.maryLocale,
                     outputFile: destFile.get().asFile
