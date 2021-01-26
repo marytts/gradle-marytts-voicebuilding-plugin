@@ -5,6 +5,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
+import org.gradle.internal.os.OperatingSystem
 
 class TrainProsodyCart extends DefaultTask {
 
@@ -28,10 +29,17 @@ class TrainProsodyCart extends DefaultTask {
     final RegularFileProperty destFile = project.objects.fileProperty()
 
     TrainProsodyCart() {
-        def wagonPath = System.env['PATH'].split(':').collect { dir ->
-            new File(dir, 'wagon')
+        def binaryName = 'wagon'
+        def pathEnv = System.env.PATH
+        if (OperatingSystem.current().isWindows()) {
+            binaryName += '.exe'
+            pathEnv = System.env.Path
+        }
+        def binaryPath = pathEnv.split(File.pathSeparator).collect { dir ->
+            new File(dir, binaryName)
         }.find { it.canExecute() }
-        wagon.set(wagonPath)
+        assert binaryPath: "Could not find PATH to $binaryName"
+        wagon.set(binaryPath)
     }
 
     @TaskAction
