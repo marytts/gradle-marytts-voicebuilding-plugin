@@ -1,0 +1,65 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        java-version:
+          - 8
+          - 11
+          - 13
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v2
+
+      # https://github.com/gradle/wrapper-validation-action
+      - uses: gradle/wrapper-validation-action@v1
+
+      # https://github.com/actions/setup-java
+      - uses: actions/setup-java@v2
+        with:
+          distribution: adopt
+          java-version: ${{ matrix.java-version }}
+
+      # https://github.com/actions/cache
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Install Linux prerequisites
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo apt update
+          sudo apt -y install sox speech-tools
+
+      - name: Install macOS prerequisites
+        if: ${{ runner.os == 'macOS' }}
+        run: brew install speech-tools
+
+      - name: Build with Gradle
+        env:
+          GRADLE_OPTS: -Dorg.gradle.daemon=false
+        run: ./gradlew build
+
+      - name: Cleanup Gradle Cache
+        run: |
+          rm -f ~/.gradle/caches/modules-2/modules-2.lock
+          rm -f ~/.gradle/caches/modules-2/gc.properties
