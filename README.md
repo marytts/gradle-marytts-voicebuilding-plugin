@@ -1,5 +1,4 @@
-[![Build](https://github.com/psibre/gradle-marytts-voicebuilding-plugin/actions/workflows/main.yml/badge.svg)](https://github.com/psibre/gradle-marytts-voicebuilding-plugin/actions/workflows/main.yml)
-[![Download](https://api.bintray.com/packages/marytts/marytts/gradle-marytts-voicebuilding-plugin/images/download.svg)](https://bintray.com/marytts/marytts/gradle-marytts-voicebuilding-plugin/_latestVersion)
+[![Build](https://github.com/marytts/gradle-marytts-voicebuilding-plugin/actions/workflows/main.yml/badge.svg)](https://github.com/marytts/gradle-marytts-voicebuilding-plugin/actions/workflows/main.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
 Gradle MaryTTS voicebuilding plugin
@@ -48,17 +47,17 @@ In your project directory, place the source audio, text, and label files under y
 
     build
     ├── lab
-    │   ├── utt0001.lab
-    │   ├── utt0002.lab
-    │   ├── utt0003.lab
-    │   ├── utt0004.lab
-    │   └── utt0005.lab
+    │   ├── utt0001.lab
+    │   ├── utt0002.lab
+    │   ├── utt0003.lab
+    │   ├── utt0004.lab
+    │   └── utt0005.lab
     ├── text
-    │   ├── utt0001.txt
-    │   ├── utt0002.txt
-    │   ├── utt0003.txt
-    │   ├── utt0004.txt
-    │   └── utt0005.txt
+    │   ├── utt0001.txt
+    │   ├── utt0002.txt
+    │   ├── utt0003.txt
+    │   ├── utt0004.txt
+    │   └── utt0005.txt
     └── resources
         └── data
             ├── utt0001.wav
@@ -115,4 +114,4 @@ These files can be installed in a MaryTTS v5.2 instance, by placing them in the 
 [Java]: https://www.java.com/en/download/
 [MaryTTS]: http://mary.dfki.de/
 [SoX]: http://sox.sourceforge.net/
-[VoiceImportTools]: https://github.com/marytts/marytts/wiki/VoiceImportToolsTutorial
+[VoiceImportTools]: https://mary.opendfki.de/trac/wiki/VoiceImportToolsTutorial
