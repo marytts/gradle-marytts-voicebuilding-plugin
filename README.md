@@ -114,4 +114,4 @@ These files can be installed in a MaryTTS v5.2 instance, by placing them in the 
 [Java]: https://www.java.com/en/download/
 [MaryTTS]: http://mary.dfki.de/
 [SoX]: http://sox.sourceforge.net/
-[VoiceImportTools]: https://github.com/marytts/marytts/wiki/VoiceImportToolsTutorial
+[VoiceImportTools]: https://mary.opendfki.de/trac/wiki/VoiceImportToolsTutorial
