@@ -47,17 +47,17 @@ In your project directory, place the source audio, text, and label files under y
 
     build
     ├── lab
-    │   ├── utt0001.lab
-    │   ├── utt0002.lab
-    │   ├── utt0003.lab
-    │   ├── utt0004.lab
-    │   └── utt0005.lab
+    │   ├── utt0001.lab
+    │   ├── utt0002.lab
+    │   ├── utt0003.lab
+    │   ├── utt0004.lab
+    │   └── utt0005.lab
     ├── text
-    │   ├── utt0001.txt
-    │   ├── utt0002.txt
-    │   ├── utt0003.txt
-    │   ├── utt0004.txt
-    │   └── utt0005.txt
+    │   ├── utt0001.txt
+    │   ├── utt0002.txt
+    │   ├── utt0003.txt
+    │   ├── utt0004.txt
+    │   └── utt0005.txt
     └── resources
         └── data
             ├── utt0001.wav
