@@ -1,4 +1,4 @@
-[![Build](https://github.com/psibre/gradle-marytts-voicebuilding-plugin/actions/workflows/main.yml/badge.svg)](https://github.com/psibre/gradle-marytts-voicebuilding-plugin/actions/workflows/main.yml)
+[![Build](https://github.com/marytts/gradle-marytts-voicebuilding-plugin/actions/workflows/main.yml/badge.svg)](https://github.com/marytts/gradle-marytts-voicebuilding-plugin/actions/workflows/main.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
 Gradle MaryTTS voicebuilding plugin
