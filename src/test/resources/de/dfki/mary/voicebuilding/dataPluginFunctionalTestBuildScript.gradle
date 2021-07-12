@@ -113,10 +113,10 @@ task testBasenames(group: 'Verification') {
     doLast {
         def basenamesFile = file("$buildDir/basenames.lst")
         assert basenamesFile.exists()
-        def actual = basenamesFile.readLines() as Set
+        def actual = basenamesFile.readLines()
         def expected = fileTree("$buildDir/wav").include('*.wav').exclude('time0023.wav', 'unused.wav').collect {
             it.name - '.wav'
-        } as Set
+        }.unique().toSorted()
         assert actual == expected
     }
 }
