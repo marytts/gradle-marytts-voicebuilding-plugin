@@ -42,7 +42,7 @@ class GenerateBasenamesList extends DefaultTask {
             project.fileTree(wavDir).matching {
                 include this.includes.getOrElse('*').collect { it + '.wav' }
                 exclude this.excludes.getOrElse([]).collect { it + '.wav' }
-            }.each { wavFile ->
+            }.toSorted().each { wavFile ->
                 def basename = wavFile.name - '.wav'
                 def textFile = textDir.file("${basename}.txt").get().asFile
                 if (!textFile.canRead()) {
