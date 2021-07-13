@@ -41,7 +41,7 @@ class GenerateBasenamesListFunctionalTest {
     }
 
     @Test
-    void 'Given data directories, When custom list is provided, Then basenames uses custom order'() {
+    void 'Given data directories, When custom list is provided, Then basenames are in custom order'() {
         def projectDir = File.createTempDir()
 
         def basenames = generateBasenames(5)
@@ -64,7 +64,7 @@ class GenerateBasenamesListFunctionalTest {
     }
 
     @Test
-    void 'Given data directories, When custom list with comments is provided, Then basenames uses custom order'() {
+    void 'Given data directories, When custom list with comments is provided, Then basenames are in custom order'() {
         def projectDir = File.createTempDir()
 
         def basenames = generateBasenames(5)
@@ -90,7 +90,7 @@ class GenerateBasenamesListFunctionalTest {
     }
 
     @Test
-    void 'Given data directories with some missing files, When custom list is provided, Then basenames exclude them and maintains custom order'() {
+    void 'Given data directories with some missing files, When custom list is provided, Then basenames exclude them and are in custom order'() {
         def projectDir = File.createTempDir()
 
         def basenames = generateBasenames(6)
