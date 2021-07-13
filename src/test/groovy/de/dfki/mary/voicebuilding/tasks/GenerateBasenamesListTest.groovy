@@ -64,6 +64,32 @@ class GenerateBasenamesListFunctionalTest {
     }
 
     @Test
+    void 'Given data directories, When custom list with comments is provided, Then basenames uses custom order'() {
+        def projectDir = File.createTempDir()
+
+        def basenames = generateBasenames(5)
+        createDataDirectories(projectDir, basenames)
+
+        Collections.shuffle(basenames)
+        new File(projectDir, 'custom.lst').withWriter { customList ->
+            customList.writeLine('# This is the custom order:')
+            basenames.eachWithIndex { basename, b ->
+                customList.writeLine(basename)
+                if (b == 3)
+                    customList.writeLine('  # Another comment!')
+            }
+        }
+
+        def buildScript = generateBuildScript(projectDir)
+        buildScript << "basenames.srcFile = file('custom.lst')"
+        runGradle(projectDir)
+
+        def expected = basenames
+        def actual = new File(projectDir, 'basenames.lst').readLines()
+        assert expected == actual
+    }
+
+    @Test
     void 'Given data directories with some missing files, When custom list is provided, Then basenames exclude them and maintains custom order'() {
         def projectDir = File.createTempDir()
 
