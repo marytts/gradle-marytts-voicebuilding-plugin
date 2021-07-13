@@ -8,6 +8,10 @@ import org.gradle.api.tasks.*
 
 class GenerateBasenamesList extends DefaultTask {
 
+    @Optional
+    @InputFile
+    final RegularFileProperty srcFile = project.objects.fileProperty()
+
     @InputDirectory
     final DirectoryProperty wavDir = project.objects.directoryProperty()
 

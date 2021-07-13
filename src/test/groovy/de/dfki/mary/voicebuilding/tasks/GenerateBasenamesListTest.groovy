@@ -40,6 +40,29 @@ class GenerateBasenamesListFunctionalTest {
         assert expected == actual
     }
 
+    @Test
+    void 'Given data directories, When custom list is provided, Then basenames uses custom order'() {
+        def projectDir = File.createTempDir()
+
+        def basenames = generateBasenames(5)
+        createDataDirectories(projectDir, basenames)
+
+        Collections.shuffle(basenames)
+        new File(projectDir, 'custom.lst').withWriter { customList ->
+            basenames.each { basename ->
+                customList.writeLine(basename)
+            }
+        }
+
+        def buildScript = generateBuildScript(projectDir)
+        buildScript << "basenames.srcFile = file('custom.lst')"
+        runGradle(projectDir)
+
+        def expected = basenames
+        def actual = new File(projectDir, 'basenames.lst').readLines()
+        assert expected == actual
+    }
+
     private static List<String> generateBasenames(int n) {
         (1..n).collect { i ->
             String.format('test_%04d', i)
@@ -56,8 +79,9 @@ class GenerateBasenamesListFunctionalTest {
         }
     }
 
-    private static void generateBuildScript(File projectDir) {
-        new File(projectDir, 'build.gradle').text = '''
+    private static File generateBuildScript(File projectDir) {
+        def buildScript = new File(projectDir, 'build.gradle')
+        buildScript.text = '''
             plugins {
                 id 'de.dfki.mary.voicebuilding-data'
             }
@@ -69,6 +93,7 @@ class GenerateBasenamesListFunctionalTest {
                 destFile = file('basenames.lst')
             }
             '''.stripMargin()
+        buildScript
     }
 
     private static BuildResult runGradle(File projectDir) {
