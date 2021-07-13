@@ -63,6 +63,33 @@ class GenerateBasenamesListFunctionalTest {
         assert expected == actual
     }
 
+    @Test
+    void 'Given data directories with some missing files, When custom list is provided, Then basenames exclude them and maintains custom order'() {
+        def projectDir = File.createTempDir()
+
+        def basenames = generateBasenames(6)
+        createDataDirectories(projectDir, basenames)
+
+        Collections.shuffle(basenames)
+        new File(projectDir, 'custom.lst').withWriter { customList ->
+            basenames.each { basename ->
+                customList.writeLine(basename)
+            }
+        }
+
+        new File(projectDir.path + File.separator + 'wav', 'test_0002.wav').delete()
+        new File(projectDir.path + File.separator + 'txt', 'test_0004.txt').delete()
+        new File(projectDir.path + File.separator + 'lab', 'test_0006.lab').delete()
+
+        def buildScript = generateBuildScript(projectDir)
+        buildScript << "basenames.srcFile = file('custom.lst')"
+        runGradle(projectDir)
+
+        def expected = basenames - ['test_0002', 'test_0004', 'test_0006']
+        def actual = new File(projectDir, 'basenames.lst').readLines()
+        assert expected == actual
+    }
+
     private static List<String> generateBasenames(int n) {
         (1..n).collect { i ->
             String.format('test_%04d', i)
