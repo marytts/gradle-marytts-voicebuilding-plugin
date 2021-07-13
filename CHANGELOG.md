@@ -19,6 +19,10 @@ Gradle MaryTTS voicebuilding plugin
 - Drop testing on Oracle JDK
 - [all changes since v5.4]
 
+### Fixed
+
+- Utterance order in `basenames.lst` is now deterministic, either sorted (the default) or specified via a provided `srcFile` (optional)
+
 [v5.4] - 2018-12-12
 -------------------
 
