@@ -53,13 +53,16 @@ class GenerateBasenamesList extends DefaultTask {
                 }.collect { it.name - '.wav' }.toSorted()
             }
             basenames.each { basename ->
+                def wavFile = wavDir.file("${basename}.wav").get().asFile
+                if (!wavFile.canRead())
+                    project.logger.warn "WARNING: Could not read from $wavFile"
                 def textFile = textDir.file("${basename}.txt").get().asFile
                 if (!textFile.canRead())
                     project.logger.warn "WARNING: Could not read from $textFile"
                 def labFile = labDir.file("${basename}.lab").get().asFile
                 if (!labFile.canRead())
                     project.logger.warn "WARNING: Could not read from $labFile"
-                if (textFile.canRead() && labFile.canRead()) {
+                if (wavFile.canRead() && textFile.canRead() && labFile.canRead()) {
                     writer.println basename
                 }
             }
