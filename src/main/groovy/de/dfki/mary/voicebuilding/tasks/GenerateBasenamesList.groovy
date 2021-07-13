@@ -45,7 +45,7 @@ class GenerateBasenamesList extends DefaultTask {
         destFile.get().asFile.withWriter('UTF-8') { writer ->
             def basenames
             if (srcFile.getOrNull()) {
-                basenames = srcFile.get().asFile.readLines()
+                basenames = srcFile.get().asFile.readLines().findAll { !it.trim().startsWith('#') }
             } else {
                 basenames = project.fileTree(wavDir).matching {
                     include this.includes.getOrElse('*').collect { it + '.wav' }
