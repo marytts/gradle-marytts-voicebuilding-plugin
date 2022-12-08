@@ -36,8 +36,8 @@ jobs:
       - if: runner.os == 'Linux'
         env:
           DEBIAN_FRONTEND: noninteractive
-        run: |
-          sudo apt-get -qq update
+        run: >
+          sudo apt-get -qq update &&
           sudo apt-get -qq install sox speech-tools
 
       - if: runner.os == 'macOS'
