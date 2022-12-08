@@ -30,15 +30,6 @@ def voiceLocale = new Locale.Builder()
 
 repositories {
     ivy {
-        url 'https://dl.bintray.com/marytts/marytts'
-        patternLayout {
-            artifact '[organisation]/[module]/[artifact].[ext]'
-        }
-        metadataSources {
-            artifact()
-        }
-    }
-    ivy {
         url 'http://festvox.org/examples'
         allowInsecureProtocol = true
         patternLayout {

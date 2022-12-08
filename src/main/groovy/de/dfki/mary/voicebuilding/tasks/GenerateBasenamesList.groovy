@@ -8,6 +8,10 @@ import org.gradle.api.tasks.*
 
 class GenerateBasenamesList extends DefaultTask {
 
+    @Optional
+    @InputFile
+    final RegularFileProperty srcFile = project.objects.fileProperty()
+
     @InputDirectory
     final DirectoryProperty wavDir = project.objects.directoryProperty()
 
@@ -39,20 +43,26 @@ class GenerateBasenamesList extends DefaultTask {
     @TaskAction
     void generate() {
         destFile.get().asFile.withWriter('UTF-8') { writer ->
-            project.fileTree(wavDir).matching {
-                include this.includes.getOrElse('*').collect { it + '.wav' }
-                exclude this.excludes.getOrElse([]).collect { it + '.wav' }
-            }.toSorted().each { wavFile ->
-                def basename = wavFile.name - '.wav'
+            def basenames
+            if (srcFile.getOrNull()) {
+                basenames = srcFile.get().asFile.readLines().findAll { !it.trim().startsWith('#') }
+            } else {
+                basenames = project.fileTree(wavDir).matching {
+                    include this.includes.getOrElse('*').collect { it + '.wav' }
+                    exclude this.excludes.getOrElse([]).collect { it + '.wav' }
+                }.collect { it.name - '.wav' }.toSorted()
+            }
+            basenames.each { basename ->
+                def wavFile = wavDir.file("${basename}.wav").get().asFile
+                if (!wavFile.canRead())
+                    project.logger.warn "WARNING: Could not read from $wavFile"
                 def textFile = textDir.file("${basename}.txt").get().asFile
-                if (!textFile.canRead()) {
+                if (!textFile.canRead())
                     project.logger.warn "WARNING: Could not read from $textFile"
-                }
                 def labFile = labDir.file("${basename}.lab").get().asFile
-                if (!labFile.canRead()) {
+                if (!labFile.canRead())
                     project.logger.warn "WARNING: Could not read from $labFile"
-                }
-                if (textFile.canRead() && labFile.canRead()) {
+                if (wavFile.canRead() && textFile.canRead() && labFile.canRead()) {
                     writer.println basename
                 }
             }
