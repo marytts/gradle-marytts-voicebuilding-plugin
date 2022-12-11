@@ -64,7 +64,7 @@ repositories {
 
 dependencies {
     implementation localGroovy()
-    implementation group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion, {
+    implementation group: 'de.dfki.mary', name: 'marytts-runtime', version: libs.versions.marytts.get(), {
         exclude group: '*', module: 'groovy-all'
         exclude group: '*', module: 'mwdumper'
         exclude group: '*', module: 'sgt'
@@ -82,7 +82,7 @@ java {
 
 processResources {
     doLast {
-        file("$destinationDir/maryttsVersion.txt").text = maryttsVersion
+        file("$destinationDir/maryttsVersion.txt").text = libs.versions.marytts.get()
     }
 }
 
@@ -102,7 +102,7 @@ test {
         // path to shared testkit gradle home
         systemProperty 'testProjectDir', temporaryDir
         // dynamic marytts version
-        systemProperty 'maryVersion', maryttsVersion
+        systemProperty 'maryVersion', libs.versions.marytts.get()
     }
 }
 
