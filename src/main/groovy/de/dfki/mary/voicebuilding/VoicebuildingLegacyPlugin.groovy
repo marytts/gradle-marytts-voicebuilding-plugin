@@ -408,7 +408,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 api "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
                     exclude group: '*', module: 'groovy-all'
                 }
-                testImplementation "junit:junit:4.13"
+                testImplementation "junit:junit:4.13.2"
             }
         }
     }
