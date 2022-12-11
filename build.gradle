@@ -99,8 +99,7 @@ test {
     }
     failFast = true
     doFirst {
-        // path to shared testkit gradle home
-        systemProperty 'testProjectDir', temporaryDir
+        systemProperty 'java.io.tmpdir', temporaryDir
         // dynamic marytts version
         systemProperty 'maryVersion', libs.versions.marytts.get()
     }
