@@ -98,11 +98,8 @@ test {
         }
     }
     failFast = true
-    doFirst {
-        systemProperty 'java.io.tmpdir', temporaryDir
-        // dynamic marytts version
-        systemProperty 'maryVersion', libs.versions.marytts.get()
-    }
+    systemProperty 'java.io.tmpdir', temporaryDir
+    systemProperty 'maryVersion', libs.versions.marytts.get()
 }
 
 publishing {
