@@ -76,6 +76,10 @@ dependencies {
     testImplementation group: 'xmlunit', name: 'xmlunit', version: '1.6'
 }
 
+java {
+    withSourcesJar()
+}
+
 processResources {
     doLast {
         file("$destinationDir/maryttsVersion.txt").text = maryttsVersion
@@ -102,17 +106,10 @@ test {
     }
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-            artifact sourceJar {
-                classifier 'sources'
-            }
         }
     }
     repositories {
