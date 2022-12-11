@@ -8,7 +8,7 @@ class GenerateBasenamesListFunctionalTest {
 
     @Test
     void 'Given data directories, When basenames list is generated, Then basenames are in sort order'() {
-        def projectDir = File.createTempDir()
+        def projectDir = createProjectDir()
 
         def basenames = generateBasenames(5)
         createDataDirectories(projectDir, basenames)
@@ -23,7 +23,7 @@ class GenerateBasenamesListFunctionalTest {
 
     @Test
     void 'Given data directories with some missing files, When basenames list is generated, Then basenames exclude them'() {
-        def projectDir = File.createTempDir()
+        def projectDir = createProjectDir()
 
         def basenames = generateBasenames(6)
         createDataDirectories(projectDir, basenames)
@@ -42,7 +42,7 @@ class GenerateBasenamesListFunctionalTest {
 
     @Test
     void 'Given data directories, When custom list is provided, Then basenames are in custom order'() {
-        def projectDir = File.createTempDir()
+        def projectDir = createProjectDir()
 
         def basenames = generateBasenames(5)
         createDataDirectories(projectDir, basenames)
@@ -65,7 +65,7 @@ class GenerateBasenamesListFunctionalTest {
 
     @Test
     void 'Given data directories, When custom list with comments is provided, Then basenames are in custom order'() {
-        def projectDir = File.createTempDir()
+        def projectDir = createProjectDir()
 
         def basenames = generateBasenames(5)
         createDataDirectories(projectDir, basenames)
@@ -91,7 +91,7 @@ class GenerateBasenamesListFunctionalTest {
 
     @Test
     void 'Given data directories with some missing files, When custom list is provided, Then basenames exclude them and are in custom order'() {
-        def projectDir = File.createTempDir()
+        def projectDir = createProjectDir()
 
         def basenames = generateBasenames(6)
         createDataDirectories(projectDir, basenames)
@@ -114,6 +114,10 @@ class GenerateBasenamesListFunctionalTest {
         def expected = basenames - ['test_0002', 'test_0004', 'test_0006']
         def actual = new File(projectDir, 'basenames.lst').readLines()
         assert expected == actual
+    }
+
+    private static File createProjectDir() {
+        File.createTempDir()
     }
 
     private static List<String> generateBasenames(int n) {
