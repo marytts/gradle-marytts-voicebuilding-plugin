@@ -42,7 +42,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             }
             testImplementation group: 'junit', name: 'junit', version: '4.13'
             integrationTestImplementation localGroovy()
-            integrationTestImplementation group: 'org.testng', name: 'testng', version: '7.0.0'
+            integrationTestImplementation group: 'org.testng', name: 'testng', version: '7.5'
         }
 
         project.afterEvaluate {

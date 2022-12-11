@@ -72,7 +72,7 @@ dependencies {
     implementation group: 'de.dfki.mary', name: 'gradle-marytts-component-plugin', version: '0.2.2'
     implementation group: 'org.m2ci.msp', name: 'gradle-praat-wrapper-plugin', version: '0.6'
     implementation group: 'org.m2ci.msp', name: 'jtgt', version: '0.6.1'
-    testImplementation group: 'org.testng', name: 'testng', version: '7.0.0'
+    testImplementation group: 'org.testng', name: 'testng', version: '7.5'
     testImplementation group: 'xmlunit', name: 'xmlunit', version: '1.6'
 }
 
