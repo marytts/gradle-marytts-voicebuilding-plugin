@@ -58,20 +58,30 @@ pluginBundle {
 }
 
 repositories {
-    jcenter()
-    gradlePluginPortal()
+    mavenCentral()
+    exclusiveContent {
+        forRepository {
+            maven {
+                name 'DFKI-MLT'
+                url 'https://mlt.jfrog.io/artifactory/mlt-mvn-releases-local'
+            }
+        }
+        filter {
+            includeGroup 'de.dfki.lt.jtok'
+        }
+    }
 }
 
 dependencies {
     implementation localGroovy()
     implementation group: 'de.dfki.mary', name: 'marytts-runtime', version: libs.versions.marytts.get(), {
         exclude group: '*', module: 'groovy-all'
-        exclude group: '*', module: 'mwdumper'
-        exclude group: '*', module: 'sgt'
+        exclude group: 'com.twmacinta', module: 'fast-md5'
+        exclude group: 'gov.nist.math', module: 'Jampack'
     }
-    implementation group: 'de.dfki.mary', name: 'gradle-marytts-component-plugin', version: '0.2.2'
-    implementation group: 'org.m2ci.msp', name: 'gradle-praat-wrapper-plugin', version: '0.6'
-    implementation group: 'org.m2ci.msp', name: 'jtgt', version: '0.6.1'
+    implementation group: 'de.dfki.mary', name: 'gradle-marytts-component-plugin', version: '0.3.0'
+    implementation group: 'io.github.m2ci-msp', name: 'gradle-praat-wrapper-plugin', version: '0.7.0'
+    implementation group: 'io.github.m2ci-msp', name: 'jtgt', version: '0.7.0'
     testImplementation group: 'org.testng', name: 'testng', version: '7.5'
     testImplementation group: 'xmlunit', name: 'xmlunit', version: '1.6'
 }

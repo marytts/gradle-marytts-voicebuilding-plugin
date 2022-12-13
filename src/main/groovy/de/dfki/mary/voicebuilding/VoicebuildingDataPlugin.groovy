@@ -26,9 +26,11 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             project.afterEvaluate {
                 marytts group: 'de.dfki.mary', name: "marytts-lang-$project.marytts.voice.locale.language", version: project.marytts.version, {
                     exclude group: '*', module: 'groovy-all'
+                    exclude group: 'com.twmacinta', module: 'fast-md5'
+                    exclude group: 'gov.nist.math', module: 'Jampack'
                 }
             }
-            marytts group: 'de.dfki.mary', name: "marytts-voicebuilding", version: '0.1'
+            marytts group: 'de.dfki.mary', name: 'marytts-voicebuilding', version: '0.2.0'
         }
 
         def templateTask = project.task('templates', type: CopyClasspathResources) {
