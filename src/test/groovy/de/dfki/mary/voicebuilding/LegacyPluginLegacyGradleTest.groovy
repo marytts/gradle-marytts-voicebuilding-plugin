@@ -26,14 +26,14 @@ class LegacyPluginLegacyGradleTest {
     }
 
     @Test
-    void 'Gradle v6-1 cannot apply plugin'() {
-        gradle.withGradleVersion('6.1').buildAndFail()
+    void 'Gradle v6-9 cannot apply plugin'() {
+        gradle.withGradleVersion('6.9').buildAndFail()
     }
 
     @Test
-    void 'Gradle v6-2 can apply plugin'() {
-        if (JavaVersion.current() > JavaVersion.VERSION_13)
-            throw new SkipException('Gradle v6.2 does not support Java versions higher than 13')
-        gradle.withGradleVersion('6.2').build()
+    void 'Gradle v7-0 can apply plugin'() {
+        if (JavaVersion.current() > JavaVersion.VERSION_16)
+            throw new SkipException('Gradle v7.0 does not support Java versions higher than 16')
+        gradle.withGradleVersion('7.0').build()
     }
 }
