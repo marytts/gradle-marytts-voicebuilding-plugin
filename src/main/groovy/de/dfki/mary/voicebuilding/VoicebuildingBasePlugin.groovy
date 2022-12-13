@@ -127,7 +127,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.task('run', type: JavaExec) {
             classpath = project.configurations.runtimeClasspath + project.sourceSets.main.output
-            main = 'marytts.server.Mary'
+            mainClass = 'marytts.server.Mary'
             systemProperty 'log4j.logger.marytts', 'INFO,stderr'
         }
     }

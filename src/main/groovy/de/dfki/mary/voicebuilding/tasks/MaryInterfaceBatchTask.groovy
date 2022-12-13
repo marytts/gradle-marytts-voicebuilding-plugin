@@ -66,7 +66,7 @@ class MaryInterfaceBatchTask extends DefaultTask {
         batchFile.text = new JsonBuilder(batch).toPrettyString()
         project.javaexec {
             classpath project.configurations.marytts
-            main 'marytts.BatchProcessor'
+            mainClass = 'marytts.BatchProcessor'
             args batchFile
             systemProperties << maryttsProperties.getOrElse([:])
         }
