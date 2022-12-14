@@ -61,10 +61,11 @@ task testGenerateVoiceSource(group: 'Verification') {
     }
 }
 
-task testCompileGroovy(group: 'Verification') {
-    dependsOn compileGroovy
+task testCompileJava(group: 'Verification') {
+    dependsOn compileJava
     doLast {
-        assert file("$buildDir/classes/groovy/main/marytts/voice/$marytts.voice.nameCamelCase/${marytts.voice.nameCamelCase}Config.class").exists()
+        assert fileTree(sourceSets.main.java.classesDirectory)
+                .contains(file("$buildDir/classes/java/main/marytts/voice/$marytts.voice.nameCamelCase/${marytts.voice.nameCamelCase}Config.class"))
     }
 }
 
