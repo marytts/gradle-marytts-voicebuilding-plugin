@@ -402,17 +402,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 }
             }
         }
-
-        project.afterEvaluate {
-            project.dependencies {
-                api "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
-                    exclude group: '*', module: 'groovy-all'
-                    exclude group: 'com.twmacinta', module: 'fast-md5'
-                    exclude group: 'gov.nist.math', module: 'Jampack'
-                }
-                testImplementation "junit:junit:4.13.2"
-            }
-        }
     }
 
 }

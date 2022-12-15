@@ -37,7 +37,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.dependencies {
-            api group: 'de.dfki.mary', name: 'marytts-runtime', version: project.marytts.version, {
+            api group: 'de.dfki.mary', name: "marytts-lang-$project.marytts.voice.language", version: project.marytts.version, {
                 exclude group: '*', module: 'groovy-all'
                 exclude group: 'com.twmacinta', module: 'fast-md5'
                 exclude group: 'gov.nist.math', module: 'Jampack'
@@ -46,17 +46,6 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             integrationTestImplementation localGroovy()
             integrationTestImplementation group: 'org.testng', name: 'testng', version: '7.5'
         }
-
-        project.afterEvaluate {
-            project.dependencies {
-                runtimeOnly "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
-                    exclude group: '*', module: 'groovy-all'
-                    exclude group: 'com.twmacinta', module: 'fast-md5'
-                    exclude group: 'gov.nist.math', module: 'Jampack'
-                }
-            }
-        }
-
 
         project.tasks.register 'generateVoiceConfig', GenerateVoiceConfig, {
 
