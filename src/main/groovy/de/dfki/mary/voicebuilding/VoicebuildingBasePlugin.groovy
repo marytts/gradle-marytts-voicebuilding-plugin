@@ -82,13 +82,10 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
                     from project.components.java
                     pom {
                         description = project.marytts.voice.description
-                        // TODO: Properties not being resolved lazily in nested license extension, so...
-                        project.afterEvaluate {
-                            licenses {
-                                license {
-                                    name = project.marytts.voice.license.name
-                                    url = project.marytts.voice.license.url
-                                }
+                        licenses {
+                            license {
+                                name = project.marytts.voice.license.name
+                                url = project.marytts.voice.license.url
                             }
                         }
                     }
