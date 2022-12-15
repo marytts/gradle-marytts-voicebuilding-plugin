@@ -34,18 +34,21 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         def templateTask = project.task('templates', type: CopyClasspathResources) {
+            group = 'MaryTTS Voicebuilding Data'
             destDir = project.layout.buildDirectory.dir('templates')
             resources.add '/de/dfki/mary/voicebuilding/templates/extractPitch.praat'
             resources.add '/de/dfki/mary/voicebuilding/templates/pitchmarks.praat'
         }
 
         def wavTask = project.task('wav', type: ProcessWav) {
+            group = 'MaryTTS Voicebuilding Data'
             dependsOn project.processDataResources
             srcDir = project.processDataResources.destinationDir
             destDir = project.layout.buildDirectory.dir('wav')
         }
 
         def basenamesTask = project.task('basenames', type: GenerateBasenamesList) {
+            group = 'MaryTTS Voicebuilding Data'
             wavDir = wavTask.destDir
             textDir = project.layout.buildDirectory.dir('text')
             labDir = project.layout.buildDirectory.dir('lab')
@@ -53,6 +56,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         def praatPitchExtractorTask = project.task('praatPitchExtractor', type: PraatExtractPitch) {
+            group = 'MaryTTS Voicebuilding Data'
             dependsOn project.praat, templateTask
             basenamesFile = basenamesTask.destFile
             scriptFile = templateTask.destDir.file('extractPitch.praat')
@@ -61,6 +65,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         def praatPitchmarkerTask = project.task('praatPitchmarker', type: PraatExtractPitchmarks) {
+            group = 'MaryTTS Voicebuilding Data'
             dependsOn project.praat, templateTask
             basenamesFile = basenamesTask.destFile
             scriptFile = templateTask.destDir.file('pitchmarks.praat')
@@ -70,12 +75,14 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         def pitchmarkConverterTask = project.task('pitchmarkConverter', type: PitchmarkConverter) {
+            group = 'MaryTTS Voicebuilding Data'
             basenamesFile = basenamesTask.destFile
             srcDir = praatPitchmarkerTask.destDir
             destDir = project.layout.buildDirectory.dir('pm')
         }
 
         project.task('mcepExtractor', type: ExtractMcep) {
+            group = 'MaryTTS Voicebuilding Data'
             basenamesFile = basenamesTask.destFile
             wavDir = wavTask.destDir
             pmDir = pitchmarkConverterTask.destDir
@@ -83,6 +90,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         def generateAllophonesTask = project.task('generateAllophones', type: MaryInterfaceBatchTask) {
+            group = 'MaryTTS Voicebuilding Data'
             srcDir = project.layout.buildDirectory.dir('text')
             destDir = project.layout.buildDirectory.dir('prompt_allophones')
             inputType = 'TEXT'
@@ -93,6 +101,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         project.task('generatePhoneFeatures', type: MaryInterfaceBatchTask) {
+            group = 'MaryTTS Voicebuilding Data'
             srcDir = generateAllophonesTask.destDir
             destDir = project.layout.buildDirectory.dir('phonefeatures')
             inputType = 'ALLOPHONES'
@@ -103,6 +112,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
         }
 
         project.task('generateHalfPhoneFeatures', type: MaryInterfaceBatchTask) {
+            group = 'MaryTTS Voicebuilding Data'
             srcDir = generateAllophonesTask.destDir
             destDir = project.layout.buildDirectory.dir('halfphonefeatures')
             inputType = 'ALLOPHONES'

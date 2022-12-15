@@ -48,10 +48,11 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.tasks.register 'generateVoiceConfig', GenerateVoiceConfig, {
-
+            group = 'MaryTTS Voicebuilding Base'
         }
 
         project.tasks.register 'generateVoiceSource', GenerateVoiceSource, {
+            group = 'MaryTTS Voicebuilding Base'
             dependsOn "generateSource", "generateConfig"
             testDirectory = project.file("$project.buildDir/generatedSrc/test/groovy/voice")
             integrationTestDirectory = project.file("$project.buildDir/generatedSrc/integrationTest/groovy/voice")
@@ -94,6 +95,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.task('generatePomProperties', type: WriteProperties) {
+            group = 'MaryTTS Voicebuilding Base'
             outputFile = project.layout.buildDirectory.file('pom.properties')
             properties = [
                     groupId   : project.group,
@@ -112,6 +114,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.task('run', type: JavaExec) {
+            group = 'MaryTTS Voicebuilding Base'
             classpath = project.configurations.runtimeClasspath + project.sourceSets.main.output
             mainClass = 'marytts.server.Mary'
             systemProperty 'log4j.logger.marytts', 'INFO,stderr'
