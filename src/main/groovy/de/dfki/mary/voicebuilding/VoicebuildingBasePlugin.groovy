@@ -35,7 +35,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.dependencies {
-            api group: 'de.dfki.mary', name: "marytts-lang-$project.marytts.voice.language", version: project.marytts.version, {
+            runtimeOnly group: 'de.dfki.mary', name: "marytts-lang-$project.marytts.voice.language", version: project.marytts.version, {
                 exclude group: '*', module: 'groovy-all'
                 exclude group: 'com.twmacinta', module: 'fast-md5'
                 exclude group: 'gov.nist.math', module: 'Jampack'
@@ -65,12 +65,14 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             publications {
                 mavenJava(MavenPublication) {
                     from project.components.java
-                    pom {
-                        description = project.marytts.voice.description
-                        licenses {
-                            license {
-                                name = project.marytts.voice.license.name
-                                url = project.marytts.voice.license.url
+                    project.afterEvaluate {
+                        pom {
+                            description = project.marytts.voice.description
+                            licenses {
+                                license {
+                                    name = project.marytts.voice.license.name
+                                    url = project.marytts.voice.license.url
+                                }
                             }
                         }
                     }

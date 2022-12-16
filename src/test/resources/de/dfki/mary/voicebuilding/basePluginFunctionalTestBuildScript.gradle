@@ -124,7 +124,7 @@ task testGeneratePomFileForMavenJavaPublication(group: 'Verification') {
         def pomXml = new groovy.xml.StreamingMarkupBuilder().bind {
             project(xmlns: "http://maven.apache.org/POM/4.0.0",
                     'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance",
-                    'xsi:schemaLocation': "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd") {
+                    'xsi:schemaLocation': "http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd") {
                 modelVersion '4.0.0'
                 groupId project.group
                 artifactId projectDir.name
@@ -144,16 +144,16 @@ task testGeneratePomFileForMavenJavaPublication(group: 'Verification') {
                         scope 'compile'
                         exclusions {
                             exclusion {
-                                artifactId 'groovy-all'
-                                groupId '*'
+                                artifactId 'Jampack'
+                                groupId 'gov.nist.math'
                             }
                             exclusion {
                                 artifactId 'fast-md5'
                                 groupId 'com.twmacinta'
                             }
                             exclusion {
-                                artifactId 'Jampack'
-                                groupId 'gov.nist.math'
+                                artifactId 'groovy-all'
+                                groupId '*'
                             }
                         }
                     }
@@ -164,16 +164,16 @@ task testGeneratePomFileForMavenJavaPublication(group: 'Verification') {
                         scope 'runtime'
                         exclusions {
                             exclusion {
-                                artifactId 'groovy-all'
-                                groupId '*'
+                                artifactId 'Jampack'
+                                groupId 'gov.nist.math'
                             }
                             exclusion {
                                 artifactId 'fast-md5'
                                 groupId 'com.twmacinta'
                             }
                             exclusion {
-                                artifactId 'Jampack'
-                                groupId 'gov.nist.math'
+                                artifactId 'groovy-all'
+                                groupId '*'
                             }
                         }
                     }
