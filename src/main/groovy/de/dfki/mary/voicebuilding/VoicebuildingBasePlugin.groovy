@@ -19,8 +19,8 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
         project.sourceCompatibility = '1.8'
 
-        project.marytts.extensions.create 'voice', VoiceExtension, project
-        project.marytts.voice.extensions.create 'license', VoiceLicenseExtension, project
+        project.marytts.extensions.create('voice', VoiceExtension, project)
+        project.marytts.voice.extensions.create('license', VoiceLicenseExtension, project)
 
         project.marytts {
             component {
@@ -41,7 +41,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             integrationTestImplementation group: 'org.testng', name: 'testng', version: '7.5'
         }
 
-        project.tasks.register 'generateVoiceConfig', GenerateVoiceConfig, {
+        project.tasks.register('generateVoiceConfig', GenerateVoiceConfig) {
             group = 'MaryTTS Voicebuilding Base'
         }
 
@@ -53,7 +53,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             resourceNames.add 'LoadVoiceIT.groovy'
         }
 
-        project.generateConfig {
+        project.tasks.named('generateConfig').configure {
             dependsOn project.tasks.named("generateVoiceConfig")
         }
 
@@ -76,7 +76,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             }
         }
 
-        project.task('generatePomProperties', type: WriteProperties) {
+        project.tasks.register('generatePomProperties', WriteProperties) {
             group = 'MaryTTS Voicebuilding Base'
             outputFile = project.layout.buildDirectory.file('pom.properties')
             properties = [
@@ -86,7 +86,7 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             ]
         }
 
-        project.processResources {
+        project.tasks.named('processResources').configure {
             from project.generatePomProperties, {
                 rename { "META-INF/maven/$project.group/voice-$project.marytts.voice.name/pom.xml" }
             }
@@ -95,10 +95,10 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             }
         }
 
-        project.task('run', type: JavaExec) {
+        project.tasks.register('run', JavaExec) {
             group = 'MaryTTS Voicebuilding Base'
             classpath = project.configurations.runtimeClasspath + project.sourceSets.main.output
-            mainClass = 'marytts.server.Mary'
+            mainClass.set 'marytts.server.Mary'
             systemProperty 'log4j.logger.marytts', 'INFO,stderr'
         }
     }
