@@ -54,13 +54,6 @@ task testJavaCompatibility(group: 'Verification') {
     }
 }
 
-task testGenerateVoiceSource(group: 'Verification') {
-    dependsOn generateSource
-    doLast {
-        // TODO: assert file("$buildDir/generatedSrc/main/java/marytts/voice/$marytts.voice.nameCamelCase/Config.java").exists()
-    }
-}
-
 task testCompileJava(group: 'Verification') {
     dependsOn compileJava
     doLast {
@@ -72,14 +65,16 @@ task testCompileJava(group: 'Verification') {
 task testCompileTestGroovy(group: 'Verification') {
     dependsOn compileTestGroovy
     doLast {
-        assert file("$buildDir/classes/groovy/test/marytts/voice/$marytts.voice.nameCamelCase/ConfigTest.class").exists()
+        assert fileTree(sourceSets.test.groovy.classesDirectory)
+                .contains(file("$buildDir/classes/groovy/test/marytts/voice/$marytts.voice.nameCamelCase/VoiceConfigTest.class"))
     }
 }
 
 task testCompileIntegrationTestGroovy(group: 'Verification') {
     dependsOn compileIntegrationTestGroovy
     doLast {
-        assert file("$buildDir/classes/groovy/integrationTest/marytts/voice/$marytts.voice.nameCamelCase/LoadVoiceIT.class").exists()
+        assert fileTree(sourceSets.integrationTest.groovy.classesDirectory)
+                .contains(file("$buildDir/classes/groovy/integrationTest/marytts/voice/$marytts.voice.nameCamelCase/LoadVoiceIT.class"))
     }
 }
 

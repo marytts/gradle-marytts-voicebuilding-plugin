@@ -2,7 +2,6 @@ package de.dfki.mary.voicebuilding
 
 import de.dfki.mary.ComponentPlugin
 
-import de.dfki.mary.voicebuilding.tasks.GenerateVoiceSource
 import de.dfki.mary.voicebuilding.tasks.GenerateVoiceConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -12,7 +11,6 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.WriteProperties
-import org.gradle.api.tasks.testing.Test
 
 class VoicebuildingBasePlugin implements Plugin<Project> {
 
@@ -51,31 +49,17 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             group = 'MaryTTS Voicebuilding Base'
         }
 
-        project.tasks.register 'generateVoiceSource', GenerateVoiceSource, {
-            group = 'MaryTTS Voicebuilding Base'
-            dependsOn "generateSource", "generateConfig"
-            testDirectory = project.file("$project.buildDir/generatedSrc/test/groovy/voice")
-            integrationTestDirectory = project.file("$project.buildDir/generatedSrc/integrationTest/groovy/voice")
+        project.tasks.named('unpackTestSourceTemplates').configure {
+            resourceNames.add 'VoiceConfigTest.java'
+        }
 
+        project.tasks.named('unpackIntegrationTestSourceTemplates').configure {
+            resourceNames.add 'LoadVoiceIT.groovy'
         }
 
         project.generateConfig {
             dependsOn project.tasks.named("generateVoiceConfig")
         }
-
-        project.sourceSets {
-            test {
-                groovy {
-                    srcDirs += project.generateVoiceSource.testDirectory.get()
-                }
-            }
-            integrationTest {
-                groovy {
-                    srcDirs += project.generateVoiceSource.integrationTestDirectory.get()
-                }
-            }
-        }
-
 
         project.publishing {
             publications {
