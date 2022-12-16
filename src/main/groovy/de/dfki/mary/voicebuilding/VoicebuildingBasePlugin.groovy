@@ -5,8 +5,6 @@ import de.dfki.mary.ComponentPlugin
 import de.dfki.mary.voicebuilding.tasks.GenerateVoiceConfig
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.plugins.GroovyPlugin
-import org.gradle.api.plugins.JavaLibraryPlugin
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
 import org.gradle.api.tasks.JavaExec
@@ -16,10 +14,8 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        project.plugins.apply JavaLibraryPlugin
-        project.plugins.apply GroovyPlugin
-        project.plugins.apply MavenPublishPlugin
-        project.plugins.apply ComponentPlugin
+        project.plugins.apply(ComponentPlugin)
+        project.plugins.apply(MavenPublishPlugin)
 
         project.sourceCompatibility = '1.8'
 
