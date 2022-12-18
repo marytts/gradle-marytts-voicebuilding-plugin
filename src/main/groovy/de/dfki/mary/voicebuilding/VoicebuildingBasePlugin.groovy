@@ -7,6 +7,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin
+import org.gradle.api.publish.maven.tasks.GenerateMavenPom
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.WriteProperties
 
@@ -31,11 +32,6 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
         }
 
         project.dependencies {
-            runtimeOnly group: 'de.dfki.mary', name: "marytts-lang-$project.marytts.voice.language", version: project.marytts.version, {
-                exclude group: '*', module: 'groovy-all'
-                exclude group: 'com.twmacinta', module: 'fast-md5'
-                exclude group: 'gov.nist.math', module: 'Jampack'
-            }
             testImplementation group: 'junit', name: 'junit', version: '4.13.2'
             integrationTestImplementation localGroovy()
             integrationTestImplementation group: 'org.testng', name: 'testng', version: '7.5'
@@ -61,17 +57,6 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             publications {
                 mavenJava(MavenPublication) {
                     from project.components.java
-                    project.afterEvaluate {
-                        pom {
-                            description = project.marytts.voice.description
-                            licenses {
-                                license {
-                                    name = project.marytts.voice.license.name
-                                    url = project.marytts.voice.license.url
-                                }
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -100,6 +85,26 @@ class VoicebuildingBasePlugin implements Plugin<Project> {
             classpath = project.configurations.runtimeClasspath + project.sourceSets.main.output
             mainClass.set 'marytts.server.Mary'
             systemProperty 'log4j.logger.marytts', 'INFO,stderr'
+        }
+
+        project.afterEvaluate {
+            project.dependencies {
+                runtimeOnly group: 'de.dfki.mary', name: "marytts-lang-$project.marytts.voice.language", version: project.marytts.version, {
+                    exclude group: '*', module: 'groovy-all'
+                    exclude group: 'com.twmacinta', module: 'fast-md5'
+                    exclude group: 'gov.nist.math', module: 'Jampack'
+                }
+            }
+
+            project.tasks.withType(GenerateMavenPom).configureEach {
+                pom.description = project.marytts.voice.description
+                pom.licenses {
+                    license {
+                        name = project.marytts.voice.license.name
+                        url = project.marytts.voice.license.url
+                    }
+                }
+            }
         }
     }
 }
