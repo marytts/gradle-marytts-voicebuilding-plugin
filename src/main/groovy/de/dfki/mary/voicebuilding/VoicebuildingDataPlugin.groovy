@@ -22,19 +22,6 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
             create 'data'
         }
 
-        project.repositories {
-            exclusiveContent {
-                forRepository {
-                    maven {
-                        url 'https://oss.sonatype.org/content/repositories/snapshots'
-                    }
-                }
-                filter {
-                    includeModule 'de.dfki.mary', 'marytts-voicebuilding'
-                }
-            }
-        }
-
         project.dependencies {
             project.afterEvaluate {
                 marytts group: 'de.dfki.mary', name: "marytts-lang-$project.marytts.voice.locale.language", version: project.marytts.version, {
@@ -43,7 +30,7 @@ class VoicebuildingDataPlugin implements Plugin<Project> {
                     exclude group: 'gov.nist.math', module: 'Jampack'
                 }
             }
-            marytts group: 'de.dfki.mary', name: 'marytts-voicebuilding', version: '0.3.0-SNAPSHOT'
+            marytts group: 'de.dfki.mary', name: 'marytts-voicebuilding', version: '0.2.1'
         }
 
         def templateTask = project.task('templates', type: CopyClasspathResources) {
