@@ -2,6 +2,7 @@ package de.dfki.mary.voicebuilding.tasks
 
 import groovy.json.JsonBuilder
 import org.gradle.api.DefaultTask
+import org.gradle.api.JavaVersion
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -69,6 +70,13 @@ class MaryInterfaceBatchTask extends DefaultTask {
             mainClass = 'marytts.BatchProcessor'
             args batchFile
             systemProperties << maryttsProperties.getOrElse([:])
+            if (JavaVersion.current().java9Compatible) {
+                jvmArgs = [
+                        '--add-opens', 'java.base/java.io=ALL-UNNAMED',
+                        '--add-opens', 'java.base/java.lang=ALL-UNNAMED',
+                        '--add-opens', 'java.base/java.util=ALL-UNNAMED'
+                ]
+            }
         }
     }
 }
