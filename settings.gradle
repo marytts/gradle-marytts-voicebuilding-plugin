@@ -1,1 +1,10 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+    }
+    plugins {
+        id 'com.gradle.plugin-publish' version '0.11.0'
+    }
+}
 rootProject.name = 'gradle-marytts-voicebuilding-plugin'
+includeBuild 'gradle-marytts-component-plugin'
