@@ -65,8 +65,11 @@ class MaryInterfaceBatchTask extends DefaultTask {
         def batchFile = project.file("$temporaryDir/batch.json")
         batchFile.text = new JsonBuilder(batch).toPrettyString()
         project.javaexec {
+
             classpath project.configurations.marytts
-            main 'marytts.BatchProcessor'
+            classpath this.class.classLoader.URLs
+
+            main 'de.dfki.mary.voicebuilding.utils.BatchProcessor'
             args batchFile
             systemProperties << maryttsProperties.getOrElse([:])
         }

@@ -25,7 +25,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
 
         project.task('alignLabelsWithPrompts', type: AlignLabelsWithPrompts) {
             basenamesFile = project.basenames.destFile
-            labDir = project.layout.buildDirectory.dir('lab')
+            labDir = project.tasks.getByName("processPhoneLabels").destDir
             maryXmlDir = project.tasks.getByName('generateAllophones').destDir
             destDir = project.layout.buildDirectory.dir('allophones')
         }
@@ -122,7 +122,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         project.task('makeWaveDatagrams', type: MakeWaveDatagrams) {
             basenamesFile = project.basenames.destFile
             sampleRate = project.marytts.voice.samplingRate
-            wavDir = project.wav.destDir
+            wavDir = project.layout.buildDirectory.dir('wav')
             pmDir = project.tasks.getByName('pitchmarkConverter').destDir
             destDir = project.layout.buildDirectory.dir('waveDatagrams')
         }
@@ -299,7 +299,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.generateVoiceConfig {
-            project.afterEvaluate {
                 config.putAll([
                         'viterbi.wTargetCosts'    : 0.7,
                         'viterbi.beamsize'        : 100,
@@ -311,38 +310,37 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                         unitReaderClass           : 'marytts.unitselection.data.UnitFileReader',
                         cartReaderClass           : 'marytts.cart.io.MARYCartReader',
                         audioTimelineReaderClass  : 'marytts.unitselection.data.TimelineReader',
-                        featureFile               : "MARY_BASE/lib/voices/$project.marytts.voice.name/halfphoneFeatures_ac.mry",
-                        targetCostWeights         : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/halfphoneUnitFeatureDefinition_ac.txt",
-                        joinCostFile              : "MARY_BASE/lib/voices/$project.marytts.voice.name/joinCostFeatures.mry",
-                        joinCostWeights           : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/joinCostWeights.txt",
-                        unitsFile                 : "MARY_BASE/lib/voices/$project.marytts.voice.name/halfphoneUnits.mry",
-                        cartFile                  : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/cart.mry",
-                        audioTimelineFile         : "MARY_BASE/lib/voices/$project.marytts.voice.name/timeline_waveforms.mry",
-                        basenameTimeline          : "MARY_BASE/lib/voices/$project.marytts.voice.name/timeline_basenames.mry",
+                        featureFile               : 'MARY_BASE/lib/voices/$project.marytts.voice.name/halfphoneFeatures_ac.mry',
+                        targetCostWeights         : 'jar:/marytts/voice/$project.marytts.voice.nameCamelCase/halfphoneUnitFeatureDefinition_ac.txt',
+                        joinCostFile              : 'MARY_BASE/lib/voices/$project.marytts.voice.name/joinCostFeatures.mry',
+                        joinCostWeights           : 'jar:/marytts/voice/$project.marytts.voice.nameCamelCase/joinCostWeights.txt',
+                        unitsFile                 : 'MARY_BASE/lib/voices/$project.marytts.voice.name/halfphoneUnits.mry',
+                        cartFile                  : 'jar:/marytts/voice/$project.marytts.voice.nameCamelCase/cart.mry',
+                        audioTimelineFile         : 'MARY_BASE/lib/voices/$project.marytts.voice.name/timeline_waveforms.mry',
+                        basenameTimeline          : 'MARY_BASE/lib/voices/$project.marytts.voice.name/timeline_basenames.mry',
                         acousticModels            : 'duration F0 midF0 rightF0',
                         'duration.model'          : 'cart',
-                        'duration.data'           : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/dur.tree",
+                        'duration.data'           : 'jar:/marytts/voice/$project.marytts.voice.nameCamelCase/dur.tree',
                         'duration.attribute'      : 'd',
                         'F0.model'                : 'cart',
-                        'F0.data'                 : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/f0.left.tree",
+                        'F0.data'                 : 'jar:/marytts/voice/$project.marytts.voice.nameCamelCase/f0.left.tree',
                         'F0.attribute'            : 'f0',
                         'F0.attribute.format'     : '(0,%.0f)',
                         'F0.predictFrom'          : 'firstVowels',
                         'F0.applyTo'              : 'firstVoicedSegments',
                         'midF0.model'             : 'cart',
-                        'midF0.data'              : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/f0.mid.tree",
+                        'midF0.data'              : 'jar:/marytts/voice/$project.marytts.voice.nameCamelCase/f0.mid.tree',
                         'midF0.attribute'         : 'f0',
                         'midF0.attribute.format'  : '(50,%.0f)',
                         'midF0.predictFrom'       : 'firstVowels',
                         'midF0.applyTo'           : 'firstVowels',
                         'rightF0.model'           : 'cart',
-                        'rightF0.data'            : "jar:/marytts/voice/$project.marytts.voice.nameCamelCase/f0.right.tree",
+                        'rightF0.data'            : 'jar:/marytts/voice/$project.marytts.voice.nameCamelCase/f0.right.tree',
                         'rightF0.attribute'       : 'f0',
                         'rightF0.attribute.format': '(100,%.0f)',
                         'rightF0.predictFrom'     : 'firstVowels',
                         'rightF0.applyTo'         : 'lastVoicedSegments'
                 ])
-            }
         }
 
         project.processResources {
