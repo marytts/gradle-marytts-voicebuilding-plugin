@@ -44,6 +44,6 @@ jobs:
       - if: runner.os == 'macOS'
         run: brew install speech-tools
 
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v2.12.0
         with:
           arguments: build --warning-mode all
