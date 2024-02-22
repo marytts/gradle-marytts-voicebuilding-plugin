@@ -72,10 +72,7 @@ repositories {
     }
     exclusiveContent {
         forRepository {
-            maven {
-                name 'OSSRH-snapshots'
-                url 'https://oss.sonatype.org/content/repositories/snapshots'
-            }
+            gradlePluginPortal()
         }
         filter {
             includeModule 'de.dfki.mary', 'gradle-marytts-component-plugin'
@@ -90,7 +87,7 @@ dependencies {
         exclude group: 'com.twmacinta', module: 'fast-md5'
         exclude group: 'gov.nist.math', module: 'Jampack'
     }
-    implementation group: 'de.dfki.mary', name: 'gradle-marytts-component-plugin', version: '0.4.0-SNAPSHOT'
+    implementation group: 'de.dfki.mary', name: 'gradle-marytts-component-plugin', version: '0.3.2'
     implementation group: 'io.github.m2ci-msp', name: 'gradle-praat-wrapper-plugin', version: '0.7.0'
     implementation group: 'io.github.m2ci-msp', name: 'jtgt', version: '0.7.0'
     testImplementation group: 'org.testng', name: 'testng', version: '7.5'
