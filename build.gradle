@@ -58,27 +58,49 @@ pluginBundle {
 }
 
 repositories {
-    jcenter()
-    gradlePluginPortal()
+    mavenCentral()
+    exclusiveContent {
+        forRepository {
+            maven {
+                name 'DFKI-MLT'
+                url 'https://raw.githubusercontent.com/DFKI-MLT/Maven-Repository/main'
+            }
+        }
+        filter {
+            includeGroup 'de.dfki.lt.jtok'
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            gradlePluginPortal()
+        }
+        filter {
+            includeModule 'de.dfki.mary', 'gradle-marytts-component-plugin'
+        }
+    }
 }
 
 dependencies {
     implementation localGroovy()
-    implementation group: 'de.dfki.mary', name: 'marytts-runtime', version: maryttsVersion, {
+    implementation group: 'de.dfki.mary', name: 'marytts-runtime', version: libs.versions.marytts.get(), {
         exclude group: '*', module: 'groovy-all'
-        exclude group: '*', module: 'mwdumper'
-        exclude group: '*', module: 'sgt'
+        exclude group: 'com.twmacinta', module: 'fast-md5'
+        exclude group: 'gov.nist.math', module: 'Jampack'
     }
-    implementation group: 'de.dfki.mary', name: 'gradle-marytts-component-plugin', version: '0.2.2'
-    implementation group: 'org.m2ci.msp', name: 'gradle-praat-wrapper-plugin', version: '0.6'
-    implementation group: 'org.m2ci.msp', name: 'jtgt', version: '0.6.1'
-    testImplementation group: 'org.testng', name: 'testng', version: '7.0.0'
+    implementation group: 'de.dfki.mary', name: 'gradle-marytts-component-plugin', version: '0.3.2'
+    implementation group: 'io.github.m2ci-msp', name: 'gradle-praat-wrapper-plugin', version: '0.7.0'
+    implementation group: 'io.github.m2ci-msp', name: 'jtgt', version: '0.7.0'
+    testImplementation group: 'org.testng', name: 'testng', version: '7.5.1'
     testImplementation group: 'xmlunit', name: 'xmlunit', version: '1.6'
+}
+
+java {
+    withSourcesJar()
 }
 
 processResources {
     doLast {
-        file("$destinationDir/maryttsVersion.txt").text = maryttsVersion
+        file("$destinationDir/maryttsVersion.txt").text = libs.versions.marytts.get()
     }
 }
 
@@ -94,25 +116,14 @@ test {
         }
     }
     failFast = true
-    doFirst {
-        // path to shared testkit gradle home
-        systemProperty 'testProjectDir', temporaryDir
-        // dynamic marytts version
-        systemProperty 'maryVersion', maryttsVersion
-    }
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
+    systemProperty 'java.io.tmpdir', temporaryDir
+    systemProperty 'maryVersion', libs.versions.marytts.get()
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-            artifact sourceJar {
-                classifier 'sources'
-            }
         }
     }
     repositories {

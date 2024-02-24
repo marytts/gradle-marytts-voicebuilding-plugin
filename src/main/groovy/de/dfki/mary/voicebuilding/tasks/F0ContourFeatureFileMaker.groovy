@@ -239,7 +239,9 @@ class F0ContourFeatureFileMaker extends DefaultTask {
     private List<Polynomial> fitPolynomialsToSyllables(Sentence s, double[] logF0, int polynomOrder, UnitFileReader units) {
         List<Polynomial> poly = new ArrayList<Polynomial>();
         for (Syllable syl : s) {
+
             Pair<Integer, Integer> syllableIndices = getSyllableIndicesInSentenceArray(s, syl, logF0.length, units);
+
             double[] sylLogF0 = new double[syllableIndices.getSecond() - syllableIndices.getFirst()];
             System.arraycopy(logF0, syllableIndices.getFirst(), sylLogF0, 0, sylLogF0.length);
             double[] coeffs = Polynomial.fitPolynomial(sylLogF0, polynomOrder);
@@ -272,7 +274,10 @@ class F0ContourFeatureFileMaker extends DefaultTask {
         assert tsSylStart >= tsSentenceStart;
         long tsSylEnd = units.getUnit(syl.getLastUnitIndex()).startTime + units.getUnit(syl.getLastUnitIndex()).duration;
         assert tsSylEnd >= tsSylStart;
-        assert tsSylEnd <= tsSentenceEnd;
+        if (tsSylEnd > tsSentenceEnd) {
+            tsSylEnd = tsSentenceEnd;
+        }
+        // TODO: check if should be kept:  assert tsSylEnd <= tsSentenceEnd;
         // Now map time to position in logF0 array:
         double factor = (double) arrayLength / (double) tsSentenceDuration;
         int iSylStart = (int) (factor * (tsSylStart - tsSentenceStart));

@@ -18,7 +18,7 @@ plugins {
 ```
 For details, see https://plugins.gradle.org/plugin/de.dfki.mary.voicebuilding-legacy.
 
-Note that Gradle v6.2 or higher is required.
+Note that Gradle v7.0 or higher is required.
 
 Prerequisites
 -------------

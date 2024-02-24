@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath group: 'xmlunit', name: 'xmlunit', version: '1.6'
@@ -54,31 +54,27 @@ task testJavaCompatibility(group: 'Verification') {
     }
 }
 
-task testGenerateVoiceSource(group: 'Verification') {
-    dependsOn generateSource
+task testCompileJava(group: 'Verification') {
+    dependsOn compileJava
     doLast {
-        // TODO: assert file("$buildDir/generatedSrc/main/java/marytts/voice/$marytts.voice.nameCamelCase/Config.java").exists()
-    }
-}
-
-task testCompileGroovy(group: 'Verification') {
-    dependsOn compileGroovy
-    doLast {
-        assert file("$buildDir/classes/groovy/main/marytts/voice/$marytts.voice.nameCamelCase/${marytts.voice.nameCamelCase}Config.class").exists()
+        assert fileTree(sourceSets.main.java.classesDirectory)
+                .contains(file("$buildDir/classes/java/main/marytts/voice/$marytts.voice.nameCamelCase/${marytts.voice.nameCamelCase}Config.class"))
     }
 }
 
 task testCompileTestGroovy(group: 'Verification') {
     dependsOn compileTestGroovy
     doLast {
-        assert file("$buildDir/classes/groovy/test/marytts/voice/$marytts.voice.nameCamelCase/ConfigTest.class").exists()
+        assert fileTree(sourceSets.test.groovy.classesDirectory)
+                .contains(file("$buildDir/classes/groovy/test/marytts/voice/$marytts.voice.nameCamelCase/VoiceConfigTest.class"))
     }
 }
 
 task testCompileIntegrationTestGroovy(group: 'Verification') {
     dependsOn compileIntegrationTestGroovy
     doLast {
-        assert file("$buildDir/classes/groovy/integrationTest/marytts/voice/$marytts.voice.nameCamelCase/LoadVoiceIT.class").exists()
+        assert fileTree(sourceSets.integrationTest.groovy.classesDirectory)
+                .contains(file("$buildDir/classes/groovy/integrationTest/marytts/voice/$marytts.voice.nameCamelCase/LoadVoiceIT.class"))
     }
 }
 
@@ -128,7 +124,7 @@ task testGeneratePomFileForMavenJavaPublication(group: 'Verification') {
         def pomXml = new groovy.xml.StreamingMarkupBuilder().bind {
             project(xmlns: "http://maven.apache.org/POM/4.0.0",
                     'xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance",
-                    'xsi:schemaLocation': "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd") {
+                    'xsi:schemaLocation': "http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd") {
                 modelVersion '4.0.0'
                 groupId project.group
                 artifactId projectDir.name
@@ -148,6 +144,14 @@ task testGeneratePomFileForMavenJavaPublication(group: 'Verification') {
                         scope 'compile'
                         exclusions {
                             exclusion {
+                                artifactId 'Jampack'
+                                groupId 'gov.nist.math'
+                            }
+                            exclusion {
+                                artifactId 'fast-md5'
+                                groupId 'com.twmacinta'
+                            }
+                            exclusion {
                                 artifactId 'groovy-all'
                                 groupId '*'
                             }
@@ -159,6 +163,14 @@ task testGeneratePomFileForMavenJavaPublication(group: 'Verification') {
                         delegate.version maryVersion
                         scope 'runtime'
                         exclusions {
+                            exclusion {
+                                artifactId 'Jampack'
+                                groupId 'gov.nist.math'
+                            }
+                            exclusion {
+                                artifactId 'fast-md5'
+                                groupId 'com.twmacinta'
+                            }
                             exclusion {
                                 artifactId 'groovy-all'
                                 groupId '*'

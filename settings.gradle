@@ -1,1 +1,8 @@
 rootProject.name = 'gradle-marytts-voicebuilding-plugin'
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            version('marytts', '5.2.1')
+        }
+    }
+}

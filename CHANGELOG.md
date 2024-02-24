@@ -9,6 +9,10 @@ Gradle MaryTTS voicebuilding plugin
 - Plugin usage documented in readme
 - Testing on OpenJDK 11 and 13
 
+### Removed
+
+- Support for Gradle versions older than v7.0
+
 ### Changed
 
 - Migrate testing from Travis CI to GitHub Actions

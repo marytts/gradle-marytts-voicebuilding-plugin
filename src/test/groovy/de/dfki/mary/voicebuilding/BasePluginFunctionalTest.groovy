@@ -16,6 +16,7 @@ class BasePluginFunctionalTest {
     @BeforeSuite
     void setup() {
         def projectDir = File.createTempDir()
+        new File(projectDir, 'settings.gradle').createNewFile()
 
         gradle = GradleRunner.create()
                 .withProjectDir(projectDir)
@@ -53,10 +54,8 @@ class BasePluginFunctionalTest {
                 ['testVoiceProps', false],
                 ['testJavaCompatibility', false],
                 ['generateConfig', false],
-                ['generateVoiceSource', false],
-                // ['compileTestJava', true],
-                ['compileGroovy', true],
-                // NOTE: no need for now, but in case it is needed for the future ['compileJava', true],
+                ['compileJava', true],
+                ['compileTestGroovy', true],
                 ['compileIntegrationTestGroovy', true],
                 ['testGeneratePomFileForMavenJavaPublication', false],
                 ['generatePomProperties', true],
