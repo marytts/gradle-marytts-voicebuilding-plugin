@@ -28,12 +28,14 @@ class VoicebuildingFestvoxPlugin implements Plugin<Project> {
         }
 
         project.task('text', type: FestvoxExtractText) {
+            group = 'MaryTTS Voicebuilding FestVox'
             dependsOn project.tasks.findByName('processDataResources')
             srcFile = project.file("$project.sourceSets.data.output.resourcesDir/txt.done.data")
             destDir = project.layout.buildDirectory.dir('text')
         }
 
         project.task('lab', type: FestvoxExtractLab) {
+            group = 'MaryTTS Voicebuilding FestVox'
             srcFiles = project.files(project.tasks.getByName('processDataResources'))
             destDir = project.layout.buildDirectory.dir('lab')
             mapping = [

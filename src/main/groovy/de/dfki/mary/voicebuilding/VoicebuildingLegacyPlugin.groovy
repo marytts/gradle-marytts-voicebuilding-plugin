@@ -18,25 +18,29 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('processPhoneLabels', type: ProcessPhoneLabels) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             srcDir = project.layout.buildDirectory.dir('lab')
             destDir = project.layout.buildDirectory.dir('lab_processed')
         }
 
         project.task('alignLabelsWithPrompts', type: AlignLabelsWithPrompts) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
-            labDir = project.layout.buildDirectory.dir('lab')
+            labDir = project.tasks.getByName("processPhoneLabels").destDir
             maryXmlDir = project.tasks.getByName('generateAllophones').destDir
             destDir = project.layout.buildDirectory.dir('allophones')
         }
 
         project.task('splitPhoneLabelsIntoHalfPhones', type: SplitPhoneLabelsIntoHalfPhones) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             srcDir = project.processPhoneLabels.destDir
             destDir = project.layout.buildDirectory.dir('halfphonelab_aligned')
         }
 
         project.task('phoneUnitFileMaker', type: PhoneUnitFileMaker) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             srcDir = project.processPhoneLabels.destDir
             srcExt = 'lab'
@@ -46,6 +50,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('halfPhoneUnitFileMaker', type: PhoneUnitFileMaker) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             srcDir = project.splitPhoneLabelsIntoHalfPhones.destDir
             srcExt = 'hplab'
@@ -55,10 +60,12 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         def featureListerTask = project.task('featureLister', type: FeatureListerTask) {
+            group = 'MaryTTS Voicebuilding Legacy'
             destFile = project.legacyBuildDir.get().file('features.txt')
         }
 
         def phoneUnitFeatureListerTask = project.task('phoneUnitFeatureLister', type: PhoneUnitFeatureLister) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcFile = featureListerTask.destFile
             destFile = project.layout.buildDirectory.file('phoneUnitFeatures.txt')
             featureToListFirst = 'phone'
@@ -66,6 +73,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('phoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcDir = project.alignLabelsWithPrompts.destDir
             destDir = project.layout.buildDirectory.dir('phonefeatures')
             inputType = 'ALLOPHONES'
@@ -76,18 +84,21 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('generatePhoneFeatureDefinitionFile', type: GeneratePhoneFeatureDefinitionFile) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcDir = project.phoneUnitFeatureComputer.destDir
             srcExt = project.phoneUnitFeatureComputer.outputExt
             destFile = project.legacyBuildDir.get().file('phoneUnitFeatureDefinition.txt')
         }
 
         def halfPhoneUnitFeatureListerTask = project.task('halfPhoneUnitFeatureLister', type: PhoneUnitFeatureLister) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcFile = featureListerTask.destFile
             destFile = project.layout.buildDirectory.file('halfPhoneUnitFeatures.txt')
             featureToListFirst = 'halfphone_unitname'
         }
 
         project.task('halfPhoneUnitFeatureComputer', type: MaryInterfaceBatchTask) {
+            group = 'MaryTTS Voicebuilding Legacy'
             dependsOn featureListerTask
             srcDir = project.alignLabelsWithPrompts.destDir
             destDir = project.layout.buildDirectory.dir('halfphonefeatures')
@@ -99,12 +110,14 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('generateHalfPhoneFeatureDefinitionFile', type: GeneratePhoneFeatureDefinitionFile) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcDir = project.halfPhoneUnitFeatureComputer.destDir
             srcExt = project.halfPhoneUnitFeatureComputer.outputExt
             destFile = project.legacyBuildDir.get().file('halfphoneUnitFeatureDefinition.txt')
         }
 
         project.task('makeBasenameDatagrams', type: MakeBasenameDatagrams) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             sampleRate = project.marytts.voice.samplingRate
             pmDir = project.tasks.getByName('pitchmarkConverter').destDir
@@ -112,6 +125,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('basenameTimelineMaker', type: TimelineMaker) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             sampleRate = project.marytts.voice.samplingRate
             idxIntervalInSeconds = 2.0
@@ -120,6 +134,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('makeWaveDatagrams', type: MakeWaveDatagrams) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             sampleRate = project.marytts.voice.samplingRate
             wavDir = project.wav.destDir
@@ -128,6 +143,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('waveTimelineMaker', type: TimelineMaker) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             sampleRate = project.marytts.voice.samplingRate
             idxIntervalInSeconds = 0.1
@@ -136,6 +152,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('makeMcepDatagrams', type: MakeMcepDatagrams) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             sampleRate = project.marytts.voice.samplingRate
             mcepDir = project.mcepExtractor.destDir
@@ -143,11 +160,13 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('generateMcepTimelineHeader', type: GenerateMcepTimelineHeader) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcDir = project.mcepExtractor.destDir
             destFile = project.legacyBuildDir.get().file('timeline_mcep.properties')
         }
 
         project.task('mcepTimelineMaker', type: McepTimelineMaker) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             headerFile = project.generateMcepTimelineHeader.destFile
             sampleRate = project.marytts.voice.samplingRate
@@ -157,6 +176,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('phoneFeatureFileMaker', type: PhoneFeatureFileMaker) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             srcDir = project.phoneUnitFeatureComputer.destDir
             srcExt = project.phoneUnitFeatureComputer.outputExt
@@ -166,6 +186,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('halfPhoneFeatureFileMaker', type: PhoneFeatureFileMaker) {
+            group = 'MaryTTS Voicebuilding Legacy'
             basenamesFile = project.basenames.destFile
             srcDir = project.halfPhoneUnitFeatureComputer.destDir
             srcExt = project.halfPhoneUnitFeatureComputer.outputExt
@@ -175,6 +196,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('f0ContourFeatureFileMaker', type: F0ContourFeatureFileMaker) {
+            group = 'MaryTTS Voicebuilding Legacy'
             featureFile = project.halfPhoneFeatureFileMaker.destFile
             timelineFile = project.waveTimelineMaker.destFile
             unitFile = project.halfPhoneUnitFileMaker.destFile
@@ -183,11 +205,13 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('generateAcousticFeatureDefinitionFile', type: GenerateAcousticFeatureDefinitionFile) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcFile = project.halfPhoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('halfphoneUnitFeatureDefinition_ac.txt')
         }
 
         project.task('acousticFeatureFileMaker', type: AcousticFeatureFileMaker) {
+            group = 'MaryTTS Voicebuilding Legacy'
             featureDefinitionFile = project.generateAcousticFeatureDefinitionFile.destFile
             unitFile = project.halfPhoneUnitFileMaker.destFile
             contourFile = project.f0ContourFeatureFileMaker.destFile
@@ -196,10 +220,12 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('generateJoinCostWeights', type: GenerateJoinCostWeights) {
+            group = 'MaryTTS Voicebuilding Legacy'
             destFile = project.legacyBuildDir.get().file('joinCostWeights.txt')
         }
 
         project.task('joinCostFileMaker', type: JoinCostFileMaker) {
+            group = 'MaryTTS Voicebuilding Legacy'
             weightsFile = project.generateJoinCostWeights.destFile
             mcepFile = project.mcepTimelineMaker.destFile
             unitFile = project.halfPhoneUnitFileMaker.destFile
@@ -208,35 +234,41 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('generateFeatureSequence', type: GenerateFeatureSequence) {
+            group = 'MaryTTS Voicebuilding Legacy'
             features = ['phone']
             destFile = project.legacyBuildDir.get().file('featureSequence.txt')
         }
 
         project.task('cartBuilder', type: CartBuilder) {
+            group = 'MaryTTS Voicebuilding Legacy'
             featureFile = project.acousticFeatureFileMaker.destFile
             featureSequenceFile = project.generateFeatureSequence.destFile
             destFile = project.legacyBuildDir.get().file('cart.mry')
         }
 
         project.task('generateDurationFeatureDescription', type: GenerateProsodyFeatureDescription) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcFile = project.phoneFeatureFileMaker.destFile
             targetFeatures = ['segment_duration']
             destFile = project.layout.buildDirectory.dir('prosody').get().file('dur.desc')
         }
 
         project.task('generateF0FeatureDescription', type: GenerateProsodyFeatureDescription) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcFile = project.phoneFeatureFileMaker.destFile
             targetFeatures = ['leftF0', 'midF0', 'rightF0']
             destFile = project.layout.buildDirectory.dir('prosody').get().file('f0.desc')
         }
 
         project.task('extractDurationFeatures', type: ExtractDurationFeatures) {
+            group = 'MaryTTS Voicebuilding Legacy'
             unitFile = project.phoneUnitFileMaker.destFile
             featureFile = project.phoneFeatureFileMaker.destFile
             destFile = project.layout.buildDirectory.dir('prosody').get().file('dur.feats')
         }
 
         project.task('extractF0Features', type: ExtractF0Features) {
+            group = 'MaryTTS Voicebuilding Legacy'
             unitFile = project.phoneUnitFileMaker.destFile
             featureFile = project.phoneFeatureFileMaker.destFile
             timelineFile = project.waveTimelineMaker.destFile
@@ -244,6 +276,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('trainDurationCart', type: TrainProsodyCart) {
+            group = 'MaryTTS Voicebuilding Legacy'
             dataFile = project.extractDurationFeatures.destFile
             descriptionFile = project.generateDurationFeatureDescription.destFile
             predictee = 'segment_duration'
@@ -251,6 +284,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('trainF0LeftCart', type: TrainProsodyCart) {
+            group = 'MaryTTS Voicebuilding Legacy'
             dataFile = project.extractF0Features.destFile
             descriptionFile = project.generateF0FeatureDescription.destFile
             predictee = 'leftF0'
@@ -259,6 +293,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('trainF0MidCart', type: TrainProsodyCart) {
+            group = 'MaryTTS Voicebuilding Legacy'
             dataFile = project.extractF0Features.destFile
             descriptionFile = project.generateF0FeatureDescription.destFile
             predictee = 'midF0'
@@ -267,6 +302,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('trainF0RightCart', type: TrainProsodyCart) {
+            group = 'MaryTTS Voicebuilding Legacy'
             dataFile = project.extractF0Features.destFile
             descriptionFile = project.generateF0FeatureDescription.destFile
             predictee = 'rightF0'
@@ -275,24 +311,28 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('convertDurationCart', type: ConvertProsodyCart) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcFile = project.trainDurationCart.destFile
             featureFile = project.phoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('dur.tree')
         }
 
         project.task('convertF0LeftCart', type: ConvertProsodyCart) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcFile = project.trainF0LeftCart.destFile
             featureFile = project.phoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('f0.left.tree')
         }
 
         project.task('convertF0MidCart', type: ConvertProsodyCart) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcFile = project.trainF0MidCart.destFile
             featureFile = project.phoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('f0.mid.tree')
         }
 
         project.task('convertF0RightCart', type: ConvertProsodyCart) {
+            group = 'MaryTTS Voicebuilding Legacy'
             srcFile = project.trainF0RightCart.destFile
             featureFile = project.phoneFeatureFileMaker.destFile
             destFile = project.legacyBuildDir.get().file('f0.right.tree')
@@ -357,6 +397,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('processLegacyResources', type: Copy) {
+            group = 'MaryTTS Voicebuilding Legacy'
             from project.waveTimelineMaker,
                     project.basenameTimelineMaker,
                     project.halfPhoneUnitFileMaker,
@@ -377,6 +418,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         def legacyZipTask = project.task('legacyZip', type: Zip) {
+            group = 'Publishing'
             from project.processLegacyResources
             from project.jar, {
                 rename { "lib/$it" }
@@ -385,6 +427,7 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
         }
 
         project.task('legacyDescriptor', type: LegacyDescriptorTask) {
+            group = 'Publishing'
             srcFile = legacyZipTask.archiveFile
             def destFileName = legacyZipTask.archiveFileName.get() - '.zip' + '-component-descriptor.xml'
             destFile = project.distsDirectory.get().file(destFileName)
@@ -400,15 +443,6 @@ class VoicebuildingLegacyPlugin implements Plugin<Project> {
                 mavenJava {
                     artifact legacyZipTask
                 }
-            }
-        }
-
-        project.afterEvaluate {
-            project.dependencies {
-                api "de.dfki.mary:marytts-lang-$project.marytts.voice.language:$project.marytts.version", {
-                    exclude group: '*', module: 'groovy-all'
-                }
-                testImplementation "junit:junit:4.13"
             }
         }
     }
