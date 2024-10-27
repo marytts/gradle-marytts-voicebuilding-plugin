@@ -42,7 +42,7 @@ jobs:
           sudo apt-get -qq install sox speech-tools
 
       - if: runner.os == 'macOS'
-        run: brew install speech-tools
+        run: brew install sox speech-tools
 
       - uses: gradle/gradle-build-action@v2.12.0
         with:
